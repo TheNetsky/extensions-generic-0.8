@@ -120,6 +120,7 @@ describe('MangaGenki Tests', function () {
         expect(homePages[1], "No latest updates section available").to.exist;
         expect(homePages[2], "No top alltime section available").to.exist;
         expect(homePages[3], "No top monthly section available").to.exist;
+        expect(homePages[4], "No top weekly section available").to.exist;
     });
 
     it("Testing Notifications", async () => {

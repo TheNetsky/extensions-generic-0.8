@@ -1,34 +1,34 @@
 import { LanguageCode, SourceInfo, TagType } from "paperback-extensions-common";
 import { MangaStream } from '../MangaStream'
 
-const MANGAGENKI_DOMAIN = "https://mangagenki.com"
+const RAWKUMA_DOMAIN = "https://rawkuma.com"
 
-export const MangaGenkiInfo: SourceInfo = {
+export const RawKumaInfo: SourceInfo = {
     version: '1.0.1',
-    name: 'MangaGenki',
-    description: 'Extension that pulls manga from MangaGenki',
+    name: 'RawKuma',
+    description: 'Extension that pulls manga from RawKuma',
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: "icon.png",
     hentaiSource: false,
-    websiteBaseURL: MANGAGENKI_DOMAIN,
+    websiteBaseURL: RAWKUMA_DOMAIN,
     sourceTags: [
         {
             text: "Notifications",
             type: TagType.GREEN
         },
         {
-            text: "18+",
-            type: TagType.YELLOW
+            text: "Japanese",
+            type: TagType.GREY
         }
     ]
 }
 
-export class MangaGenki extends MangaStream {
+export class RawKuma extends MangaStream {
     //FOR ALL THE SELECTIONS, PLEASE CHECK THE MangaSteam.ts FILE!!!
 
-    baseUrl: string = MANGAGENKI_DOMAIN
-    languageCode: LanguageCode = LanguageCode.ENGLISH
+    baseUrl: string = RAWKUMA_DOMAIN
+    languageCode: LanguageCode = LanguageCode.JAPANESE
     hasAdvancedSearchPage: boolean = true
 
     //----MANGA DETAILS SELECTORS
@@ -53,7 +53,6 @@ export class MangaGenki extends MangaStream {
     homescreen_LatestUpdate_enabled: boolean = true
 
     homescreen_NewManga_enabled: boolean = true
-    homescreen_NewManga_selector: string = "h3:contains(New Titles)"
 
     homescreen_TopAllTime_enabled: boolean = true
     homescreen_TopMonthly_enabled: boolean = true
@@ -73,5 +72,4 @@ export class MangaGenki extends MangaStream {
     tags_selector_item: string = "li"
     tags_selector_label: string = "span"
     */
-
 }

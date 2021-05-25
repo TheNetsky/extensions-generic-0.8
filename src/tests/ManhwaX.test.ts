@@ -16,7 +16,7 @@ describe('ManhwaX Tests', function () {
      * Try to choose a manga which is updated frequently, so that the historical checking test can 
      * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
      */
-    var mangaId = "that-mans-epilepsy";
+    var mangaId = "masters-of-masturbation";
 
     it("Retrieve Manga Details", async () => {
         let details = await wrapper.getMangaDetails(source, mangaId);
@@ -116,10 +116,10 @@ describe('ManhwaX Tests', function () {
     it("Testing Home-Page aquisition", async () => {
         let homePages = await wrapper.getHomePageSections(source);
         expect(homePages, "No response from server").to.exist;
-        expect(homePages[0], "No popular today section available").to.exist;
-        expect(homePages[1], "No latest updates section available").to.exist;
-        expect(homePages[2], "No top alltime section available").to.exist;
-        expect(homePages[3], "No top monthly section available").to.exist;
+        expect(homePages[0], "No latest updates section available").to.exist;
+        expect(homePages[1], "No top alltime section available").to.exist;
+        expect(homePages[2], "No top monthly section available").to.exist;
+        expect(homePages[3], "No top weekly section available").to.exist;
     });
 
     it("Testing Notifications", async () => {
