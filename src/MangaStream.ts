@@ -13,6 +13,36 @@ import {
 
 import { Parser, UpdatedManga } from './MangaStreamParser'
 
+interface TimeAgo {
+    now: string[],
+    yesterday: string[],
+    years: string[],
+    months: string[],
+    weeks: string[],
+    days: string[],
+    hours: string[],
+    minutes: string[],
+    seconds: string[]
+};
+interface dateMonths {
+    january: string,
+    february: string,
+    march: string,
+    april: string,
+    may: string,
+    june: string,
+    july: string,
+    august: string,
+    september: string,
+    october: string,
+    november: string,
+    december: string
+};
+interface StatusTypes {
+    ONGOING: string,
+    COMPLETED: string
+};
+
 export abstract class MangaStream extends Source {
     /**
      * The URL of the website. Eg. https://mangadark.com without a trailing slash
@@ -35,12 +65,18 @@ export abstract class MangaStream extends Source {
      * Eg. https://mangadark.com/manga/mashle-magic-and-muscles the pathname would be "manga"
      * Default = "manga"
      */
-    sourceTraversalPathName: string = 'manga'
+    sourceTraversalPathName: string = "manga"
 
     /**
      * N/A.
      */
     hasAdvancedSearchPage: boolean = false
+
+    /**
+     * Fallback image if no image is present
+     * Default = "https://i.imgur.com/GYUxEX8.png"
+     */
+    fallbackImage: string = "https://i.imgur.com/GYUxEX8.png"
 
     //----MANGA DETAILS SELECTORS----
     /**
@@ -49,28 +85,86 @@ export abstract class MangaStream extends Source {
      * Leave default if not used!
      * Default = "b:contains(Alternative Titles)"
     */
-    mangaAlternativeTitlesSelector: string = "b:contains(Alternative Titles)"
+    manga_selector_AlternativeTitles: string = "Alternative Titles"
     /**
-     * The selector for alternative titles.
+     * The selector for authors.
      * This can change depending on the language
      * Leave default if not used!
-     * Default = "b:contains(Author)"
+     * Default = "Author" (English)
     */
-    mangaAuthorSelector: string = "b:contains(Author)"
+    manga_selector_author: string = "Author"
+    /**
+     * The selector for artists.
+     * This can change depending on the language
+     * Leave default if not used!
+     * Default = "Artist" (English)
+    */
+    manga_selector_artist: string = "Artist"
 
+    manga_selector_status: string = "Status"
+
+    manga_tag_selector_box: string = "span.mgen"
+
+    manga_tag_TraversalPathName: string = "genres"
+    /**
+     * The selector for the manga status.
+     * These can change depending on the language
+     * Default = "ONGOING: "ONGOING", COMPLETED: "COMPLETED"
+    */
+    manga_StatusTypes: StatusTypes = {
+        ONGOING: "ONGOING",
+        COMPLETED: "COMPLETED"
+    }
+
+
+    //----DATE SELECTORS----
+    /**
+     * Enter the months for the website's language in correct order, case insensitive.
+     * Default = English Translation
+     */
+    dateMonths: dateMonths = {
+        january: "January",
+        february: "February",
+        march: "March",
+        april: "April",
+        may: "May",
+        june: "June",
+        july: "July",
+        august: "August",
+        september: "September",
+        october: "October",
+        november: "November",
+        december: "December"
+    };
+    /**
+     * In this object, add the site's translations for the following time formats, case insensitive.
+     * If the site uses "12 hours ago" or "1 hour ago", only adding "hour" will be enough since "hours" includes "hour".
+     * Default =  English Translation
+     */
+    dateTimeAgo: TimeAgo = {
+        now: ["less than an hour", "just now"],
+        yesterday: ["yesterday"],
+        years: ["year"],
+        months: ["month"],
+        weeks: ["week"],
+        days: ["day"],
+        hours: ["hour"],
+        minutes: ["min"],
+        seconds: ["second"]
+    };
     //----CHAPTER SELECTORS----
     /**
      * The selector for the chapter box
      * This box contains all the chapter items
      * Default = "div#chapterlist.eplister"
     */
-    chapterBoxSelector: string = "div#chapterlist.eplister"
+    chapter_selector_box: string = "div#chapterlist.eplister"
     /**
      * The selector for each individual chapter element
      * This is the element for each small box containing the chapter information
      * Default = "li"
     */
-    chapterElementSelector: string = "li"
+    chapter_selector_item: string = "li"
 
     //----TAGS SELECTORS----
     /**
@@ -78,63 +172,51 @@ export abstract class MangaStream extends Source {
      * Eg. https://mangadark.com/genres/ needs this selector to be set to "/genres/"
      * Default = ""
     */
-    tagsSubdirectoryPathName: string = ""
+    tags_SubdirectoryPathName: string = ""
     /**
      * The selector to select the box with all the genres
      * Default = "ul.genre"
     */
-    tagsBoxSelector: string = "ul.genre"
+    tags_selector_box: string = "ul.genre"
     /**
-     * The selector to select each individual genre boxes
+     * The selector to select each individual genre box
      * Default = "li"
     */
-    tagsElementSelector: string = "li"
+    tags_selector_item: string = "li"
     /**
      * The selector to select the label name
      * Some sites have a result number after the genre name, this selector allows you to filter this.
      * Default = ""
     */
-    tagsLabelSelector: string = ""
+    tags_selector_label: string = ""
 
     //----HOMESCREEN SELECTORS----
     /**
      * Enable or disable the "Popular Today" section on the homescreen
      * Some sites don't have this section on this homescreen, if they don't disable this.
-     * Default = true
+     * Enabled Default = true
+     * Selector Default = "h2:contains(Popular Today)"
     */
-    homescreenPopularTodayEnabled: boolean = true
-    /**
-     * The selector for the "Popular Today" section.
-     * This can change depending on the language
-     * Default = "h2:contains(Popular Today)"
-    */
-    homescreenPopularTodaySelector: string = "h2:contains(Popular Today)"
+    homescreen_PopularToday_enabled: boolean = true
+    homescreen_PopularToday_selector: string = "h2:contains(Popular Today)"
 
-    homescreenLatestUpdateEnabled: boolean = true
-    homescreenLatestUpdateBoxSelector: string = "h2:contains(Latest Update)"
-    homescreenLatestUpdateElementSelector: string = "div.uta"
+    homescreen_LatestUpdate_enabled: boolean = true
+    homescreen_LatestUpdate_selector_box: string = "h2:contains(Latest Update)"
+    homescreen_LatestUpdate_selector_item: string = "div.uta"
 
-    homescreenNewMangaEnabled: boolean = true
-    homescreenNewMangaSelector: string = "h3:contains(New Series)"
+    homescreen_NewManga_enabled: boolean = true
+    homescreen_NewManga_selector: string = "h3:contains(New Series)"
 
-    homescreenTopAllTimeEnabled: boolean = true
-    homescreenTopAllTimeSelector: string = "div.serieslist.pop.wpop.wpop-alltime"
+    homescreen_TopAllTime_enabled: boolean = true
+    homescreen_TopAllTime_selector: string = "div.serieslist.pop.wpop.wpop-alltime"
 
-    homescreenTopMonthlyEnabled: boolean = true
-    homescreenTopMonthlySelector: string = "div.serieslist.pop.wpop.wpop-monthly"
+    homescreen_TopMonthly_enabled: boolean = true
+    homescreen_TopMonthly_selector: string = "div.serieslist.pop.wpop.wpop-monthly"
 
-    //----FILTER UPDATED MANGA SELECTORS----
-    /**
-     * The selector for the updated manga section
-     * This uses the @homescreenLatestUpdateBoxSelector by default
-    */
-    updateBoxSelector: string = this.homescreenLatestUpdateBoxSelector
-    /**
-     * The selector for the updated manga section
-     * This uses the @homescreenLatestUpdateBoxSelector by default
-    */
-    updateElementSelector: string = this.homescreenLatestUpdateElementSelector
+    homescreen_TopWeekly_enabled: boolean = true
+    homescreen_TopWeekly_selector: string = "div.serieslist.pop.wpop.wpop-weekly"
 
+    //----REQUEST MANAGER----
     requestManager = createRequestManager({
         requestsPerSecond: 2.5,
         requestTimeout: 15000,
@@ -150,7 +232,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}`,
             method: 'GET',
-            headers: this.constructHeaders({})
+        //    headers: this.constructHeaders({})
         });
 
         const response = await this.requestManager.schedule(request, 1);
@@ -164,7 +246,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${mangaId}`,
             method: 'GET',
-            headers: this.constructHeaders({})
+        //    headers: this.constructHeaders({})
         });
 
         const response = await this.requestManager.schedule(request, 1);
@@ -178,7 +260,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${chapterId}`,
             method: 'GET',
-            headers: this.constructHeaders({}),
+         //   headers: this.constructHeaders({}),
         });
 
         const response = await this.requestManager.schedule(request, 1);
@@ -190,7 +272,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: this.baseUrl,
             method: "GET",
-            param: this.tagsSubdirectoryPathName
+            param: this.tags_SubdirectoryPathName
         });
 
         const response = await this.requestManager.schedule(request, 1);
@@ -252,13 +334,15 @@ export abstract class MangaStream extends Source {
         const section3 = createHomeSection({ id: 'new_titles', title: 'New Titles', view_more: true });
         const section4 = createHomeSection({ id: 'top_alltime', title: 'Top All Time', view_more: false });
         const section5 = createHomeSection({ id: 'top_monthly', title: 'Top Monthly', view_more: false });
+        const section6 = createHomeSection({ id: 'top_weekly', title: 'Top Weekly', view_more: false });
 
         const sections: any[] = [];
-        if (this.homescreenPopularTodayEnabled) sections.push(section1);
-        if (this.homescreenLatestUpdateEnabled) sections.push(section2);
-        if (this.homescreenNewMangaEnabled) sections.push(section3);
-        if (this.homescreenTopAllTimeEnabled) sections.push(section4);
-        if (this.homescreenTopMonthlyEnabled) sections.push(section5);
+        if (this.homescreen_PopularToday_enabled) sections.push(section1);
+        if (this.homescreen_LatestUpdate_enabled) sections.push(section2);
+        if (this.homescreen_NewManga_enabled) sections.push(section3);
+        if (this.homescreen_TopAllTime_enabled) sections.push(section4);
+        if (this.homescreen_TopMonthly_enabled) sections.push(section5);
+        if (this.homescreen_TopWeekly_enabled) sections.push(section6);
 
         const request = createRequestObject({
             url: this.baseUrl,
@@ -276,13 +360,13 @@ export abstract class MangaStream extends Source {
         let param = "";
         switch (homepageSectionId) {
             case "new_titles":
-                param = `/manga/?page=${page}&order=latest`;
+                param = `/${this.sourceTraversalPathName}/?page=${page}&order=latest`;
                 break;
             case "latest_update":
-                param = `/manga/?page=${page}&order=update`;
+                param = `/${this.sourceTraversalPathName}/?page=${page}&order=update`;
                 break;
             case "popular_today":
-                param = `/manga/?page=${page}&order=popular`;
+                param = `/${this.sourceTraversalPathName}/?page=${page}&order=popular`;
                 break;
             default:
                 return Promise.resolve(null);;
@@ -309,10 +393,10 @@ export abstract class MangaStream extends Source {
         return createRequestObject({
             url: this.baseUrl,
             method: 'GET',
-            headers: this.constructHeaders({})
+           // headers: this.constructHeaders({})
         })
     }
-
+/*
     constructHeaders(headers: any, refererPath?: string): any {
         if (this.userAgentRandomizer !== '') {
             headers["user-agent"] = this.userAgentRandomizer;
@@ -335,7 +419,7 @@ export abstract class MangaStream extends Source {
             }
         }
     }
-
+*/
     CloudFlareError(status: any) {
         if (status == 503) {
             throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > \<\The name of this source\> and press Cloudflare Bypass');

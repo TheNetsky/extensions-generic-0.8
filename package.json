@@ -1,6 +1,6 @@
 {
   "name": "mangastream-extensions",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "repositoryName": "MangaStream Extensions",
   "description": "Contains sources using the MangaStream template",
   "scripts": {
@@ -17,6 +17,7 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "cheerio": "^1.0.0-rc.5",
+    "entities": "^2.2.0",
     "paperback-cli": "^1.2.5",
     "paperback-extensions-common": "^2.1.125",
     "ts-mocha": "^7.0.0",

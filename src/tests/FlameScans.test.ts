@@ -1,12 +1,12 @@
 import cheerio from 'cheerio'
 import { MangaStream } from '../MangaStream'
-import { MangaDark } from '../MangaDark/MangaDark'
+import { FlameScans } from '../FlameScans/FlameScans'
 import { APIWrapper } from "paperback-extensions-common";
 
-describe('DarkManga Tests', function () {
+describe('FlameScans Tests', function () {
 
     var wrapper: APIWrapper = new APIWrapper();
-    var source: MangaStream = new MangaDark(cheerio);
+    var source: MangaStream = new FlameScans(cheerio);
     var chai = require('chai'), expect = chai.expect, should = chai.should();
     var chaiAsPromised = require('chai-as-promised');
     chai.use(chaiAsPromised);
@@ -16,7 +16,7 @@ describe('DarkManga Tests', function () {
      * Try to choose a manga which is updated frequently, so that the historical checking test can 
      * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
      */
-    var mangaId = "tomb-raider-king";
+    var mangaId = "hero-of-his-own-opinion";
 
     it("Retrieve Manga Details", async () => {
         let details = await wrapper.getMangaDetails(source, mangaId);
@@ -124,7 +124,7 @@ describe('DarkManga Tests', function () {
     });
 
     it("Testing Notifications", async () => {
-        let updates = await wrapper.filterUpdatedManga(source, new Date("2021-2-10"), [mangaId, "omukae-shibuya-kun", "kill-the-hero"]);
+        let updates = await wrapper.filterUpdatedManga(source, new Date("2021-4-20"), [mangaId]);
         expect(updates, "No server response").to.exist
         expect(updates, "Empty server response").to.not.be.empty
         expect(updates[0], "No updates").to.not.be.empty;
