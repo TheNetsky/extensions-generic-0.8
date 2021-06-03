@@ -62,7 +62,7 @@ export class Parser {
         return createManga({
             id: mangaId,
             titles: titles,
-            image: image == "" ? source.fallbackImage : image,
+            image: !image ? source.fallbackImage : image,
             rating: 0,
             status: status,
             author: author == "" ? "Unknown" : author,
@@ -153,7 +153,7 @@ export class Parser {
             if (collectedIds.includes(id) || !id || !title) continue;
             mangas.push(createMangaTile({
                 id,
-                image: image == "" ? source.fallbackImage : image,
+                image: !image ? source.fallbackImage : image,
                 title: createIconText({ text: this.decodeHTMLEntity(title) }),
                 subtitleText: createIconText({ text: subtitle }),
             }));
@@ -166,10 +166,12 @@ export class Parser {
         const updatedManga: string[] = [];
         let loadMore = true;
         const isLast = this.isLastPage($, "view_more"); //Check if it's the last page or not, needed for some sites!
+        if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error("Unable to parse valid update sectiond!");
         for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
             const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
             const mangaDate = convertDateAgo($("li > span", $("div.luf", manga)).first().text().trim(), source);
             //Check if manga time is older than the time porvided, is this manga has an update. Return this.
+            if (!id) continue;
             if (mangaDate > time) {
                 if (ids.includes(id)) {
                     updatedManga.push(id);
@@ -195,6 +197,7 @@ export class Parser {
             //Popular Today
             if (section.id == "popular_today") {
                 const popularToday: MangaTile[] = [];
+                if (!$("div.bsx", $(source.homescreen_PopularToday_selector)?.parent()?.next()).length) throw new Error("Unable to parse valid Popular Today section!");
                 for (const manga of $("div.bsx", $(source.homescreen_PopularToday_selector).parent().next()).toArray()) {
                     const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
                     const title = $("a", manga).attr('title');
@@ -203,7 +206,7 @@ export class Parser {
                     if (!id || !title) continue;
                     popularToday.push(createMangaTile({
                         id: id,
-                        image: image == "" ? source.fallbackImage : image,
+                        image: !image ? source.fallbackImage : image,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                         subtitleText: createIconText({ text: subtitle }),
                     }));
@@ -215,6 +218,7 @@ export class Parser {
             //Latest Update
             if (section.id == "latest_update") {
                 const latestUpdate: MangaTile[] = [];
+                if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error("Unable to parse valid Latest Update section!");
                 for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
                     const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
                     const title = $("a", manga).attr('title');
@@ -223,7 +227,7 @@ export class Parser {
                     if (!id || !title) continue;
                     latestUpdate.push(createMangaTile({
                         id: id,
-                        image: image == "" ? source.fallbackImage : image,
+                        image: !image ? source.fallbackImage : image,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                         subtitleText: createIconText({ text: subtitle }),
                     }));
@@ -235,6 +239,7 @@ export class Parser {
             //New Titles
             if (section.id == "new_titles") {
                 const NewTitles: MangaTile[] = [];
+                if (!$("li", $(source.homescreen_NewManga_selector)?.parent()?.next()).length) throw new Error("Unable to parse valid New Titles section!");
                 for (const manga of $("li", $(source.homescreen_NewManga_selector).parent().next()).toArray()) {
                     const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
                     const title = $("h2", manga).text().trim();
@@ -242,7 +247,7 @@ export class Parser {
                     if (!id || !title) continue;
                     NewTitles.push(createMangaTile({
                         id: id,
-                        image: image == "" ? source.fallbackImage : image,
+                        image: !image ? source.fallbackImage : image,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                     }));
                 }
@@ -260,7 +265,7 @@ export class Parser {
                     if (!id || !title) continue;
                     TopAllTime.push(createMangaTile({
                         id: id,
-                        image: image == "" ? source.fallbackImage : image,
+                        image: !image ? source.fallbackImage : image,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                     }));
                 }
@@ -278,7 +283,7 @@ export class Parser {
                     if (!id || !title) continue;
                     TopMonthly.push(createMangaTile({
                         id: id,
-                        image: image == "" ? source.fallbackImage : image,
+                        image: !image ? source.fallbackImage : image,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                     }));
                 }
@@ -296,7 +301,7 @@ export class Parser {
                     if (!id || !title) continue;
                     TopWeekly.push(createMangaTile({
                         id: id,
-                        image: image == "" ? source.fallbackImage : image,
+                        image: !image ? source.fallbackImage : image,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                     }));
                 }
@@ -318,7 +323,7 @@ export class Parser {
             if (collectedIds.includes(id) || !id || !title) continue;
             mangas.push(createMangaTile({
                 id,
-                image: image == "" ? source.fallbackImage : image,
+                image: !image ? source.fallbackImage : image,
                 title: createIconText({ text: this.decodeHTMLEntity(title) }),
                 subtitleText: createIconText({ text: subtitle }),
             }));
