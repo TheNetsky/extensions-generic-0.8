@@ -348,8 +348,9 @@ export class Parser {
 
     protected getImageSrc(imageObj: Cheerio | undefined): string {
         let image;
-        if (typeof imageObj?.attr('data-src') != 'undefined') {
-            image = imageObj?.attr('data-src');
+
+        if (typeof imageObj?.attr('src') != 'undefined') {
+            image = imageObj?.attr('src');
         }
         else if (typeof imageObj?.attr('data-lazy-src') != 'undefined') {
             image = imageObj?.attr('data-lazy-src')
@@ -358,7 +359,7 @@ export class Parser {
             image = imageObj?.attr('srcset')?.split(' ')[0] ?? '';
         }
         else {
-            image = imageObj?.attr('src');
+            image = imageObj?.attr('data-src');
         }
         return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')));
     }

@@ -158,7 +158,7 @@ export abstract class MangaStream extends Source {
      * This box contains all the chapter items
      * Default = "div#chapterlist.eplister"
     */
-    chapter_selector_box: string = "div#chapterlist.eplister"
+    chapter_selector_box: string = "div#chapterlist"
     /**
      * The selector for each individual chapter element
      * This is the element for each small box containing the chapter information
@@ -232,7 +232,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}`,
             method: 'GET',
-        //    headers: this.constructHeaders({})
+            headers: this.constructHeaders({})
         });
 
         const response = await this.requestManager.schedule(request, 1);
@@ -244,9 +244,9 @@ export abstract class MangaStream extends Source {
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/${mangaId}`,
+            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}`,
             method: 'GET',
-        //    headers: this.constructHeaders({})
+            headers: this.constructHeaders({})
         });
 
         const response = await this.requestManager.schedule(request, 1);
@@ -260,7 +260,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${chapterId}`,
             method: 'GET',
-         //   headers: this.constructHeaders({}),
+            headers: this.constructHeaders({}),
         });
 
         const response = await this.requestManager.schedule(request, 1);
@@ -393,10 +393,10 @@ export abstract class MangaStream extends Source {
         return createRequestObject({
             url: this.baseUrl,
             method: 'GET',
-           // headers: this.constructHeaders({})
+            headers: this.constructHeaders({})
         })
     }
-/*
+
     constructHeaders(headers: any, refererPath?: string): any {
         if (this.userAgentRandomizer !== '') {
             headers["user-agent"] = this.userAgentRandomizer;
@@ -419,7 +419,7 @@ export abstract class MangaStream extends Source {
             }
         }
     }
-*/
+
     CloudFlareError(status: any) {
         if (status == 503) {
             throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > \<\The name of this source\> and press Cloudflare Bypass');
