@@ -1,8 +1,8 @@
 {
   "name": "mangastream-extensions",
   "version": "1.1.0",
-  "repositoryName": "MangaStream Extensions",
-  "description": "Contains sources using the MangaStream template",
+  "repositoryName": "MangaStream Extensions (Dev)",
+  "description": "DEVELOPMENT VERSIONS",
   "scripts": {
     "start": "tsc && node dist/api.js",
     "build": "tsc",
