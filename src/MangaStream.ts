@@ -225,12 +225,12 @@ export abstract class MangaStream extends Source {
     parser = new Parser();
 
     getMangaShareUrl(mangaId: string): string {
-        return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}`;
+        return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`;
     }
 
     async getMangaDetails(mangaId: string): Promise<Manga> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}`,
+            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
             method: 'GET',
             headers: this.constructHeaders({})
         });
@@ -244,7 +244,7 @@ export abstract class MangaStream extends Source {
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}`,
+            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
             method: 'GET',
             headers: this.constructHeaders({})
         });
@@ -258,7 +258,7 @@ export abstract class MangaStream extends Source {
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/${chapterId}`,
+            url: `${this.baseUrl}/${chapterId}/`,
             method: 'GET',
             headers: this.constructHeaders({}),
         });
@@ -270,7 +270,7 @@ export abstract class MangaStream extends Source {
 
     async getTags(): Promise<TagSection[] | null> {
         const request = createRequestObject({
-            url: this.baseUrl,
+            url: `${this.baseUrl}/`,
             method: "GET",
             param: this.tags_SubdirectoryPathName
         });
@@ -345,7 +345,7 @@ export abstract class MangaStream extends Source {
         if (this.homescreen_TopWeekly_enabled) sections.push(section6);
 
         const request = createRequestObject({
-            url: this.baseUrl,
+            url: `${this.baseUrl}/`,
             method: "GET",
         });
 
@@ -373,7 +373,7 @@ export abstract class MangaStream extends Source {
         }
 
         const request = createRequestObject({
-            url: this.baseUrl,
+            url: `${this.baseUrl}/`,
             method: "GET",
             param,
         });
@@ -391,7 +391,7 @@ export abstract class MangaStream extends Source {
 
     getCloudflareBypassRequest() {
         return createRequestObject({
-            url: this.baseUrl,
+            url: `${this.baseUrl}/`,
             method: 'GET',
             headers: this.constructHeaders({})
         })

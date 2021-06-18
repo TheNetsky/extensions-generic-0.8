@@ -62,7 +62,7 @@ export class Parser {
         return createManga({
             id: mangaId,
             titles: titles,
-            image: !image ? source.fallbackImage : image,
+            image: image ? image : source.fallbackImage,
             rating: 0,
             status: status,
             author: author == "" ? "Unknown" : author,
@@ -153,7 +153,7 @@ export class Parser {
             if (collectedIds.includes(id) || !id || !title) continue;
             mangas.push(createMangaTile({
                 id,
-                image: !image ? source.fallbackImage : image,
+                image: image ? image : source.fallbackImage,
                 title: createIconText({ text: this.decodeHTMLEntity(title) }),
                 subtitleText: createIconText({ text: subtitle }),
             }));
@@ -206,7 +206,7 @@ export class Parser {
                     if (!id || !title) continue;
                     popularToday.push(createMangaTile({
                         id: id,
-                        image: !image ? source.fallbackImage : image,
+                        image: image ? image : source.fallbackImage,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                         subtitleText: createIconText({ text: subtitle }),
                     }));
@@ -227,7 +227,7 @@ export class Parser {
                     if (!id || !title) continue;
                     latestUpdate.push(createMangaTile({
                         id: id,
-                        image: !image ? source.fallbackImage : image,
+                        image: image ? image : source.fallbackImage,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                         subtitleText: createIconText({ text: subtitle }),
                     }));
@@ -247,7 +247,7 @@ export class Parser {
                     if (!id || !title) continue;
                     NewTitles.push(createMangaTile({
                         id: id,
-                        image: !image ? source.fallbackImage : image,
+                        image: image ? image : source.fallbackImage,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                     }));
                 }
@@ -265,7 +265,7 @@ export class Parser {
                     if (!id || !title) continue;
                     TopAllTime.push(createMangaTile({
                         id: id,
-                        image: !image ? source.fallbackImage : image,
+                        image: image ? image : source.fallbackImage,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                     }));
                 }
@@ -283,7 +283,7 @@ export class Parser {
                     if (!id || !title) continue;
                     TopMonthly.push(createMangaTile({
                         id: id,
-                        image: !image ? source.fallbackImage : image,
+                        image: image ? image : source.fallbackImage,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                     }));
                 }
@@ -301,7 +301,7 @@ export class Parser {
                     if (!id || !title) continue;
                     TopWeekly.push(createMangaTile({
                         id: id,
-                        image: !image ? source.fallbackImage : image,
+                        image: image ? image : source.fallbackImage,
                         title: createIconText({ text: this.decodeHTMLEntity(title) }),
                     }));
                 }
@@ -323,7 +323,7 @@ export class Parser {
             if (collectedIds.includes(id) || !id || !title) continue;
             mangas.push(createMangaTile({
                 id,
-                image: !image ? source.fallbackImage : image,
+                image: image ? image : source.fallbackImage,
                 title: createIconText({ text: this.decodeHTMLEntity(title) }),
                 subtitleText: createIconText({ text: subtitle }),
             }));
