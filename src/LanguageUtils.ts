@@ -20,8 +20,10 @@ export function convertDateAgo(date: string, source: any) {
     //Get type of time that has passed
     let timeType: string | null = null;
     for (const typeOfTime in timeObject) {
-        if (dateString.includes(timeObject[typeOfTime.toLowerCase()])) {
-            timeType = typeOfTime;
+        for (const item of timeObject[typeOfTime]) {
+            if (dateString.includes(item.toLowerCase())) {
+                timeType = typeOfTime;
+            }
         }
     }
 

@@ -81,7 +81,7 @@ export class Parser {
         if (mangaId.toUpperCase().endsWith("-RAW") && source.languageCode == "gb") langCode = LanguageCode.KOREAN;
         for (const chapter of $(source.chapter_selector_item, source.chapter_selector_box).toArray()) {
             const title = $("span.chapternum", chapter).text().trim();
-            const id = $("a", chapter).attr('href')?.replace(`${source.baseUrl}/`, "")?.replace(/\/$/, "") ?? "";
+            const id = this.idCleaner($("a", chapter).attr('href') ?? "", source);
             const date = convertDate($("span.chapterdate", chapter).text().trim(), source);
             const getNumber = chapter.attribs["data-num"];
             const chapterNumberRegex = getNumber.match(/(\d+\.?\d?)/);
@@ -146,7 +146,7 @@ export class Parser {
         const collectedIds: string[] = [];
 
         for (const manga of $("div.bs", "div.listupd").toArray()) {
-            const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
+            const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
             const title = $("a", manga).attr('title');
             const image = this.getImageSrc($("img", manga))?.split("?resize")[0] ?? "";
             const subtitle = $("div.epxs", manga).text().trim();
@@ -168,7 +168,7 @@ export class Parser {
         const isLast = this.isLastPage($, "view_more"); //Check if it's the last page or not, needed for some sites!
         if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error("Unable to parse valid update sectiond!");
         for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
-            const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
+            const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
             const mangaDate = convertDateAgo($("li > span", $("div.luf", manga)).first().text().trim(), source);
             //Check if manga time is older than the time porvided, is this manga has an update. Return this.
             if (!id) continue;
@@ -199,8 +199,7 @@ export class Parser {
                 const popularToday: MangaTile[] = [];
                 if (!$("div.bsx", $(source.homescreen_PopularToday_selector)?.parent()?.next()).length) throw new Error("Unable to parse valid Popular Today section!");
                 for (const manga of $("div.bsx", $(source.homescreen_PopularToday_selector).parent().next()).toArray()) {
-                    const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
-                    const title = $("a", manga).attr('title');
+                    const id = this.idCleaner($("a", manga).attr('href') ?? "", source); const title = $("a", manga).attr('title');
                     const image = this.getImageSrc($("img", manga))?.split("?resize")[0] ?? "";
                     const subtitle = $("div.epxs", manga).text().trim();
                     if (!id || !title) continue;
@@ -220,7 +219,7 @@ export class Parser {
                 const latestUpdate: MangaTile[] = [];
                 if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error("Unable to parse valid Latest Update section!");
                 for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
-                    const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
+                    const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
                     const title = $("a", manga).attr('title');
                     const image = this.getImageSrc($("img", manga))?.split("?resize")[0] ?? "";
                     const subtitle = $("li > span", $("div.luf", manga)).first().text().trim()
@@ -241,7 +240,7 @@ export class Parser {
                 const NewTitles: MangaTile[] = [];
                 if (!$("li", $(source.homescreen_NewManga_selector)?.parent()?.next()).length) throw new Error("Unable to parse valid New Titles section!");
                 for (const manga of $("li", $(source.homescreen_NewManga_selector).parent().next()).toArray()) {
-                    const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
+                    const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
                     const title = $("h2", manga).text().trim();
                     const image = this.getImageSrc($("img", manga))?.split("?resize")[0] ?? "";
                     if (!id || !title) continue;
@@ -259,7 +258,7 @@ export class Parser {
             if (section.id == "top_alltime") {
                 const TopAllTime: MangaTile[] = [];
                 for (const manga of $("li", source.homescreen_TopAllTime_selector).toArray()) {
-                    const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
+                    const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
                     const title = $("h2", manga).text().trim();
                     const image = this.getImageSrc($("img", manga))?.split("?resize")[0] ?? "";
                     if (!id || !title) continue;
@@ -277,7 +276,7 @@ export class Parser {
             if (section.id == "top_monthly") {
                 const TopMonthly: MangaTile[] = [];
                 for (const manga of $("li", source.homescreen_TopMonthly_selector).toArray()) {
-                    const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
+                    const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
                     const title = $("h2", manga).text().trim();
                     const image = this.getImageSrc($("img", manga))?.split("?resize")[0] ?? "";
                     if (!id || !title) continue;
@@ -295,7 +294,7 @@ export class Parser {
             if (section.id == "top_weekly") {
                 const TopWeekly: MangaTile[] = [];
                 for (const manga of $("li", source.homescreen_TopWeekly_selector).toArray()) {
-                    const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
+                    const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
                     const title = $("h2", manga).text().trim();
                     const image = this.getImageSrc($("img", manga))?.split("?resize")[0] ?? "";
                     if (!id || !title) continue;
@@ -316,7 +315,7 @@ export class Parser {
         const collectedIds: string[] = [];
 
         for (const manga of $("div.bs", "div.listupd").toArray()) {
-            const id = $("a", manga).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, "")?.replace(/\/$/, "") ?? "";
+            const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
             const title = $("a", manga).attr('title');
             const image = this.getImageSrc($("img", manga))?.split("?resize")[0] ?? "";
             const subtitle = $("div.epxs", manga).text().trim();
@@ -366,5 +365,14 @@ export class Parser {
 
     protected decodeHTMLEntity(str: string): string {
         return entities.decodeHTML(str);
+    }
+
+    protected idCleaner(str: string, source: any): string {
+        const base = source.baseUrl.split("://").pop();
+        str = str.replace(/(https:\/\/|http:\/\/)/, "");
+        str = str.replace(/\/$/, "");
+        str = str.replace(`${base}/`, "");
+        str = str.replace(`${source.sourceTraversalPathName}/`, "");
+        return str
     }
 }
