@@ -11,7 +11,7 @@ import {
 
 } from "paperback-extensions-common"
 
-import { Parser, UpdatedManga } from './MangaStreamParser'
+import { MangaStreamParser, UpdatedManga } from './MangaStreamParser'
 
 interface TimeAgo {
     now: string[],
@@ -222,7 +222,7 @@ export abstract class MangaStream extends Source {
         requestTimeout: 15000,
     });
 
-    parser = new Parser();
+    parser = new MangaStreamParser();
 
     getMangaShareUrl(mangaId: string): string {
         return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`;

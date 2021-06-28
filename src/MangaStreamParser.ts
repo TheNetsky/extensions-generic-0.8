@@ -20,7 +20,7 @@ export interface UpdatedManga {
     loadMore: boolean;
 }
 
-export class Parser {
+export class MangaStreamParser {
 
     parseMangaDetails($: CheerioSelector, mangaId: string, source: any): Manga {
         const titles = [];
@@ -166,7 +166,7 @@ export class Parser {
         const updatedManga: string[] = [];
         let loadMore = true;
         const isLast = this.isLastPage($, "view_more"); //Check if it's the last page or not, needed for some sites!
-        if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error("Unable to parse valid update sectiond!");
+        if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error("Unable to parse valid update section!");
         for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
             const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
             const mangaDate = convertDateAgo($("li > span", $("div.luf", manga)).first().text().trim(), source);
@@ -197,7 +197,10 @@ export class Parser {
             //Popular Today
             if (section.id == "popular_today") {
                 const popularToday: MangaTile[] = [];
-                if (!$("div.bsx", $(source.homescreen_PopularToday_selector)?.parent()?.next()).length) throw new Error("Unable to parse valid Popular Today section!");
+                if (!$("div.bsx", $(source.homescreen_PopularToday_selector)?.parent()?.next()).length) {
+                    console.log("Unable to parse valid Popular Today section!")
+                    continue;
+                }
                 for (const manga of $("div.bsx", $(source.homescreen_PopularToday_selector).parent().next()).toArray()) {
                     const id = this.idCleaner($("a", manga).attr('href') ?? "", source); const title = $("a", manga).attr('title');
                     const image = this.getImageSrc($("img", manga))?.split("?resize")[0] ?? "";
@@ -217,7 +220,10 @@ export class Parser {
             //Latest Update
             if (section.id == "latest_update") {
                 const latestUpdate: MangaTile[] = [];
-                if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error("Unable to parse valid Latest Update section!");
+                if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) {
+                    console.log("Unable to parse valid Latest Update section!");
+                    continue;
+                }
                 for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
                     const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
                     const title = $("a", manga).attr('title');
@@ -238,7 +244,10 @@ export class Parser {
             //New Titles
             if (section.id == "new_titles") {
                 const NewTitles: MangaTile[] = [];
-                if (!$("li", $(source.homescreen_NewManga_selector)?.parent()?.next()).length) throw new Error("Unable to parse valid New Titles section!");
+                if (!$("li", $(source.homescreen_NewManga_selector)?.parent()?.next()).length) {
+                    console.log("Unable to parse valid New Titles section!");
+                    continue;
+                }
                 for (const manga of $("li", $(source.homescreen_NewManga_selector).parent().next()).toArray()) {
                     const id = this.idCleaner($("a", manga).attr('href') ?? "", source);
                     const title = $("h2", manga).text().trim();

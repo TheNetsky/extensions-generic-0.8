@@ -4,7 +4,7 @@ import { MangaStream } from '../MangaStream'
 const READKOMIK_DOMAIN = "https://readkomik.com"
 
 export const ReadKomikInfo: SourceInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'ReadKomik',
     description: 'Extension that pulls manga from ReadKomik',
     author: 'Netsky',

@@ -4,7 +4,7 @@ import { MangaStream } from '../MangaStream'
 const EDOUJIN_DOMAIN = "https://edoujin.net"
 
 export const eDoujinInfo: SourceInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'eDoujin',
     description: 'Extension that pulls manga from eDoujin',
     author: 'Netsky',

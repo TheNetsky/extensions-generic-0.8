@@ -1,10 +1,11 @@
 import { LanguageCode, SourceInfo, TagType } from "paperback-extensions-common";
 import { MangaStream } from '../MangaStream'
+import { ManhwaXParser } from "./ManhwaXParser";
 
 const MANHWAX_DOMAIN = "https://manhwax.com"
 
 export const ManhwaXInfo: SourceInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'ManhwaX',
     description: 'Extension that pulls manga from ManhwaX',
     author: 'Netsky',
@@ -31,6 +32,9 @@ export class ManhwaX extends MangaStream {
     languageCode: LanguageCode = LanguageCode.ENGLISH
     hasAdvancedSearchPage: boolean = true
 
+    readonly parser: ManhwaXParser = new ManhwaXParser();
+
+
     //----MANGA DETAILS SELECTORS
     /*
     If a website uses different names/words for the status below, change them to these.
@@ -50,6 +54,7 @@ export class ManhwaX extends MangaStream {
     homescreen_PopularToday_enabled: boolean = false
 
     homescreen_LatestUpdate_enabled: boolean = true
+    homescreen_LatestUpdate_selector_item: string = "div.bsx"
 
     homescreen_NewManga_enabled: boolean = false
 

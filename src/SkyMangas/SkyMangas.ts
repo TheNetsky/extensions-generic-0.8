@@ -4,7 +4,7 @@ import { MangaStream } from '../MangaStream'
 const SKYMANGAS_DOMAIN = "http://skymangas.com"
 
 export const SkyMangasInfo: SourceInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'SkyMangas',
     description: 'Extension that pulls manga from SkyMangas',
     author: 'Netsky',

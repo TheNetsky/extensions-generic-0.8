@@ -4,7 +4,7 @@ import { MangaStream } from '../MangaStream'
 const GSNATION_DOMAIN = "https://gs-nation.fr"
 
 export const GSNationInfo: SourceInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'GS-Nation',
     description: 'Extension that pulls manga from GSNation',
     author: 'Netsky',

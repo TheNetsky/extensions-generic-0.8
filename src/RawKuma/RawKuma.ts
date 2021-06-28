@@ -4,7 +4,7 @@ import { MangaStream } from '../MangaStream'
 const RAWKUMA_DOMAIN = "https://rawkuma.com"
 
 export const RawKumaInfo: SourceInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'RawKuma',
     description: 'Extension that pulls manga from RawKuma',
     author: 'Netsky',

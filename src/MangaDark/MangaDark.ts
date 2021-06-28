@@ -4,7 +4,7 @@ import { MangaStream } from '../MangaStream'
 const MANGADARK_DOMAIN = "https://mangadark.com"
 
 export const MangaDarkInfo: SourceInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'MangaDark',
     description: 'Extension that pulls manga from MangaDark',
     author: 'Netsky',

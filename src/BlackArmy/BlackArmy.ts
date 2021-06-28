@@ -4,7 +4,7 @@ import { MangaStream } from '../MangaStream'
 const BLACKARMY_DOMAIN = "https://blackarmy.fr"
 
 export const BlackArmyInfo: SourceInfo = {
-    version: '1.0.0',
+    version: '1.0.1',
     name: 'BlackArmy',
     description: 'Extension that pulls manga from BlackArmy',
     author: 'Netsky',

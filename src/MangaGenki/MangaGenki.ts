@@ -4,7 +4,7 @@ import { MangaStream } from '../MangaStream'
 const MANGAGENKI_DOMAIN = "https://mangagenki.com"
 
 export const MangaGenkiInfo: SourceInfo = {
-    version: '1.0.1',
+    version: '1.0.2',
     name: 'MangaGenki',
     description: 'Extension that pulls manga from MangaGenki',
     author: 'Netsky',
