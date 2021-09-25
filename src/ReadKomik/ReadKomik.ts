@@ -1,20 +1,30 @@
-import { LanguageCode, SourceInfo, TagType } from "paperback-extensions-common";
-import { MangaStream } from '../MangaStream'
+/* eslint-disable linebreak-style */
+import {
+    LanguageCode,
+    SourceInfo,
+    TagType,
+    ContentRating
+} from 'paperback-extensions-common'
 
-const READKOMIK_DOMAIN = "https://readkomik.com"
+import {
+    MangaStream,
+    getExportVersion
+} from '../MangaStream'
+
+const READKOMIK_DOMAIN = 'https://readkomik.com'
 
 export const ReadKomikInfo: SourceInfo = {
-    version: '1.0.2',
+    version: getExportVersion('0.0.0'),
     name: 'ReadKomik',
     description: 'Extension that pulls manga from ReadKomik',
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
-    icon: "icon.png",
-    hentaiSource: false,
+    icon: 'icon.png',
+    contentRating: ContentRating.MATURE,
     websiteBaseURL: READKOMIK_DOMAIN,
     sourceTags: [
         {
-            text: "Notifications",
+            text: 'Notifications',
             type: TagType.GREEN
         }
     ]
@@ -25,7 +35,6 @@ export class ReadKomik extends MangaStream {
 
     baseUrl: string = READKOMIK_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
-    hasAdvancedSearchPage: boolean = true
 
     //----MANGA DETAILS SELECTORS
     /*
@@ -41,15 +50,15 @@ export class ReadKomik extends MangaStream {
 
     //----HOMESCREEN SELECTORS
     //Disabling some of these will cause some Home-Page tests to fail, be sure to test this in the app!
-    homescreen_PopularToday_enabled: boolean = true
+    override homescreen_PopularToday_enabled = true
 
-    homescreen_LatestUpdate_enabled: boolean = true
+    override homescreen_LatestUpdate_enabled = true
 
-    homescreen_NewManga_enabled: boolean = false
+    override homescreen_NewManga_enabled = false
 
-    homescreen_TopAllTime_enabled: boolean = true
-    homescreen_TopMonthly_enabled: boolean = true
-    homescreen_TopWeekly_enabled: boolean = true
+    override homescreen_TopAllTime_enabled = true
+    override homescreen_TopMonthly_enabled = true
+    override homescreen_TopWeekly_enabled = true
 
     /*
     ----TAG SELECTORS
@@ -66,9 +75,9 @@ export class ReadKomik extends MangaStream {
     tags_selector_label: string = "span"
     */
 
-    tags_SubdirectoryPathName: string = ""
-    tags_selector_box: string = "ul.genre"
-    tags_selector_item: string = "li"
-    tags_selector_label: string = ""
+    override tags_SubdirectoryPathName = ''
+    override tags_selector_box = 'ul.genre'
+    override tags_selector_item = 'li'
+    override tags_selector_label = ''
 
 }

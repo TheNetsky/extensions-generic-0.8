@@ -1,24 +1,34 @@
-import { LanguageCode, SourceInfo, TagType } from "paperback-extensions-common";
-import { MangaStream } from '../MangaStream'
+/* eslint-disable linebreak-style */
+import {
+    LanguageCode,
+    SourceInfo,
+    TagType,
+    ContentRating
+} from 'paperback-extensions-common'
 
-const SKYMANGAS_DOMAIN = "http://skymangas.com"
+import {
+    MangaStream,
+    getExportVersion
+} from '../MangaStream'
+
+const SKYMANGAS_DOMAIN = 'https://skymangas.com'
 
 export const SkyMangasInfo: SourceInfo = {
-    version: '1.0.1',
+    version: getExportVersion('0.0.0'),
     name: 'SkyMangas',
     description: 'Extension that pulls manga from SkyMangas',
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
-    icon: "icon.png",
-    hentaiSource: false,
+    icon: 'icon.png',
+    contentRating: ContentRating.MATURE,
     websiteBaseURL: SKYMANGAS_DOMAIN,
     sourceTags: [
         {
-            text: "Notifications",
+            text: 'Notifications',
             type: TagType.GREEN
         },
         {
-            text: "Spanish",
+            text: 'Spanish',
             type: TagType.GREY
         }
     ]
@@ -28,42 +38,41 @@ export class SkyMangas extends MangaStream {
     //FOR ALL THE SELECTIONS, PLEASE CHECK THE MangaSteam.ts FILE!!!
 
     baseUrl: string = SKYMANGAS_DOMAIN
-    languageCode: LanguageCode = LanguageCode.FRENCH
-    hasAdvancedSearchPage: boolean = true
+    languageCode: LanguageCode = LanguageCode.SPANISH
 
     //----DATE SETTINGS
-    dateMonths = {
-        january: "enero",
-        february: "febrero",
-        march: "marzo",
-        april: "abril",
-        may: "mayo",
-        june: "junio",
-        july: "julio",
-        august: "agosto",
-        september: "septiembre",
-        october: "octubre",
-        november: "noviembre",
-        december: "diciembre"
+    override dateMonths = {
+        january: 'enero',
+        february: 'febrero',
+        march: 'marzo',
+        april: 'abril',
+        may: 'mayo',
+        june: 'junio',
+        july: 'julio',
+        august: 'agosto',
+        september: 'septiembre',
+        october: 'octubre',
+        november: 'noviembre',
+        december: 'diciembre'
     };
-    dateTimeAgo = {
-        now: ["less than an hour", "just now"],
-        yesterday: ["ayer"],
-        years: ["año", "ano"],
-        months: ["mes", "meses"],
-        weeks: ["semana", "semanas"],
-        days: ["día", "dia", "dias"],
-        hours: ["hora"],
-        minutes: ["minutre"],
-        seconds: ["segundo"]
+    override dateTimeAgo = {
+        now: ['less than an hour', 'just now'],
+        yesterday: ['ayer'],
+        years: ['año', 'ano'],
+        months: ['mes', 'meses'],
+        weeks: ['semana', 'semanas'],
+        days: ['día', 'dia', 'dias'],
+        hours: ['hora'],
+        minutes: ['minutre'],
+        seconds: ['segundo']
     };
 
     //----MANGA DETAILS SELECTORS
-    manga_selector_author: string = "Autor"
+    override manga_selector_author = 'Autor'
 
-    manga_selector_artist: string = "Artista"
+    override manga_selector_artist = 'Artista'
 
-    manga_selector_status: string = "Estado"
+    override manga_selector_status = 'Estado'
 
     /*
     If a website uses different names/words for the status below, change them to these.
@@ -80,17 +89,17 @@ export class SkyMangas extends MangaStream {
     //Disabling some of these will cause some Home-Page tests to fail, edit these test files to match the setting.
     //Always be sure to test this in the app!
 
-    homescreen_PopularToday_enabled: boolean = true
-    homescreen_PopularToday_selector: string = "h2:contains(Popular Hoy)"
+    override homescreen_PopularToday_enabled = true
+    override homescreen_PopularToday_selector = 'h2:contains(Popular Hoy)'
 
-    homescreen_LatestUpdate_enabled: boolean = true
-    homescreen_LatestUpdate_selector_box: string = "h2:contains(Actualizaciones)"
+    override homescreen_LatestUpdate_enabled = true
+    override homescreen_LatestUpdate_selector_box = 'h2:contains(Actualizaciones)'
 
-    homescreen_NewManga_enabled: boolean = false
+    override homescreen_NewManga_enabled = false
 
-    homescreen_TopAllTime_enabled: boolean = true
-    homescreen_TopMonthly_enabled: boolean = true
-    homescreen_TopWeekly_enabled: boolean = true
+    override homescreen_TopAllTime_enabled = true
+    override homescreen_TopMonthly_enabled = true
+    override homescreen_TopWeekly_enabled = true
 
     /*
     ----TAG SELECTORS
@@ -107,9 +116,9 @@ export class SkyMangas extends MangaStream {
     tags_selector_label: string = "span"
     */
 
-    tags_SubdirectoryPathName: string = ""
-    tags_selector_box: string = "ul.genre"
-    tags_selector_item: string = "li"
-    tags_selector_label: string = ""
+    override tags_SubdirectoryPathName = ''
+    override tags_selector_box = 'ul.genre'
+    override tags_selector_item = 'li'
+    override tags_selector_label = ''
 
 }

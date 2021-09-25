@@ -1,24 +1,34 @@
-import { LanguageCode, SourceInfo, TagType } from "paperback-extensions-common";
-import { MangaStream } from '../MangaStream'
+/* eslint-disable linebreak-style */
+import {
+    LanguageCode,
+    SourceInfo,
+    TagType,
+    ContentRating
+} from 'paperback-extensions-common'
 
-const BLACKARMY_DOMAIN = "https://blackarmy.fr"
+import {
+    MangaStream,
+    getExportVersion
+} from '../MangaStream'
+
+const BLACKARMY_DOMAIN = 'https://blackarmy.fr'
 
 export const BlackArmyInfo: SourceInfo = {
-    version: '1.0.1',
+    version: getExportVersion('0.0.0'),
     name: 'BlackArmy',
     description: 'Extension that pulls manga from BlackArmy',
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
-    icon: "icon.png",
-    hentaiSource: false,
+    icon: 'icon.png',
+    contentRating: ContentRating.MATURE,
     websiteBaseURL: BLACKARMY_DOMAIN,
     sourceTags: [
         {
-            text: "Notifications",
+            text: 'Notifications',
             type: TagType.GREEN
         },
         {
-            text: "French",
+            text: 'French',
             type: TagType.GREY
         }
     ]
@@ -29,41 +39,40 @@ export class BlackArmy extends MangaStream {
 
     baseUrl: string = BLACKARMY_DOMAIN
     languageCode: LanguageCode = LanguageCode.FRENCH
-    hasAdvancedSearchPage: boolean = true
 
     //----DATE SETTINGS
-    dateMonths = {
-        january: "janvier",
-        february: "février",
-        march: "mars",
-        april: "avril",
-        may: "mai",
-        june: "juin",
-        july: "juillet",
-        august: "aout",
-        september: "septembre",
-        october: "octobre",
-        november: "novembre",
-        december: "décembre"
+    override dateMonths = {
+        january: 'janvier',
+        february: 'février',
+        march: 'mars',
+        april: 'avril',
+        may: 'mai',
+        june: 'juin',
+        july: 'juillet',
+        august: 'août',
+        september: 'septembre',
+        october: 'octobre',
+        november: 'novembre',
+        december: 'décembre'
     };
-    dateTimeAgo = {
-        now: ["less than an hour", "just now"],
-        yesterday: ["hier"],
-        years: ["year"],
-        months: ["mois"],
-        weeks: ["semaine"],
-        days: ["jour"],
-        hours: ["heure"],
-        minutes: ["minute"],
-        seconds: ["second"]
+    override dateTimeAgo = {
+        now: ['less than an hour', 'just now'],
+        yesterday: ['hier'],
+        years: ['year'],
+        months: ['mois'],
+        weeks: ['semaine'],
+        days: ['jour'],
+        hours: ['heure'],
+        minutes: ['minute'],
+        seconds: ['second']
     };
 
     //----MANGA DETAILS SELECTORS
-    manga_selector_author: string = "Autheur"
+    override manga_selector_author = 'Autheur'
 
-    manga_selector_artist: string = "Artiste"
+    override manga_selector_artist = 'Artiste'
 
-    manga_selector_status: string = "Statut"
+    override manga_selector_status = 'Statut'
 
     /*
     If a website uses different names/words for the status below, change them to these.
@@ -80,18 +89,18 @@ export class BlackArmy extends MangaStream {
     //Disabling some of these will cause some Home-Page tests to fail, edit these test files to match the setting.
     //Always be sure to test this in the app!
 
-    homescreen_PopularToday_enabled: boolean = true
-    homescreen_PopularToday_selector: string = "h2:contains(Populaire aujourd'hui)"
+    override homescreen_PopularToday_enabled = true
+    override homescreen_PopularToday_selector = 'h2:contains(Populaire aujourd\'hui)'
 
-    homescreen_LatestUpdate_enabled: boolean = true
-    homescreen_LatestUpdate_selector_box: string = "h2:contains(Dernière Sortie)"
+    override homescreen_LatestUpdate_enabled = true
+    override homescreen_LatestUpdate_selector_box = 'h2:contains(Dernière Sortie)'
 
-    homescreen_NewManga_enabled: boolean = true
-    homescreen_NewManga_selector: string = "h3:contains(nouvelle séries)"
+    override homescreen_NewManga_enabled = true
+    override homescreen_NewManga_selector = 'h3:contains(nouvelle séries)'
 
-    homescreen_TopAllTime_enabled: boolean = true
-    homescreen_TopMonthly_enabled: boolean = true
-    homescreen_TopWeekly_enabled: boolean = true
+    override homescreen_TopAllTime_enabled = true
+    override homescreen_TopMonthly_enabled = true
+    override homescreen_TopWeekly_enabled = true
 
     /*
     ----TAG SELECTORS
@@ -108,9 +117,9 @@ export class BlackArmy extends MangaStream {
     tags_selector_label: string = "span"
     */
 
-    tags_SubdirectoryPathName: string = ""
-    tags_selector_box: string = "ul.genre"
-    tags_selector_item: string = "li"
-    tags_selector_label: string = ""
+    override tags_SubdirectoryPathName = ''
+    override tags_selector_box = 'ul.genre'
+    override tags_selector_item = 'li'
+    override tags_selector_label = ''
 
 }

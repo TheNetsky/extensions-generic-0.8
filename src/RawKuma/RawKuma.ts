@@ -1,24 +1,34 @@
-import { LanguageCode, SourceInfo, TagType } from "paperback-extensions-common";
-import { MangaStream } from '../MangaStream'
+/* eslint-disable linebreak-style */
+import {
+    LanguageCode,
+    SourceInfo,
+    ContentRating,
+    TagType
+} from 'paperback-extensions-common'
 
-const RAWKUMA_DOMAIN = "https://rawkuma.com"
+import {
+    MangaStream,
+    getExportVersion
+} from '../MangaStream'
+
+const RAWKUMA_DOMAIN = 'https://rawkuma.com'
 
 export const RawKumaInfo: SourceInfo = {
-    version: '1.0.2',
+    version: getExportVersion('0.0.0'),
     name: 'RawKuma',
     description: 'Extension that pulls manga from RawKuma',
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
-    icon: "icon.png",
-    hentaiSource: false,
+    icon: 'icon.png',
+    contentRating: ContentRating.MATURE,
     websiteBaseURL: RAWKUMA_DOMAIN,
     sourceTags: [
         {
-            text: "Notifications",
+            text: 'Notifications',
             type: TagType.GREEN
         },
         {
-            text: "Japanese",
+            text: 'Japanese',
             type: TagType.GREY
         }
     ]
@@ -29,7 +39,6 @@ export class RawKuma extends MangaStream {
 
     baseUrl: string = RAWKUMA_DOMAIN
     languageCode: LanguageCode = LanguageCode.JAPANESE
-    hasAdvancedSearchPage: boolean = true
 
     //----MANGA DETAILS SELECTORS
     /*
@@ -48,15 +57,15 @@ export class RawKuma extends MangaStream {
     //Disabling some of these will cause some Home-Page tests to fail, edit these test files to match the setting.
     //Always be sure to test this in the app!
 
-    homescreen_PopularToday_enabled: boolean = true
+    override homescreen_PopularToday_enabled = true
 
-    homescreen_LatestUpdate_enabled: boolean = true
+    override homescreen_LatestUpdate_enabled = true
 
-    homescreen_NewManga_enabled: boolean = true
+    override homescreen_NewManga_enabled = true
 
-    homescreen_TopAllTime_enabled: boolean = true
-    homescreen_TopMonthly_enabled: boolean = true
-    homescreen_TopWeekly_enabled: boolean = true
+    override homescreen_TopAllTime_enabled = true
+    override homescreen_TopMonthly_enabled = true
+    override homescreen_TopWeekly_enabled = true
 
     /*
     ----TAG SELECTORS

@@ -1,20 +1,30 @@
-import { LanguageCode, SourceInfo, TagType } from "paperback-extensions-common";
-import { MangaStream } from '../MangaStream'
+/* eslint-disable linebreak-style */
+import {
+    LanguageCode,
+    SourceInfo,
+    TagType,
+    ContentRating
+} from 'paperback-extensions-common'
 
-const EDOUJIN_DOMAIN = "https://edoujin.net"
+import {
+    MangaStream,
+    getExportVersion
+} from '../MangaStream'
+
+const EDOUJIN_DOMAIN = 'https://edoujin.net'
 
 export const eDoujinInfo: SourceInfo = {
-    version: '1.0.2',
+    version: getExportVersion('0.0.0'),
     name: 'eDoujin',
     description: 'Extension that pulls manga from eDoujin',
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
-    icon: "icon.png",
-    hentaiSource: false, //true
+    icon: 'icon.png',
+    contentRating: ContentRating.ADULT,
     websiteBaseURL: EDOUJIN_DOMAIN,
     sourceTags: [
         {
-            text: "18+",
+            text: '18+',
             type: TagType.YELLOW
         }
     ]
@@ -25,9 +35,8 @@ export class eDoujin extends MangaStream {
 
     baseUrl: string = EDOUJIN_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
-    hasAdvancedSearchPage: boolean = true
 
-     //----MANGA DETAILS SELECTORS
+    //----MANGA DETAILS SELECTORS
     /*
     If a website uses different names/words for the status below, change them to these.
     These must also be changed id a different language is used!
@@ -43,16 +52,16 @@ export class eDoujin extends MangaStream {
     //Disabling some of these will cause some Home-Page tests to fail, edit these test files to match the setting.
     //Always be sure to test this in the app!
 
-    homescreen_PopularToday_enabled: boolean = true
+    override homescreen_PopularToday_enabled = true
 
-    homescreen_LatestUpdate_enabled: boolean = true
-    homescreen_LatestUpdate_selector_item: string = "div.bsx"
+    override homescreen_LatestUpdate_enabled = true
+    override homescreen_LatestUpdate_selector_item = 'div.bsx'
 
-    homescreen_NewManga_enabled: boolean = false
+    override homescreen_NewManga_enabled = false
 
-    homescreen_TopAllTime_enabled: boolean = false
-    homescreen_TopMonthly_enabled: boolean = false
-    homescreen_TopWeekly_enabled: boolean = false
+    override homescreen_TopAllTime_enabled = false
+    override homescreen_TopMonthly_enabled = false
+    override homescreen_TopWeekly_enabled = false
 
     /*
     ----TAG SELECTORS
@@ -69,9 +78,9 @@ export class eDoujin extends MangaStream {
     tags_selector_label: string = "span"
     */
 
-    tags_SubdirectoryPathName: string = ""
-    tags_selector_box: string = "ul.genre"
-    tags_selector_item: string = "li"
-    tags_selector_label: string = "span"
+    override tags_SubdirectoryPathName = '/genres/'
+    override tags_selector_box = 'ul.taxindex'
+    override tags_selector_item = 'li'
+    override tags_selector_label = 'span'
 
 }

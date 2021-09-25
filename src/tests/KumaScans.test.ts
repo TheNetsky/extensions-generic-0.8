@@ -4,14 +4,14 @@ import {
     SearchRequest,
 } from 'paperback-extensions-common'
 import { MangaStream } from '../MangaStream'
-import { eDoujin } from '../eDoujin/eDoujin'
+import { KumaScans } from '../KumaScans/KumaScans'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
-describe('eDoujin Tests', () => {
+describe('KumaScans Tests', () => {
 
     const wrapper: APIWrapper = new APIWrapper()
-    const source: MangaStream = new eDoujin(cheerio)
+    const source: MangaStream = new KumaScans(cheerio)
     const expect = chai.expect
     chai.use(chaiAsPromised)
 
@@ -20,7 +20,7 @@ describe('eDoujin Tests', () => {
    * Try to choose a manga which is updated frequently, so that the historical checking test can
    * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
    */
-    const mangaId = 'reformation-of-the-deadbeat-noble' // secret-class
+    const mangaId = 'the-kingdoms-of-ruin' // the-kingdoms-of-ruin
 
     it('Retrieve Manga Details', async () => {
         const details = await wrapper.getMangaDetails(source, mangaId)
@@ -67,11 +67,18 @@ describe('eDoujin Tests', () => {
     })
 
     it('Testing home page results for popular titles', async () => {
-        const results = await wrapper.getViewMoreItems(source, 'popular_today', {}, 1)
+        const results = await wrapper.getViewMoreItems(source, 'hot_release', {}, 1)
 
         expect(results, 'This section does not exist').to.exist
         expect(results, 'No results whatsoever for this section').to.be.not.empty
+
+        //console.log(results)
+        //  const data = results![0]
+        //  expect(data?.id, 'No ID present').to.exist
+        //   expect(data?.image, 'No image present').to.exist
+        // expect(data?.title.text, 'No title present').to.exist
     })
+
 
     it('Testing search', async () => {
         const testSearch: SearchRequest = {

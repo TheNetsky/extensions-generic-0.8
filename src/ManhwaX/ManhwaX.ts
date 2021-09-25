@@ -1,25 +1,36 @@
-import { LanguageCode, SourceInfo, TagType } from "paperback-extensions-common";
-import { MangaStream } from '../MangaStream'
-import { ManhwaXParser } from "./ManhwaXParser";
+/* eslint-disable linebreak-style */
+import {
+    LanguageCode,
+    SourceInfo,
+    ContentRating,
+    TagType
+} from 'paperback-extensions-common'
 
-const MANHWAX_DOMAIN = "https://manhwax.com"
+import {
+    MangaStream,
+    getExportVersion
+} from '../MangaStream'
+
+import { ManhwaXParser } from './ManhwaXParser'
+
+const MANHWAX_DOMAIN = 'https://manhwax.com'
 
 export const ManhwaXInfo: SourceInfo = {
-    version: '1.0.2',
+    version: getExportVersion('0.0.0'),
     name: 'ManhwaX',
     description: 'Extension that pulls manga from ManhwaX',
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
-    icon: "icon.png",
-    hentaiSource: false,
+    icon: 'icon.png',
+    contentRating: ContentRating.ADULT,
     websiteBaseURL: MANHWAX_DOMAIN,
     sourceTags: [
         {
-            text: "Notifications",
+            text: 'Notifications',
             type: TagType.GREEN
         },
         {
-            text: "18+",
+            text: '18+',
             type: TagType.YELLOW
         }
     ]
@@ -30,9 +41,8 @@ export class ManhwaX extends MangaStream {
 
     baseUrl: string = MANHWAX_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
-    hasAdvancedSearchPage: boolean = true
 
-    readonly parser: ManhwaXParser = new ManhwaXParser();
+    override readonly parser: ManhwaXParser = new ManhwaXParser();
 
 
     //----MANGA DETAILS SELECTORS
@@ -51,16 +61,16 @@ export class ManhwaX extends MangaStream {
     //Disabling some of these will cause some Home-Page tests to fail, edit these test files to match the setting.
     //Always be sure to test this in the app!
 
-    homescreen_PopularToday_enabled: boolean = false
+    override homescreen_PopularToday_enabled = false
 
-    homescreen_LatestUpdate_enabled: boolean = true
-    homescreen_LatestUpdate_selector_item: string = "div.bsx"
+    override homescreen_LatestUpdate_enabled = true
+    override homescreen_LatestUpdate_selector_item = 'div.bsx'
 
-    homescreen_NewManga_enabled: boolean = false
+    override homescreen_NewManga_enabled = false
 
-    homescreen_TopAllTime_enabled: boolean = true
-    homescreen_TopMonthly_enabled: boolean = true
-    homescreen_TopWeekly_enabled: boolean = true
+    override homescreen_TopAllTime_enabled = true
+    override homescreen_TopMonthly_enabled = true
+    override homescreen_TopWeekly_enabled = true
 
     /*
     ----TAG SELECTORS
@@ -77,9 +87,9 @@ export class ManhwaX extends MangaStream {
     tags_selector_label: string = "span"
     */
 
-    tags_SubdirectoryPathName: string = ""
-    tags_selector_box: string = "ul.genre"
-    tags_selector_item: string = "li"
-    tags_selector_label: string = ""
+    override tags_SubdirectoryPathName = ''
+    override tags_selector_box = 'ul.genre'
+    override tags_selector_item = 'li'
+    override tags_selector_label = ''
 
 }

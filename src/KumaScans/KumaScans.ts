@@ -2,8 +2,8 @@
 import {
     LanguageCode,
     SourceInfo,
-    TagType,
-    ContentRating
+    ContentRating,
+    TagType
 } from 'paperback-extensions-common'
 
 import {
@@ -11,17 +11,17 @@ import {
     getExportVersion
 } from '../MangaStream'
 
-const MANGADARK_DOMAIN = 'https://mangadark.com'
+const KUMASCANS_DOMAIN = 'https://kumascans.com'
 
-export const MangaDarkInfo: SourceInfo = {
+export const KumaScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'MangaDark',
-    description: 'Extension that pulls manga from MangaDark',
+    name: 'KumaScans',
+    description: 'Extension that pulls manga from KumaScans',
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: MANGADARK_DOMAIN,
+    websiteBaseURL: KUMASCANS_DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -30,10 +30,10 @@ export const MangaDarkInfo: SourceInfo = {
     ]
 }
 
-export class MangaDark extends MangaStream {
+export class KumaScans extends MangaStream {
     //FOR ALL THE SELECTIONS, PLEASE CHECK THE MangaSteam.ts FILE!!!
 
-    baseUrl: string = MANGADARK_DOMAIN
+    baseUrl: string = KUMASCANS_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
 
     //----MANGA DETAILS SELECTORS
@@ -47,6 +47,7 @@ export class MangaDark extends MangaStream {
     //    ONGOING: "ongoing",
     //    COMPLETED: "completed"
     //}
+
 
     //----HOMESCREEN SELECTORS
     //Disabling some of these will cause some Home-Page tests to fail, edit these test files to match the setting.
@@ -76,10 +77,5 @@ export class MangaDark extends MangaStream {
     tags_selector_item: string = "li"
     tags_selector_label: string = "span"
     */
-
-    override tags_SubdirectoryPathName = '/genres/'
-    override tags_selector_box = 'div.page'
-    override tags_selector_item = 'li'
-    override tags_selector_label = 'span'
 
 }
