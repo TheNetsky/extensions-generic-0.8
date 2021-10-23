@@ -7,7 +7,6 @@ import {
     Manga,
     MangaUpdates,
     PagedResults,
-    RequestHeaders,
     SearchRequest,
     Source,
     TagSection,
@@ -51,7 +50,7 @@ interface StatusTypes {
 
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.0.0'
+const BASE_VERSION = '2.0.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -232,6 +231,7 @@ export abstract class MangaStream extends Source {
 
     parser = new MangaStreamParser();
 
+
     override getMangaShareUrl(mangaId: string): string {
         return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`
     }
@@ -280,6 +280,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/`,
             method: 'GET',
+            headers: this.constructHeaders({}),
             param: this.tags_SubdirectoryPathName
         })
 
@@ -297,12 +298,14 @@ export abstract class MangaStream extends Source {
             request = createRequestObject({
                 url: `${this.baseUrl}/page/${page}/?s=`,
                 method: 'GET',
+                headers: this.constructHeaders({}),
                 param: encodeURI(query.title)
             })
         } else {
             request = createRequestObject({
                 url: `${this.baseUrl}/`,
                 method: 'GET',
+                headers: this.constructHeaders({}),
                 param: `genres/${query?.includedTags?.map((x: any) => x.id)[0]}/page/${page}`
             })
         }
@@ -330,6 +333,7 @@ export abstract class MangaStream extends Source {
             const request = createRequestObject({
                 url: `${this.baseUrl}/page/${page++}/`,
                 method: 'GET',
+                headers: this.constructHeaders({})
             })
 
             const response = await this.requestManager.schedule(request, 1)
@@ -364,6 +368,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/`,
             method: 'GET',
+            headers: this.constructHeaders({})
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -392,6 +397,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/`,
             method: 'GET',
+            headers: this.constructHeaders({}),
             param,
         })
 
@@ -418,23 +424,8 @@ export abstract class MangaStream extends Source {
         if (this.userAgentRandomizer !== '') {
             headers['user-agent'] = this.userAgentRandomizer
         }
-        headers['referer'] = `${this.baseUrl}${refererPath ?? ''}`
+        headers['referer'] = `${this.baseUrl}${refererPath ?? ''}/`
         return headers
-    }
-
-    override globalRequestHeaders(): RequestHeaders {
-        if (this.userAgentRandomizer !== '') {
-            return {
-                'referer': `${this.baseUrl}/`,
-                'user-agent': this.userAgentRandomizer,
-                'accept': 'image/jpeg,image/png,image/*;q=0.8'
-            }
-        } else {
-            return {
-                'referer': `${this.baseUrl}/`,
-                'accept': 'image/jpeg,image/png,image/*;q=0.8'
-            }
-        }
     }
 
     CloudFlareError(status: any) {

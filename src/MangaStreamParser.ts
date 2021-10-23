@@ -162,11 +162,14 @@ export class MangaStreamParser {
     parseUpdatedManga($: CheerioStatic, time: Date, ids: string[], source: any): UpdatedManga {
         const updatedManga: string[] = []
         let loadMore = true
+        
         const isLast = this.isLastPage($, 'view_more') //Check if it's the last page or not, needed for some sites!
         if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error('Unable to parse valid update section!')
+      
         for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
             const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
             const mangaDate = convertDateAgo($('li > span', $('div.luf', manga)).first().text().trim(), source)
+
             //Check if manga time is older than the time porvided, is this manga has an update. Return this.
             if (!id) continue
             if (mangaDate > time) {
