@@ -1,6 +1,7 @@
 {
   "name": "extensions-mangastream",
   "version": "2.0.2",
+   "repositoryName": "MangaStream Extensions 0.6",
   "description": "MangaStream extensions for 0.6!",
   "main": "index.js",
   "scripts": {
