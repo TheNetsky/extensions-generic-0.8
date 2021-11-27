@@ -50,7 +50,7 @@ interface StatusTypes {
 
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.0.2'
+const BASE_VERSION = '2.0.3'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -273,7 +273,8 @@ export abstract class MangaStream extends Source {
 
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
-        return this.parser.parseChapterDetails(response.data, mangaId, chapterId)
+        const $ = this.cheerio.load(response.data)
+        return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
 
     override async getTags(): Promise<TagSection[]> {

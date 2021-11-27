@@ -11,10 +11,12 @@ import {
     getExportVersion
 } from '../MangaStream'
 
+import { AsuraScansParser } from './AsuraScansParser'
+
 const ASURASCANS_DOMAIN = 'https://www.asurascans.com'
 
 export const AsuraScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'AsuraScans',
     description: 'Extension that pulls manga from AsuraScans',
     author: 'Netsky',
@@ -43,6 +45,9 @@ export class AsuraScans extends MangaStream {
 
     baseUrl: string = ASURASCANS_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
+    override readonly parser: AsuraScansParser = new AsuraScansParser();
+
     override sourceTraversalPathName = 'comics'
 
     override requestManager = createRequestManager({

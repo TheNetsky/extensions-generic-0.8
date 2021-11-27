@@ -3,7 +3,6 @@ import {
     LanguageCode,
     SourceInfo,
     ContentRating,
-    TagType
 } from 'paperback-extensions-common'
 
 import {

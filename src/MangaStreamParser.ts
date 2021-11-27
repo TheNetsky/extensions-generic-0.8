@@ -86,7 +86,7 @@ export class MangaStreamParser {
             const id = this.idCleaner($('a', chapter).attr('href') ?? '', source)
             const date = convertDate($('span.chapterdate', chapter).text().trim(), source)
             const getNumber = chapter.attribs['data-num'] ?? ''
-            const chapterNumberRegex = getNumber.match(/(\d+\.?\d?)/)
+            const chapterNumberRegex = getNumber.match(/(\d+\.?\d?)+/)
             let chapterNumber = 0
             if (chapterNumberRegex && chapterNumberRegex[1]) chapterNumber = Number(chapterNumberRegex[1])
 
@@ -103,7 +103,9 @@ export class MangaStreamParser {
         return chapters
     }
 
-    parseChapterDetails(data: any, mangaId: string, chapterId: string): ChapterDetails {
+    parseChapterDetails($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails {
+        const data = $.html()
+
         const pages: string[] = []
 
         //To avoid our regex capturing more scrips, we stop at the first match of ";", also known as the first ending the matching script.
@@ -163,10 +165,10 @@ export class MangaStreamParser {
     parseUpdatedManga($: CheerioStatic, time: Date, ids: string[], source: any): UpdatedManga {
         const updatedManga: string[] = []
         let loadMore = true
-        
+
         const isLast = this.isLastPage($, 'view_more') //Check if it's the last page or not, needed for some sites!
         if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error('Unable to parse valid update section!')
-      
+
         for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
             const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
             const mangaDate = convertDateAgo($('li > span', $('div.luf', manga)).first().text().trim(), source)
