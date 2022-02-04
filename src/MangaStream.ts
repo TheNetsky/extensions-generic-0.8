@@ -10,7 +10,8 @@ import {
     SearchRequest,
     Source,
     TagSection,
-
+    Request,
+    Response
 } from 'paperback-extensions-common'
 
 import {
@@ -50,7 +51,7 @@ interface StatusTypes {
 
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.0.3'
+const BASE_VERSION = '2.1.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -227,10 +228,27 @@ export abstract class MangaStream extends Source {
     requestManager = createRequestManager({
         requestsPerSecond: 3,
         requestTimeout: 15000,
+        interceptor: {
+            interceptRequest: async (request: Request): Promise<Request> => {
+
+                request.headers = {
+                    ...(request.headers ?? {}),
+                    ...{
+                        'user-agent': this.userAgentRandomizer,
+                        'referer': this.baseUrl
+                    }
+                }
+
+                return request
+            },
+
+            interceptResponse: async (response: Response): Promise<Response> => {
+                return response
+            }
+        }
     });
 
     parser = new MangaStreamParser();
-
 
     override getMangaShareUrl(mangaId: string): string {
         return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`
@@ -239,8 +257,7 @@ export abstract class MangaStream extends Source {
     override async getMangaDetails(mangaId: string): Promise<Manga> {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-            method: 'GET',
-            headers: this.constructHeaders({})
+            method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -253,8 +270,7 @@ export abstract class MangaStream extends Source {
     override async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-            method: 'GET',
-            headers: this.constructHeaders({})
+            method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -267,8 +283,7 @@ export abstract class MangaStream extends Source {
     override async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = createRequestObject({
             url: `${this.baseUrl}/${chapterId}/`,
-            method: 'GET',
-            headers: this.constructHeaders({}),
+            method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -281,7 +296,6 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/`,
             method: 'GET',
-            headers: this.constructHeaders({}),
             param: this.tags_SubdirectoryPathName
         })
 
@@ -299,14 +313,12 @@ export abstract class MangaStream extends Source {
             request = createRequestObject({
                 url: `${this.baseUrl}/page/${page}/?s=`,
                 method: 'GET',
-                headers: this.constructHeaders({}),
                 param: encodeURI(query.title)
             })
         } else {
             request = createRequestObject({
                 url: `${this.baseUrl}/`,
                 method: 'GET',
-                headers: this.constructHeaders({}),
                 param: `genres/${query?.includedTags?.map((x: any) => x.id)[0]}/page/${page}`
             })
         }
@@ -327,14 +339,13 @@ export abstract class MangaStream extends Source {
         let page = 1
         let updatedManga: UpdatedManga = {
             ids: [],
-            loadMore: true,
+            loadMore: true
         }
 
         while (updatedManga.loadMore) {
             const request = createRequestObject({
                 url: `${this.baseUrl}/page/${page++}/`,
-                method: 'GET',
-                headers: this.constructHeaders({})
+                method: 'GET'
             })
 
             const response = await this.requestManager.schedule(request, 1)
@@ -368,8 +379,7 @@ export abstract class MangaStream extends Source {
 
         const request = createRequestObject({
             url: `${this.baseUrl}/`,
-            method: 'GET',
-            headers: this.constructHeaders({})
+            method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -398,8 +408,7 @@ export abstract class MangaStream extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/`,
             method: 'GET',
-            headers: this.constructHeaders({}),
-            param,
+            param
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -416,17 +425,8 @@ export abstract class MangaStream extends Source {
     override getCloudflareBypassRequest() {
         return createRequestObject({
             url: `${this.baseUrl}/`,
-            method: 'GET',
-            headers: this.constructHeaders({})
+            method: 'GET'
         })
-    }
-
-    constructHeaders(headers: any, refererPath?: string): any {
-        if (this.userAgentRandomizer !== '') {
-            headers['user-agent'] = this.userAgentRandomizer
-        }
-        headers['referer'] = `${this.baseUrl}${refererPath ?? ''}/`
-        return headers
     }
 
     CloudFlareError(status: any) {
