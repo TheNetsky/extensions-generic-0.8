@@ -51,7 +51,7 @@ interface StatusTypes {
 
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.1.0'
+const BASE_VERSION = '2.1.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -67,11 +67,6 @@ export abstract class MangaStream extends Source {
      */
     abstract languageCode: LanguageCode
 
-    /**
-     * Helps with CloudFlare for some sources, makes it worse for others; override with empty string if the latter is true
-     */
-    userAgentRandomizer = `Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/78.0${Math.floor(Math.random() * 100000)}`
-
     //----GENERAL SELECTORS----
     /**
      * The pathname between the domain and the manga.
@@ -85,6 +80,11 @@ export abstract class MangaStream extends Source {
      * Default = "https://i.imgur.com/GYUxEX8.png"
      */
     fallbackImage = 'https://i.imgur.com/GYUxEX8.png'
+
+    /**
+     * Sets the to be used UserAgent for requests
+     */
+    userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1'
 
     //----MANGA DETAILS SELECTORS----
     /**
@@ -234,8 +234,8 @@ export abstract class MangaStream extends Source {
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
-                        'user-agent': this.userAgentRandomizer,
-                        'referer': this.baseUrl
+                        'user-agent': this.userAgent,
+                        'referer': `${this.baseUrl}/`
                     }
                 }
 
@@ -425,7 +425,10 @@ export abstract class MangaStream extends Source {
     override getCloudflareBypassRequest() {
         return createRequestObject({
             url: `${this.baseUrl}/`,
-            method: 'GET'
+            method: 'GET',
+            headers: {
+                'user-agent': this.userAgent
+            }
         })
     }
 
@@ -434,5 +437,4 @@ export abstract class MangaStream extends Source {
             throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > <The name of this source> and press Cloudflare Bypass')
         }
     }
-
 }

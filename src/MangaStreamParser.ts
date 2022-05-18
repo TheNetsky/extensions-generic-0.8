@@ -116,7 +116,7 @@ export class MangaStreamParser {
         if (!obj?.sources) throw new Error(`Failed for find sources property for manga ${mangaId}`)
         for (const index of obj.sources) { //Check all sources, if empty continue.
             if (index?.images.length == 0) continue
-            index.images.map((p: string) => pages.push(encodeURI(p)))
+            index.images.map((p: string) => pages.push(p))
         }
 
         const chapterDetails = createChapterDetails({
