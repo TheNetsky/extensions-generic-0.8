@@ -11,17 +11,17 @@ import {
     getExportVersion
 } from '../MangaStream'
 
-const IMPERFECTCOMIC_DOMAIN = 'https://imperfectcomic.com'
+const INFERNALVOIDSCANS_DOMAIN = 'https://infernalvoidscans.com'
 
-export const ImperfectComicInfo: SourceInfo = {
+export const InfernalVoidScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'ImperfectComic',
-    description: 'Extension that pulls manga from ImperfectComic',
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
+    name: 'InfernalVoidScans',
+    description: 'Extension that pulls manga from InfernalVoidScans',
+    author: 'nicknitewolf',
+    authorWebsite: 'http://github.com/nicknitewolf',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: IMPERFECTCOMIC_DOMAIN,
+    websiteBaseURL: INFERNALVOIDSCANS_DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -30,10 +30,10 @@ export const ImperfectComicInfo: SourceInfo = {
     ]
 }
 
-export class ImperfectComic extends MangaStream {
+export class InfernalVoidScans extends MangaStream {
     //FOR ALL THE SELECTIONS, PLEASE CHECK THE MangaSteam.ts FILE!!!
 
-    baseUrl: string = IMPERFECTCOMIC_DOMAIN
+    baseUrl: string = INFERNALVOIDSCANS_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
 
     //----MANGA DETAILS SELECTORS
@@ -56,12 +56,14 @@ export class ImperfectComic extends MangaStream {
     override homescreen_PopularToday_enabled = true
 
     override homescreen_LatestUpdate_enabled = true
+    override homescreen_LatestUpdate_selector_box = 'h2:contains(Project Update)'
 
-    override homescreen_NewManga_enabled = false
+    override homescreen_NewManga_enabled = true
+    override homescreen_NewManga_selector = 'h3:contains(New series)'
 
-    override homescreen_TopAllTime_enabled = true
-    override homescreen_TopMonthly_enabled = true
-    override homescreen_TopWeekly_enabled = true
+    override homescreen_TopAllTime_enabled = false
+    override homescreen_TopMonthly_enabled = false
+    override homescreen_TopWeekly_enabled = false
 
     /*
     ----TAG SELECTORS
