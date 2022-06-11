@@ -14,7 +14,7 @@ import {
 const IMPERFECTCOMIC_DOMAIN = 'https://imperfectcomic.com'
 
 export const ImperfectComicInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ImperfectComic',
     description: 'Extension that pulls manga from ImperfectComic',
     author: 'Netsky',
