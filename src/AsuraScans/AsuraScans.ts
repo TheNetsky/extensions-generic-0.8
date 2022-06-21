@@ -16,7 +16,7 @@ import { AsuraScansParser } from './AsuraScansParser'
 const ASURASCANS_DOMAIN = 'https://www.asurascans.com'
 
 export const AsuraScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.3'),
+    version: getExportVersion('0.0.4'),
     name: 'AsuraScans',
     description: 'Extension that pulls manga from AsuraScans',
     author: 'Netsky',
@@ -48,10 +48,10 @@ export class AsuraScans extends MangaStream {
 
     override readonly parser: AsuraScansParser = new AsuraScansParser();
 
-    override sourceTraversalPathName = 'comics'
+    override sourceTraversalPathName = 'manga'
 
     override requestManager = createRequestManager({
-        requestsPerSecond: 1.5,
+        requestsPerSecond: 2,
         requestTimeout: 15000,
     });
 

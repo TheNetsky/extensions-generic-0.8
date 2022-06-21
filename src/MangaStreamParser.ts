@@ -83,7 +83,7 @@ export class MangaStreamParser {
 
         for (const chapter of $(source.chapter_selector_item, source.chapter_selector_box).toArray()) {
             const title = $('span.chapternum', chapter).text().trim()
-            const id = this.idCleaner($('a', chapter).attr('href') ?? '', source)
+            const id = this.idCleaner($('a', chapter).attr('href') ?? '')
             const date = convertDate($('span.chapterdate', chapter).text().trim(), source)
             const getNumber = chapter.attribs['data-num'] ?? ''
             const chapterNumberRegex = getNumber.match(/(\d+\.?\d?)+/)
@@ -146,7 +146,7 @@ export class MangaStreamParser {
         const collectedIds: string[] = []
 
         for (const manga of $('div.bs', 'div.listupd').toArray()) {
-            const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
+            const id = this.idCleaner($('a', manga).attr('href') ?? '')
             const title = $('a', manga).attr('title')
             const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
             const subtitle = $('div.epxs', manga).text().trim()
@@ -170,7 +170,7 @@ export class MangaStreamParser {
         if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error('Unable to parse valid update section!')
 
         for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
-            const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
+            const id = this.idCleaner($('a', manga).attr('href') ?? '')
             const mangaDate = convertDateAgo($('li > span', $('div.luf', manga)).first().text().trim(), source)
 
             //Check if manga time is older than the time porvided, is this manga has an update. Return this.
@@ -205,7 +205,7 @@ export class MangaStreamParser {
                     continue
                 }
                 for (const manga of $('div.bsx', $(source.homescreen_PopularToday_selector).parent().next()).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '', source); const title = $('a', manga).attr('title')
+                    const id = this.idCleaner($('a', manga).attr('href') ?? ''); const title = $('a', manga).attr('title')
                     const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
                     const subtitle = $('div.epxs', manga).text().trim()
                     if (!id || !title) continue
@@ -228,7 +228,7 @@ export class MangaStreamParser {
                     continue
                 }
                 for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
+                    const id = this.idCleaner($('a', manga).attr('href') ?? '')
                     const title = $('a', manga).attr('title')
                     const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
                     const subtitle = $('li > span', $('div.luf', manga)).first().text().trim()
@@ -252,7 +252,7 @@ export class MangaStreamParser {
                     continue
                 }
                 for (const manga of $('li', $(source.homescreen_NewManga_selector).parent().next()).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
+                    const id = this.idCleaner($('a', manga).attr('href') ?? '')
                     const title = $('h2', manga).text().trim()
                     const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
                     if (!id || !title) continue
@@ -270,7 +270,7 @@ export class MangaStreamParser {
             if (section.id == 'top_alltime') {
                 const TopAllTime: MangaTile[] = []
                 for (const manga of $('li', source.homescreen_TopAllTime_selector).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
+                    const id = this.idCleaner($('a', manga).attr('href') ?? '')
                     const title = $('h2', manga).text().trim()
                     const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
                     if (!id || !title) continue
@@ -288,7 +288,7 @@ export class MangaStreamParser {
             if (section.id == 'top_monthly') {
                 const TopMonthly: MangaTile[] = []
                 for (const manga of $('li', source.homescreen_TopMonthly_selector).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
+                    const id = this.idCleaner($('a', manga).attr('href') ?? '')
                     const title = $('h2', manga).text().trim()
                     const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
                     if (!id || !title) continue
@@ -306,7 +306,7 @@ export class MangaStreamParser {
             if (section.id == 'top_weekly') {
                 const TopWeekly: MangaTile[] = []
                 for (const manga of $('li', source.homescreen_TopWeekly_selector).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
+                    const id = this.idCleaner($('a', manga).attr('href') ?? '')
                     const title = $('h2', manga).text().trim()
                     const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
                     if (!id || !title) continue
@@ -327,7 +327,7 @@ export class MangaStreamParser {
         const collectedIds: string[] = []
 
         for (const manga of $('div.bs', 'div.listupd').toArray()) {
-            const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
+            const id = this.idCleaner($('a', manga).attr('href') ?? '')
             const title = $('a', manga).attr('title')
             const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
             const subtitle = $('div.epxs', manga).text().trim()
@@ -383,12 +383,12 @@ export class MangaStreamParser {
         return entities.decodeHTML(str)
     }
 
-    protected idCleaner(str: string, source: any): string {
-        const base = source.baseUrl.split('://').pop()
-        str = str.replace(/(https:\/\/|http:\/\/)/, '')
-        str = str.replace(/\/$/, '')
-        str = str.replace(`${base}/`, '')
-        str = str.replace(`${source.sourceTraversalPathName}/`, '')
-        return str
+    protected idCleaner(str: string): string {
+        let cleanId: string | null = str
+        cleanId = cleanId.replace(/\/$/, '')
+        cleanId = cleanId.split('/').pop() ?? null
+
+        if (!cleanId) throw new Error(`Unable to parse id for ${str}`)
+        return cleanId
     }
 }
