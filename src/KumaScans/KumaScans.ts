@@ -14,7 +14,7 @@ import {
 const KUMASCANS_DOMAIN = 'https://kumascans.com'
 
 export const KumaScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'KumaScans',
     description: 'Extension that pulls manga from KumaScans',
     author: 'Netsky',
@@ -56,6 +56,7 @@ export class KumaScans extends MangaStream {
     override homescreen_PopularToday_enabled = true
 
     override homescreen_LatestUpdate_enabled = true
+    override homescreen_LatestUpdate_selector_item = 'div.bsx'
 
     override homescreen_NewManga_enabled = true
 
