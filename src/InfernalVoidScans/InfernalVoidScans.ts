@@ -11,10 +11,10 @@ import {
     getExportVersion
 } from '../MangaStream'
 
-const INFERNALVOIDSCANS_DOMAIN = 'https://infernalvoidscans.com'
+const INFERNALVOIDSCANS_DOMAIN = 'https://void-scans.com'
 
 export const InfernalVoidScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'InfernalVoidScans',
     description: 'Extension that pulls manga from InfernalVoidScans',
     author: 'nicknitewolf',
