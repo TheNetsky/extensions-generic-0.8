@@ -171,7 +171,7 @@ export class MangaStreamParser {
 
         for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
             const id = this.idCleaner($('a', manga).attr('href') ?? '')
-            const mangaDate = convertDateAgo($('li > span', $('div.luf', manga)).first().text().trim(), source)
+            const mangaDate = convertDateAgo($('li > span', $('div.luf, ul.chfiv', manga)).first().text().trim(), source)
 
             //Check if manga time is older than the time porvided, is this manga has an update. Return this.
             if (!id) continue
