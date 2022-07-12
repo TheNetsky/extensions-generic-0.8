@@ -173,7 +173,7 @@ export class MangaStreamParser {
             const id = this.idCleaner($('a', manga).attr('href') ?? '')
             const mangaDate = convertDateAgo($('li > span', $('div.luf', manga)).first().text().trim(), source)
 
-            //Check if manga time is older than the time porvided, is this manga has an update. Return this.
+            //Check if manga time is older than the time provided, is this manga has an update. Return this.
             if (!id) continue
             if (mangaDate > time) {
                 if (ids.includes(id)) {
@@ -205,7 +205,8 @@ export class MangaStreamParser {
                     continue
                 }
                 for (const manga of $('div.bsx', $(source.homescreen_PopularToday_selector).parent().next()).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? ''); const title = $('a', manga).attr('title')
+                    const id = this.idCleaner($('a', manga).attr('href') ?? '')
+                    const title = $('a', manga).attr('title')
                     const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
                     const subtitle = $('div.epxs', manga).text().trim()
                     if (!id || !title) continue

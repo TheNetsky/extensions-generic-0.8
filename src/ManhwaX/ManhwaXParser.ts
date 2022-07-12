@@ -15,9 +15,9 @@ export class ManhwaXParser extends MangaStreamParser {
         const isLast = this.isLastPage($, 'view_more') //Check if it's the last page or not, needed for some sites!
         if (!$(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box)?.parent()?.next()).length) throw new Error('Unable to parse valid update section!')
         for (const manga of $(source.homescreen_LatestUpdate_selector_item, $(source.homescreen_LatestUpdate_selector_box).parent().next()).toArray()) {
-            const id = this.idCleaner($('a', manga).attr('href') ?? '', source)
+            const id = this.idCleaner($('a', manga).attr('href') ?? '')
             const mangaDate = convertDateAgo($('div.epxdate', $('div.adds', manga)).first().text().trim(), source)
-            //Check if manga time is older than the time porvided, is this manga has an update. Return this.
+            //Check if manga time is older than the time provided, is this manga has an update. Return this.
             if (!id) continue
             if (mangaDate > time) {
                 if (ids.includes(id)) {
