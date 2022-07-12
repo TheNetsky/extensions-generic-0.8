@@ -53,11 +53,11 @@ export class SushiScan extends MangaStream {
     override manga_selector_author = 'Auteur'
     override manga_selector_status = 'Statut'
 
-     /**
-     * The selector for the manga status.
-     * These can change depending on the language
-     * Default = "ONGOING: "ONGOING", COMPLETED: "COMPLETED"
-    */
+    /**
+    * The selector for the manga status.
+    * These can change depending on the language
+    * Default = "ONGOING: "ONGOING", COMPLETED: "COMPLETED"
+   */
     override manga_StatusTypes = {
         ONGOING: 'En Cours',
         COMPLETED: 'Terminé'
@@ -70,7 +70,7 @@ export class SushiScan extends MangaStream {
      * Enter the months for the website's language in correct order, case insensitive.
      * Default = English Translation
      */
-     override dateMonths = {
+    override dateMonths = {
         january: 'janvier',
         february: 'février',
         march: 'mars',

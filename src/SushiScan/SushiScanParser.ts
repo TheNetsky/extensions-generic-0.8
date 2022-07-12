@@ -1,8 +1,8 @@
-import { 
+import {
     TagSection,
-    Tag 
+    Tag
 } from 'paperback-extensions-common';
-import { 
+import {
     MangaStreamParser
 } from '../MangaStreamParser'
 
