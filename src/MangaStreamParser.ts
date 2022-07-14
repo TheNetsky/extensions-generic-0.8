@@ -76,6 +76,7 @@ export class MangaStreamParser {
 
     parseChapterList($: CheerioSelector, mangaId: string, source: any): Chapter[] {
         const chapters: Chapter[] = []
+        let sortingIndex = 0
 
         let langCode = source.languageCode
 
@@ -98,7 +99,10 @@ export class MangaStreamParser {
                 langCode: langCode,
                 chapNum: chapterNumber,
                 time: date,
+                // @ts-ignore
+                sortingIndex
             }))
+            sortingIndex--
         }
         return chapters
     }
