@@ -1,7 +1,7 @@
 import {
     TagSection,
     Tag
-} from 'paperback-extensions-common';
+} from 'paperback-extensions-common'
 import {
     MangaStreamParser
 } from '../MangaStreamParser'

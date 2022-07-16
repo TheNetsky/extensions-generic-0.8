@@ -90,7 +90,7 @@ export class SushiScan extends MangaStream {
      * Default =  English Translation
      */
     override dateTimeAgo = {
-        now: ['moins d’une heure', "tout à l'heure", "moment", "maintenant"], // The "now" quotes are not confirmed
+        now: ['moins d’une heure', 'tout à l\'heure', 'moment', 'maintenant'], // The "now" quotes are not confirmed
         yesterday: ['hier'],
         years: ['an'],
         months: ['mois'],
@@ -107,7 +107,7 @@ export class SushiScan extends MangaStream {
     //Always be sure to test this in the app!
 
     override homescreen_PopularToday_enabled = true
-    override homescreen_PopularToday_selector = "h2:contains(Populaire Aujourd'hui)"
+    override homescreen_PopularToday_selector = 'h2:contains(Populaire Aujourd\'hui)'
 
     override homescreen_LatestUpdate_enabled = true
     override homescreen_LatestUpdate_selector_box = 'h2:contains(Dernières Sorties)'
