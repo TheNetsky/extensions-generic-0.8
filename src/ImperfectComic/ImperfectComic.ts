@@ -11,10 +11,10 @@ import {
     getExportVersion
 } from '../MangaStream'
 
-const IMPERFECTCOMIC_DOMAIN = 'https://imperfectcomic.com'
+const IMPERFECTCOMIC_DOMAIN = 'https://imperfectcomic.org'
 
 export const ImperfectComicInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'ImperfectComic',
     description: 'Extension that pulls manga from ImperfectComic',
     author: 'Netsky',
