@@ -92,7 +92,7 @@ export class MangaStreamParser {
             if (chapterNumberRegex && chapterNumberRegex[1]) chapterNumber = Number(chapterNumberRegex[1])
 
             if (!id) continue
-            chapters.push(createChapter({
+            chapters.push({
                 id: id,
                 mangaId,
                 name: title,
@@ -101,10 +101,15 @@ export class MangaStreamParser {
                 time: date,
                 // @ts-ignore
                 sortingIndex
-            }))
+            })
             sortingIndex--
         }
-        return chapters
+
+        return chapters.map(chapter => {
+            // @ts-ignore
+            chapter.sortingIndex += chapters.length
+            return createChapter(chapter)
+        })
     }
 
     parseChapterDetails($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails {
