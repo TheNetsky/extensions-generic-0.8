@@ -13,10 +13,10 @@ import {
 
 import { AsuraScansParser } from './AsuraScansParser'
 
-const ASURASCANS_DOMAIN = 'https://asura.gg'
+const ASURASCANS_DOMAIN = 'https://www.asurascans.com'
 
 export const AsuraScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.7'),
+    version: getExportVersion('0.0.8'),
     name: 'AsuraScans',
     description: 'Extension that pulls manga from AsuraScans',
     author: 'Netsky',
