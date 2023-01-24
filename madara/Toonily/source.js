@@ -1096,7 +1096,7 @@ class Madara {
                 form: App.createDUIForm({
                     sections: async () => [
                         App.createDUISection({
-                            id: 'content',
+                            id: 'hq_thumb',
                             isHidden: false,
                             footer: 'Enabling HQ thumbnails will use more bandwidth and will load thumbnails slightly slower.',
                             rows: async () => [
@@ -1151,9 +1151,9 @@ class Madara {
             id: 'sourceMenu',
             header: 'Source Menu',
             isHidden: false,
-            rows: async () => {
-                return [this.sourceSettings(this.stateManager)];
-            }
+            rows: async () => [
+                this.sourceSettings(this.stateManager)
+            ]
         });
     }
     getMangaShareUrl(mangaId) {
@@ -1447,13 +1447,13 @@ class Madara {
         }
         return postId.toString();
     }
-    // Todo
     async getCloudflareBypassRequestAsync() {
         return App.createRequest({
             url: `${this.baseUrl}`,
             method: 'GET',
             headers: {
-                ...('setUA' && { 'user-agent': await this.requestManager.getDefaultUserAgent() }),
+                'referer': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
             }
         });
     }

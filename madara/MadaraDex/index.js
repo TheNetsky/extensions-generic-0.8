@@ -1465,7 +1465,46 @@ class Madara {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":69,"./MadaraParser":70}],69:[function(require,module,exports){
+},{"./MadaraHelper":70,"./MadaraParser":71}],69:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MadaraDex = exports.MadaraDexInfo = void 0;
+const types_1 = require("@paperback/types");
+const Madara_1 = require("../Madara");
+const DOMAIN = 'https://madaradex.org';
+exports.MadaraDexInfo = {
+    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    name: 'Madaradex',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: types_1.ContentRating.ADULT,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [
+        {
+            text: 'Notifications',
+            type: types_1.BadgeColor.GREEN
+        },
+        {
+            text: '18+',
+            type: types_1.BadgeColor.YELLOW
+        }
+    ],
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
+};
+class MadaraDex extends Madara_1.Madara {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+        this.hasAdvancedSearchPage = true;
+        this.alternativeChapterAjaxEndpoint = false;
+        this.searchMangaSelector = 'div.c-tabs-item > div.row';
+    }
+}
+exports.MadaraDex = MadaraDex;
+
+},{"../Madara":68,"@paperback/types":59}],70:[function(require,module,exports){
 "use strict";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1509,7 +1548,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -1756,48 +1795,5 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"entities":67}],71:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Toonily = exports.ToonilyInfo = void 0;
-const types_1 = require("@paperback/types");
-const Madara_1 = require("../Madara");
-const DOMAIN = 'https://toonily.com';
-exports.ToonilyInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
-    name: 'Toonily',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: types_1.ContentRating.ADULT,
-    websiteBaseURL: DOMAIN,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
-        {
-            text: '18+',
-            type: types_1.BadgeColor.YELLOW
-        },
-        {
-            text: 'Cloudflare',
-            type: types_1.BadgeColor.RED
-        }
-    ],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
-};
-class Toonily extends Madara_1.Madara {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-        this.hasAdvancedSearchPage = true;
-        this.alternativeChapterAjaxEndpoint = true;
-        this.searchMangaSelector = 'div.page-item-detail.manga';
-    }
-}
-exports.Toonily = Toonily;
-
-},{"../Madara":68,"@paperback/types":59}]},{},[71])(71)
+},{"entities":67}]},{},[69])(69)
 });
