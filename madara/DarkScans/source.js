@@ -1078,8 +1078,8 @@ class DarkScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.hasAdvancedSearchPage = true;
         this.alternativeChapterAjaxEndpoint = true;
+        this.hasAdvancedSearchPage = true;
     }
 }
 exports.DarkScans = DarkScans;
@@ -1098,9 +1098,14 @@ exports.getExportVersion = getExportVersion;
 class Madara {
     constructor(cheerio) {
         this.cheerio = cheerio;
+        /**
+         *  Request manager override
+         */
+        this.requestsPerSecond = 5;
+        this.requestTimeout = 20000;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 4,
-            requestTimeout: 20000,
+            requestsPerSecond: this.requestsPerSecond,
+            requestTimeout: this.requestTimeout,
             interceptor: {
                 interceptRequest: async (request) => {
                     request.headers = {
@@ -1108,7 +1113,8 @@ class Madara {
                         ...{
                             'user-agent': await this.requestManager.getDefaultUserAgent(),
                             'referer': `${this.baseUrl}/`,
-                            ...(request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' })
+                            'origin': `${this.baseUrl}/`,
+                            ...(request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' }) // Used for images hosted on Wordpress blogs
                         }
                     };
                     request.cookies = [
@@ -1178,6 +1184,18 @@ class Madara {
          * which is looped over. This may be overridden if required.
          */
         this.chapterDetailsSelector = 'div.page-break > img';
+        /**
+         * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
+         */
+        this.bypassPage = '';
+        /**
+         * If it's not possible to use postIds for certain reasons, you can disable this here.
+         */
+        this.usePostIds = true;
+        /**
+         * When not using postIds, you need to set the directory path
+         */
+        this.directoryPath = 'manga';
         this.parser = new MadaraParser_1.Parser();
     }
     async getSourceMenu() {
@@ -1191,11 +1209,11 @@ class Madara {
         });
     }
     getMangaShareUrl(mangaId) {
-        return `${this.baseUrl}/?p=${mangaId}/`;
+        return this.usePostIds ? `${this.baseUrl}/?p=${mangaId}/` : `${this.baseUrl}/${this.directoryPath}/${mangaId}/`;
     }
     async getMangaDetails(mangaId) {
         const request = App.createRequest({
-            url: `${this.baseUrl}/?p=${mangaId}/`,
+            url: this.usePostIds ? `${this.baseUrl}/?p=${mangaId}/` : `${this.baseUrl}/${this.directoryPath}/${mangaId}/`,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
@@ -1206,8 +1224,13 @@ class Madara {
     async getChapters(mangaId) {
         let endpoint;
         if (this.alternativeChapterAjaxEndpoint) {
-            const slugData = await this.convertPostIdToSlug(Number(mangaId));
-            endpoint = `${this.baseUrl}/${slugData.path}/${slugData.slug}/ajax/chapters`;
+            if (this.usePostIds) {
+                const slugData = await this.convertPostIdToSlug(Number(mangaId));
+                endpoint = `${this.baseUrl}/${slugData.path}/${slugData.slug}/ajax/chapters`;
+            }
+            else {
+                endpoint = `${this.baseUrl}/${this.directoryPath}/${mangaId}/ajax/chapters`;
+            }
         }
         else {
             endpoint = `${this.baseUrl}/wp-admin/admin-ajax.php`;
@@ -1220,7 +1243,7 @@ class Madara {
             },
             data: {
                 'action': 'manga_get_chapters',
-                'manga': mangaId
+                'manga': this.usePostIds ? mangaId : await this.convertSlugToPostId(mangaId, this.directoryPath)
             }
         });
         const response = await this.requestManager.schedule(request, 1);
@@ -1229,9 +1252,16 @@ class Madara {
         return this.parser.parseChapterList($, mangaId, this);
     }
     async getChapterDetails(mangaId, chapterId) {
-        const slugData = await this.convertPostIdToSlug(Number(mangaId));
+        let url;
+        if (this.usePostIds) {
+            const slugData = await this.convertPostIdToSlug(Number(mangaId));
+            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`;
+        }
+        else {
+            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/?style=list`;
+        }
         const request = App.createRequest({
-            url: `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`,
+            url: url,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
@@ -1268,13 +1298,23 @@ class Madara {
         const results = await this.parser.parseSearchResults($, this);
         const manga = [];
         for (const result of results) {
-            const postId = await this.slugToPostId(result.slug);
-            manga.push(App.createPartialSourceManga({
-                mangaId: String(postId),
-                image: result.image,
-                title: result.title,
-                subtitle: result.subtitle
-            }));
+            if (this.usePostIds) {
+                const postId = await this.slugToPostId(result.slug, result.path);
+                manga.push(App.createPartialSourceManga({
+                    mangaId: String(postId),
+                    image: result.image,
+                    title: result.title,
+                    subtitle: result.subtitle
+                }));
+            }
+            else {
+                manga.push(App.createPartialSourceManga({
+                    mangaId: result.slug,
+                    image: result.image,
+                    title: result.title,
+                    subtitle: result.subtitle
+                }));
+            }
         }
         return App.createPagedResults({
             results: manga,
@@ -1404,9 +1444,9 @@ class Madara {
             }
         });
     }
-    async slugToPostId(slug) {
+    async slugToPostId(slug, path) {
         if (await this.stateManager.retrieve(slug) == null) {
-            const postId = await this.convertSlugToPostId(slug);
+            const postId = await this.convertSlugToPostId(slug, path);
             const existingMappedSlug = await this.stateManager.retrieve(postId);
             if (existingMappedSlug != null) {
                 await this.stateManager.store(slug, undefined);
@@ -1443,21 +1483,24 @@ class Madara {
         const path = parseSlug.slice(-2).shift();
         return { path, slug };
     }
-    async convertSlugToPostId(slug) {
+    async convertSlugToPostId(slug, path) {
         const headRequest = App.createRequest({
-            url: `${this.baseUrl}/${slug}`,
+            url: `${this.baseUrl}/${path}/${slug}`,
             method: 'HEAD'
         });
         const headResponse = await this.requestManager.schedule(headRequest, 1);
         let postId;
-        const postIdRegex = headResponse.headers['Link'].match(/\?p=(\d+)/);
+        const postIdRegex = headResponse?.headers['Link']?.match(/\?p=(\d+)/);
         if (postIdRegex && postIdRegex[1])
             postId = postIdRegex[1];
         if (postId || !isNaN(Number(postId))) {
             return postId?.toString();
         }
+        else {
+            postId = '';
+        }
         const request = App.createRequest({
-            url: `${this.baseUrl}/${slug}`,
+            url: `${this.baseUrl}/${path}/${slug}`,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
@@ -1477,16 +1520,17 @@ class Madara {
             }
         }
         if (!postId || isNaN(postId)) {
-            throw new Error('Unable to fetch numeric postId for this item!\nCheck if path is set correctly!');
+            throw new Error(`Unable to fetch numeric postId for this item! (path:${path} slug:${slug})`);
         }
         return postId.toString();
     }
     async getCloudflareBypassRequestAsync() {
         return App.createRequest({
-            url: `${this.baseUrl}`,
+            url: this.bypassPage || this.baseUrl,
             method: 'GET',
             headers: {
                 'referer': `${this.baseUrl}/`,
+                'origin': `${this.baseUrl}/`,
                 'user-agent': await this.requestManager.getDefaultUserAgent()
             }
         });
@@ -1703,14 +1747,16 @@ class Parser {
         const results = [];
         for (const obj of $(source.searchMangaSelector).toArray()) {
             const slug = ($('a', obj).attr('href') ?? '').replace(/\/$/, '').split('/').pop() ?? '';
-            if (!slug) {
-                throw new Error('Unable to parse slug');
+            const path = ($('a', obj).attr('href') ?? '').replace(/\/$/, '').split('/').slice(-2).shift() ?? '';
+            if (!slug || !path) {
+                throw new Error(`Unable to parse slug (${slug}) or path (${path})!`);
             }
             const title = $('a', obj).attr('title') ?? '';
             const image = encodeURI(await this.getImageSrc($('img', obj), source));
             const subtitle = $('span.font-meta.chapter', obj).text().trim();
             results.push({
                 slug: slug,
+                path: path,
                 image: image,
                 title: this.decodeHTMLEntity(title),
                 subtitle: this.decodeHTMLEntity(subtitle)
@@ -1723,6 +1769,7 @@ class Parser {
         for (const obj of $('div.page-item-detail').toArray()) {
             const image = encodeURI(await this.getImageSrc($('img', obj), source) ?? '');
             const title = $('a', $('h3.h5', obj)).last().text();
+            const slug = this.idCleaner($('a', $('h3.h5', obj)).attr('href') ?? '');
             const postId = $('div', obj).attr('data-post-id');
             const subtitle = $('span.font-meta.chapter', obj).first().text().trim();
             if (isNaN(Number(postId)) || !title) {
@@ -1730,7 +1777,7 @@ class Parser {
                 continue;
             }
             items.push(App.createPartialSourceManga({
-                mangaId: String(postId),
+                mangaId: String(source.usePostIds ? postId : slug),
                 image: image,
                 title: this.decodeHTMLEntity(title),
                 subtitle: this.decodeHTMLEntity(subtitle)
@@ -1777,6 +1824,7 @@ class Parser {
         image = image
             ?.trim()
             .replace(/(\s{2,})/gi, '');
+        image = image?.replace(/http:\/\//g, 'https://');
         return decodeURI(this.decodeHTMLEntity(image ?? ''));
     }
     idCleaner(str) {
