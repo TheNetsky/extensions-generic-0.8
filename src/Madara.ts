@@ -31,9 +31,15 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
 
     constructor(private cheerio: CheerioAPI) { }
 
+    /**
+     *  Request manager override
+     */
+    requestsPerSecond = 5
+    requestTimeout = 20000
+
     requestManager = App.createRequestManager({
-        requestsPerSecond: 4,
-        requestTimeout: 20000,
+        requestsPerSecond: this.requestsPerSecond,
+        requestTimeout: this.requestTimeout,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
 
@@ -42,7 +48,8 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
                     ...{
                         'user-agent': await this.requestManager.getDefaultUserAgent(),
                         'referer': `${this.baseUrl}/`,
-                        ...(request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' })
+                        'origin': `${this.baseUrl}/`,
+                        ...(request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' }) // Used for images hosted on Wordpress blogs
                     }
                 }
                 request.cookies = [
@@ -140,16 +147,30 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
      */
     chapterDetailsSelector = 'div.page-break > img'
 
+    /**
+     * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
+     */
+    bypassPage = ''
+
+    /**
+     * If it's not possible to use postIds for certain reasons, you can disable this here.
+     */
+    usePostIds = true
+
+    /**
+     * When not using postIds, you need to set the directory path
+     */
+    directoryPath = 'manga'
 
     parser = new Parser()
 
     getMangaShareUrl(mangaId: string): string {
-        return `${this.baseUrl}/?p=${mangaId}/`
+        return this.usePostIds ? `${this.baseUrl}/?p=${mangaId}/` : `${this.baseUrl}/${this.directoryPath}/${mangaId}/`
     }
 
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const request = App.createRequest({
-            url: `${this.baseUrl}/?p=${mangaId}/`,
+            url: this.usePostIds ? `${this.baseUrl}/?p=${mangaId}/` : `${this.baseUrl}/${this.directoryPath}/${mangaId}/`,
             method: 'GET'
         })
 
@@ -164,8 +185,12 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
         let endpoint: string
 
         if (this.alternativeChapterAjaxEndpoint) {
-            const slugData: any = await this.convertPostIdToSlug(Number(mangaId))
-            endpoint = `${this.baseUrl}/${slugData.path}/${slugData.slug}/ajax/chapters`
+            if (this.usePostIds) {
+                const slugData: any = await this.convertPostIdToSlug(Number(mangaId))
+                endpoint = `${this.baseUrl}/${slugData.path}/${slugData.slug}/ajax/chapters`
+            } else {
+                endpoint = `${this.baseUrl}/${this.directoryPath}/${mangaId}/ajax/chapters`
+            }
         } else {
             endpoint = `${this.baseUrl}/wp-admin/admin-ajax.php`
         }
@@ -178,7 +203,7 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
             },
             data: {
                 'action': 'manga_get_chapters',
-                'manga': mangaId
+                'manga': this.usePostIds ? mangaId : await this.convertSlugToPostId(mangaId, this.directoryPath)
             }
         })
 
@@ -190,10 +215,17 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
-        const slugData: any = await this.convertPostIdToSlug(Number(mangaId))
+
+        let url: string
+        if (this.usePostIds) {
+            const slugData: any = await this.convertPostIdToSlug(Number(mangaId))
+            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`
+        } else {
+            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/?style=list`
+        }
 
         const request = App.createRequest({
-            url: `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`,
+            url: url,
             method: 'GET'
         })
 
@@ -238,14 +270,23 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
 
         const manga: PartialSourceManga[] = []
         for (const result of results) {
-            const postId = await this.slugToPostId(result.slug)
+            if (this.usePostIds) {
+                const postId = await this.slugToPostId(result.slug, result.path)
 
-            manga.push(App.createPartialSourceManga({
-                mangaId: String(postId),
-                image: result.image,
-                title: result.title,
-                subtitle: result.subtitle
-            }))
+                manga.push(App.createPartialSourceManga({
+                    mangaId: String(postId),
+                    image: result.image,
+                    title: result.title,
+                    subtitle: result.subtitle
+                }))
+            } else {
+                manga.push(App.createPartialSourceManga({
+                    mangaId: result.slug,
+                    image: result.image,
+                    title: result.title,
+                    subtitle: result.subtitle
+                }))
+            }
         }
 
         return App.createPagedResults({
@@ -391,9 +432,9 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
         })
     }
 
-    async slugToPostId(slug: string): Promise<string> {
+    async slugToPostId(slug: string, path: string): Promise<string> {
         if (await this.stateManager.retrieve(slug) == null) {
-            const postId = await this.convertSlugToPostId(slug)
+            const postId = await this.convertSlugToPostId(slug, path)
 
             const existingMappedSlug = await this.stateManager.retrieve(postId)
             if (existingMappedSlug != null) {
@@ -442,29 +483,30 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
         return { path, slug }
     }
 
-    async convertSlugToPostId(slug: string): Promise<string> { // Credit to the MadaraDex team :-D
+    async convertSlugToPostId(slug: string, path: string): Promise<string> { // Credit to the MadaraDex team :-D
         const headRequest = App.createRequest({
-            url: `${this.baseUrl}/${slug}`,
+            url: `${this.baseUrl}/${path}/${slug}`,
             method: 'HEAD'
         })
         const headResponse = await this.requestManager.schedule(headRequest, 1)
 
         let postId: any
 
-        const postIdRegex = headResponse.headers['Link'].match(/\?p=(\d+)/)
+        const postIdRegex = headResponse?.headers['Link']?.match(/\?p=(\d+)/)
         if (postIdRegex && postIdRegex[1]) postId = postIdRegex[1]
         if (postId || !isNaN(Number(postId))) {
             return postId?.toString()
+        } else {
+            postId = ''
         }
 
         const request = App.createRequest({
-            url: `${this.baseUrl}/${slug}`,
+            url: `${this.baseUrl}/${path}/${slug}`,
             method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-
 
         // Step 1: Try to get postId from shortlink
         postId = Number($('link[rel="shortlink"]')?.attr('href')?.split('/?p=')[1])
@@ -484,7 +526,7 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
         }
 
         if (!postId || isNaN(postId)) {
-            throw new Error('Unable to fetch numeric postId for this item!\nCheck if path is set correctly!')
+            throw new Error(`Unable to fetch numeric postId for this item! (path:${path} slug:${slug})`)
         }
 
         return postId.toString()
@@ -492,10 +534,11 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
 
     async getCloudflareBypassRequestAsync() {
         return App.createRequest({
-            url: `${this.baseUrl}`,
+            url: this.bypassPage || this.baseUrl,
             method: 'GET',
             headers: {
                 'referer': `${this.baseUrl}/`,
+                'origin': `${this.baseUrl}/`,
                 'user-agent': await this.requestManager.getDefaultUserAgent()
             }
         })

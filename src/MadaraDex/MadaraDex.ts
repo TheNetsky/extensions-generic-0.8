@@ -38,9 +38,9 @@ export class MadaraDex extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override hasAdvancedSearchPage = true
-
     override alternativeChapterAjaxEndpoint = false
+
+    override hasAdvancedSearchPage = true
 
     override searchMangaSelector = 'div.c-tabs-item > div.row'
 }

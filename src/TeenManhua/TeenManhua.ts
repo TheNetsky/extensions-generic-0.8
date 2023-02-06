@@ -34,7 +34,7 @@ export class TeenManhua extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override hasAdvancedSearchPage = true
-
     override alternativeChapterAjaxEndpoint = true
+
+    override hasAdvancedSearchPage = true
 }

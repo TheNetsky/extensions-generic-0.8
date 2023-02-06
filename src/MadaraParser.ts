@@ -145,8 +145,9 @@ export class Parser {
 
         for (const obj of $(source.searchMangaSelector).toArray()) {
             const slug: string = ($('a', obj).attr('href') ?? '').replace(/\/$/, '').split('/').pop() ?? ''
-            if (!slug) {
-                throw new Error('Unable to parse slug')
+            const path: string = ($('a', obj).attr('href') ?? '').replace(/\/$/, '').split('/').slice(-2).shift() ?? ''
+            if (!slug || !path) {
+                throw new Error(`Unable to parse slug (${slug}) or path (${path})!`)
             }
 
             const title: string = $('a', obj).attr('title') ?? ''
@@ -155,6 +156,7 @@ export class Parser {
 
             results.push({
                 slug: slug,
+                path: path,
                 image: image,
                 title: this.decodeHTMLEntity(title),
                 subtitle: this.decodeHTMLEntity(subtitle)
@@ -171,6 +173,7 @@ export class Parser {
             const image = encodeURI(await this.getImageSrc($('img', obj), source) ?? '')
             const title = $('a', $('h3.h5', obj)).last().text()
 
+            const slug = this.idCleaner($('a', $('h3.h5', obj)).attr('href') ?? '')
             const postId = $('div', obj).attr('data-post-id')
             const subtitle = $('span.font-meta.chapter', obj).first().text().trim()
 
@@ -180,7 +183,7 @@ export class Parser {
             }
 
             items.push(App.createPartialSourceManga({
-                mangaId: String(postId),
+                mangaId: String(source.usePostIds ? postId : slug),
                 image: image,
                 title: this.decodeHTMLEntity(title),
                 subtitle: this.decodeHTMLEntity(subtitle)
@@ -189,7 +192,7 @@ export class Parser {
         return items
     }
 
-    
+
     // UTILITY METHODS
     protected decodeHTMLEntity(str: string): string {
         return entities.decodeHTML(str)
@@ -233,6 +236,8 @@ export class Parser {
         image = image
             ?.trim()
             .replace(/(\s{2,})/gi, '')
+
+        image = image?.replace(/http:\/\//g, 'https://')
 
         return decodeURI(this.decodeHTMLEntity(image ?? ''))
     }
