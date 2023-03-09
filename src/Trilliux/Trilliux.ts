@@ -10,11 +10,11 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://hiperdex.com'
+const DOMAIN = 'https://trilliux.me'
 
-export const HiperDexInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
-    name: 'HiperDex',
+export const TrilliuxInfo: SourceInfo = {
+    version: getExportVersion('0.0.0'),
+    name: 'Trilliux',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -29,16 +29,12 @@ export const HiperDexInfo: SourceInfo = {
         {
             text: '18+',
             type: BadgeColor.YELLOW
-        },
-        {
-            text: 'Cloudflare',
-            type: BadgeColor.RED
         }
     ],
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI
 }
 
-export class HiperDex extends Madara {
+export class Trilliux extends Madara {
 
     baseUrl: string = DOMAIN
 
