@@ -1053,36 +1053,28 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":60,"./encode.js":62,"./escape.js":63}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HiperDex = exports.HiperDexInfo = void 0;
+exports.AstraScans = exports.AstraScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://hiperdex.com';
-exports.HiperDexInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.1'),
-    name: 'HiperDex',
+const DOMAIN = 'https://astrascans.com';
+exports.AstraScansInfo = {
+    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    name: 'AstraScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: types_1.ContentRating.ADULT,
+    contentRating: types_1.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
             type: types_1.BadgeColor.GREEN
-        },
-        {
-            text: '18+',
-            type: types_1.BadgeColor.YELLOW
-        },
-        {
-            text: 'Cloudflare',
-            type: types_1.BadgeColor.RED
         }
     ],
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
 };
-class HiperDex extends Madara_1.Madara {
+class AstraScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
@@ -1090,7 +1082,7 @@ class HiperDex extends Madara_1.Madara {
         this.hasAdvancedSearchPage = true;
     }
 }
-exports.HiperDex = HiperDex;
+exports.AstraScans = AstraScans;
 
 },{"../Madara":69,"@paperback/types":59}],69:[function(require,module,exports){
 "use strict";

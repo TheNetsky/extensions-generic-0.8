@@ -1053,48 +1053,6 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":60,"./encode.js":62,"./escape.js":63}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HiperDex = exports.HiperDexInfo = void 0;
-const types_1 = require("@paperback/types");
-const Madara_1 = require("../Madara");
-const DOMAIN = 'https://hiperdex.com';
-exports.HiperDexInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.1'),
-    name: 'HiperDex',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: types_1.ContentRating.ADULT,
-    websiteBaseURL: DOMAIN,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
-        {
-            text: '18+',
-            type: types_1.BadgeColor.YELLOW
-        },
-        {
-            text: 'Cloudflare',
-            type: types_1.BadgeColor.RED
-        }
-    ],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
-};
-class HiperDex extends Madara_1.Madara {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-        this.alternativeChapterAjaxEndpoint = true;
-        this.hasAdvancedSearchPage = true;
-    }
-}
-exports.HiperDex = HiperDex;
-
-},{"../Madara":69,"@paperback/types":59}],69:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
@@ -1551,7 +1509,7 @@ class Madara {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":70,"./MadaraParser":71}],70:[function(require,module,exports){
+},{"./MadaraHelper":69,"./MadaraParser":70}],69:[function(require,module,exports){
 "use strict";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1595,7 +1553,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],71:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -1846,5 +1804,43 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"entities":67}]},{},[68])(68)
+},{"entities":67}],71:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Trilliux = exports.TrilliuxInfo = void 0;
+const types_1 = require("@paperback/types");
+const Madara_1 = require("../Madara");
+const DOMAIN = 'https://trilliux.me';
+exports.TrilliuxInfo = {
+    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    name: 'Trilliux',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: types_1.ContentRating.ADULT,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [
+        {
+            text: 'Notifications',
+            type: types_1.BadgeColor.GREEN
+        },
+        {
+            text: '18+',
+            type: types_1.BadgeColor.YELLOW
+        }
+    ],
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
+};
+class Trilliux extends Madara_1.Madara {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+        this.alternativeChapterAjaxEndpoint = true;
+        this.hasAdvancedSearchPage = true;
+    }
+}
+exports.Trilliux = Trilliux;
+
+},{"../Madara":68,"@paperback/types":59}]},{},[71])(71)
 });
