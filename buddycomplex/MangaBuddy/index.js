@@ -1587,11 +1587,11 @@ class BuddyComplexParser {
             image = imageObj?.attr('data-src');
         }
         else {
-            image = null;
+            image = undefined;
         }
         const wpRegex = image?.match(/(https:\/\/i\d.wp.com\/)/);
         if (wpRegex)
-            image = image.replace(wpRegex[0], '');
+            image = image?.replace(wpRegex[0], '');
         if (image?.startsWith('//'))
             image = `https:${image}`;
         if (!image?.startsWith('http'))
