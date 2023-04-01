@@ -200,7 +200,7 @@ export class Parser {
 
     async getImageSrc(imageObj: Cheerio | undefined, source: any): Promise<string> {
 
-        let image
+        let image: string | undefined
         if ((typeof imageObj?.attr('data-src')) != 'undefined') {
             image = imageObj?.attr('data-src')
         }
