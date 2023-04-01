@@ -311,7 +311,7 @@ export class BuddyComplexParser {
 
 
     protected getImageSrc(imageObj: Cheerio | undefined): string {
-        let image: any
+        let image: string | undefined
         const dataLazy = imageObj?.attr('data-lazy-src')
         const srcset = imageObj?.attr('srcset')
         const dataSRC = imageObj?.attr('data-src')
@@ -323,11 +323,11 @@ export class BuddyComplexParser {
         } else if ((typeof dataSRC != 'undefined') && !dataSRC?.startsWith('data')) {
             image = imageObj?.attr('data-src')
         } else {
-            image = null
+            image = undefined
         }
 
         const wpRegex = image?.match(/(https:\/\/i\d.wp.com\/)/)
-        if (wpRegex) image = image.replace(wpRegex[0], '')
+        if (wpRegex) image = image?.replace(wpRegex[0], '')
         if (image?.startsWith('//')) image = `https:${image}`
         if (!image?.startsWith('http')) image = `https://${image}`
 
