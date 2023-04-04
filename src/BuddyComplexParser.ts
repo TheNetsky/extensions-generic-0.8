@@ -93,7 +93,7 @@ export class BuddyComplexParser {
                 time: date,
                 volume: 0,
                 sortingIndex,
-                langCode: 'English',
+                langCode: 'ENG',
                 group: ''
             })
             sortingIndex--
