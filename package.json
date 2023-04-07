@@ -6,17 +6,11 @@
   "main": "index.js",
   "scripts": {
     "bundle": "paperback bundle",
-    "serve": "paperback serve"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TheNetsky/extensions-generic-0.8.git"
+    "serve": "paperback serve",
+    "test": "paperback test"
   },
   "author": "Netsky",
   "license": "GPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/TheNetsky/extensions-generic-0.8/issues"
-  },
   "homepage": "https://thenetsky.github.io/extensions-generic-0.8",
   "devDependencies": {
     "@types/cheerio": "^0.22.21",
