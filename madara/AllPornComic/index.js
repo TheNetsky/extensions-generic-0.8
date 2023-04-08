@@ -1094,7 +1094,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '3.0.0';
+const BASE_VERSION = '3.0.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1362,7 +1362,7 @@ class Madara {
                     type: 'singleRowNormal',
                     containsMoreItems: true
                 })
-            },
+            }
         ];
         const promises = [];
         for (const section of sections) {
@@ -1540,7 +1540,7 @@ class Madara {
         });
     }
     CloudFlareError(status) {
-        if (status == 503) {
+        if (status > 400) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${this.baseUrl} and press Cloudflare Bypass`);
         }
     }
