@@ -22,14 +22,14 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '3.0.0'
+const BASE_VERSION = '3.0.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
 export abstract class Madara implements Searchable, MangaProviding, ChapterProviding {
 
-    constructor(private cheerio: CheerioAPI) { }
+    constructor(public cheerio: CheerioAPI) { }
 
     /**
      *  Request manager override
@@ -332,7 +332,7 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
                     type: 'singleRowNormal',
                     containsMoreItems: true
                 })
-            },
+            }
         ]
 
         const promises: Promise<void>[] = []
@@ -357,9 +357,9 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
     }
 
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
-
         const page = metadata?.page ?? 0
         let sortBy: any[] = []
+
         switch (homepageSectionId) {
             case '0': {
                 sortBy = ['_latest_update']
@@ -545,7 +545,7 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
     }
 
     CloudFlareError(status: any) {
-        if (status == 503) {
+        if (status > 400) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${this.baseUrl} and press Cloudflare Bypass`)
         }
     }
