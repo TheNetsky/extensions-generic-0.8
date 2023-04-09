@@ -1403,22 +1403,12 @@ class BuddyComplexParser {
             const date = new Date($('time.chapter-update', chapter)?.text() ?? '');
             if (!id)
                 continue;
-            const chapterRegex = id.match(/chapter-(\d+)(?:[-.]\d+)?/);
-            let chapterNumberRegex;
-            if (chapterRegex) {
-                chapterNumberRegex = chapterRegex[0].match(/(\d+)(?:[-.]\d+)?/);
-            }
-            else {
-                const getNumber = id.split('-').pop() ?? '';
-                chapterNumberRegex = getNumber.match(/(\d+)(?:[-.]\d+)?/);
-            }
-            let chapterNumber = 0;
-            if (chapterNumberRegex && chapterNumberRegex[1]) {
-                let chapterRegex = chapterNumberRegex[1];
-                if (chapterRegex.includes("-"))
-                    chapterRegex = chapterRegex.replace("-", ".");
-                chapterNumber = Number(chapterRegex);
-            }
+            // Check chapter/ch-* regex first
+            const byChapter = id.match(/(?:chapter|ch)-((\d+)(?:[-.]\d+)?)/);
+            const byNumber = (id.split('-').pop() ?? '').match(/(\d+)(?:[-.]\d+)?/);
+            const chapterNumberRegex = (byChapter && byChapter[1]) ? byChapter[1] : byNumber ? byNumber[0] : '0';
+            let chapterNumber = Number(chapterNumberRegex.replace('-', '.'));
+            chapterNumber = isNaN(chapterNumber) ? 0 : chapterNumber;
             chapters.push({
                 id: id,
                 name: title,
