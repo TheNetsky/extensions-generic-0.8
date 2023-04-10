@@ -46,7 +46,7 @@ export const MangakakalotInfo: SourceInfo = {
     intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
 }
 
-export class MangaKakalot extends MangaBox {
+export class Mangakakalot extends MangaBox {
     // Website base URL.
     baseURL = SITE_DOMAIN
 
