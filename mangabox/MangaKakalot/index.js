@@ -1547,16 +1547,16 @@ exports.chapterSettings = chapterSettings;
 "use strict";
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MangaKakalot = exports.MangaKakalotInfo = void 0;
+exports.MangaKakalot = exports.MangakakalotInfo = void 0;
 const types_1 = require("@paperback/types");
 const entities_1 = require("entities");
 const MangaBox_1 = require("../MangaBox");
 const MangaBoxHelpers_1 = require("../MangaBoxHelpers");
 const MangaBoxParser_1 = require("../MangaBoxParser");
 const SITE_DOMAIN = 'https://mangakakalot.com';
-exports.MangaKakalotInfo = {
+exports.MangakakalotInfo = {
     version: (0, MangaBox_1.getExportVersion)('0.0.0'),
-    name: 'MangaKakalot',
+    name: 'Mangakakalot',
     icon: 'icon.png',
     author: 'Batmeow',
     authorWebsite: 'https://github.com/Batmeow',
