@@ -1547,7 +1547,7 @@ exports.chapterSettings = chapterSettings;
 "use strict";
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MangaKakalot = exports.MangakakalotInfo = void 0;
+exports.Mangakakalot = exports.MangakakalotInfo = void 0;
 const types_1 = require("@paperback/types");
 const entities_1 = require("entities");
 const MangaBox_1 = require("../MangaBox");
@@ -1571,7 +1571,7 @@ exports.MangakakalotInfo = {
     ],
     intents: types_1.SourceIntents.SETTINGS_UI | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS
 };
-class MangaKakalot extends MangaBox_1.MangaBox {
+class Mangakakalot extends MangaBox_1.MangaBox {
     constructor() {
         super(...arguments);
         // Website base URL.
@@ -1688,7 +1688,7 @@ class MangaKakalot extends MangaBox_1.MangaBox {
         return TagSection;
     }
 }
-exports.MangaKakalot = MangaKakalot;
+exports.Mangakakalot = Mangakakalot;
 
 },{"../MangaBox":68,"../MangaBoxHelpers":69,"../MangaBoxParser":70,"@paperback/types":59,"entities":67}]},{},[72])(72)
 });
