@@ -66,12 +66,11 @@ export class Parser {
             const id = this.idCleaner($('a', obj).first().attr('href') ?? '')
 
             const chapName = $('a', obj).first().text().trim() ?? ''
-            const byChapter = id.match(/(?:chapter|ch)-((\d+)(?:[-.]\d+)?)/)
-            const byNumber = (id.split('-').pop() ?? '').match(/(\d+)(?:[-.]\d+)?/)
-            const chapNumRegex = (byChapter && byChapter[1]) ? byChapter[1] : byNumber ? byNumber[0] : '0'
+            const byChapter = id.match(/(?:chapter|ch.*?)[-_](\d+\.?\d?(?:[-_]\d+)?)/)
+			const chapNumRegex = (byChapter && byChapter[1]) ? byChapter[1].replace(/[-_]/gm,".") : '0';
 
-            let chapNum = Number(chapNumRegex.replace('-', '.'))
-            chapNum = isNaN(chapNum) ? 0 : chapNum
+			// make sure the chapter number is a number and not NaN
+            let chapNum = parseFloat(chapNumRegex) ?? 0
 
             let mangaTime: Date
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title')
