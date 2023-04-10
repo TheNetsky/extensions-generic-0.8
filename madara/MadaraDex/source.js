@@ -1681,7 +1681,11 @@ class Parser {
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = this.idCleaner($('a', obj).first().attr('href') ?? '');
             const chapName = $('a', obj).first().text().trim() ?? '';
-            const chapNum = Number(decodeURIComponent(id).match(/\D*(\d*-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'));
+            const byChapter = id.match(/(?:chapter|ch)-((\d+)(?:[-.]\d+)?)/);
+            const byNumber = (id.split('-').pop() ?? '').match(/(\d+)(?:[-.]\d+)?/);
+            const chapNumRegex = (byChapter && byChapter[1]) ? byChapter[1] : byNumber ? byNumber[0] : '0';
+            let chapNum = Number(chapNumRegex.replace('-', '.'));
+            chapNum = isNaN(chapNum) ? 0 : chapNum;
             let mangaTime;
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
@@ -1700,8 +1704,8 @@ class Parser {
             }
             chapters.push({
                 id: id,
-                langCode: source.language ?? 'Unkown',
-                chapNum: isNaN(chapNum) ? 0 : chapNum,
+                langCode: source.language ?? 'Unknown',
+                chapNum: chapNum,
                 name: chapName ? this.decodeHTMLEntity(chapName) : '',
                 time: mangaTime,
                 sortingIndex,
