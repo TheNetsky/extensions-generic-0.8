@@ -67,9 +67,9 @@ export class Parser {
 
             const chapName = $('a', obj).first().text().trim() ?? ''
             const byChapter = id.match(/(?:chapter|ch.*?)[-_](\d+\.?\d?(?:[-_]\d+)?)/)
-			const chapNumRegex = (byChapter && byChapter[1]) ? byChapter[1].replace(/[-_]/gm,".") : '0';
+            const chapNumRegex = (byChapter && byChapter[1]) ? byChapter[1].replace(/[-_]/gm,".") : '0';
 
-			// make sure the chapter number is a number and not NaN
+            // make sure the chapter number is a number and not NaN
             let chapNum = parseFloat(chapNumRegex) ?? 0
 
             let mangaTime: Date
