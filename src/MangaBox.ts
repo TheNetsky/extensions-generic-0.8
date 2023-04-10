@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
+
 import {
     Chapter,
     ChapterDetails,
@@ -12,7 +14,7 @@ import {
     SearchRequest,
     Searchable,
     SourceManga,
-    TagSection,
+    TagSection
 } from '@paperback/types'
 
 import {
@@ -21,7 +23,7 @@ import {
     parseChapters,
     parseMangaDetails,
     parseManga,
-    parseTags,
+    parseTags
 } from './MangaBoxParser'
 
 import {
@@ -96,7 +98,7 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
     // Selector for manga chapter images.
     chapterImagesSelector = 'div.container-chapter-reader img'
 
-    constructor(public cheerio: cheerio.CheerioAPI) {}
+    constructor(public cheerio: CheerioAPI) { }
 
     stateManager = App.createSourceStateManager()
 
@@ -180,18 +182,26 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
             }
         ]
 
+        const promises: Promise<void>[] = []
+
         for (const section of sections) {
-            const response = await this.requestManager.schedule(section.request, 1)
-            const $ = this.cheerio.load(response.data as string)
-            section.section.items = parseManga($, this)
             sectionCallback(section.section)
+            promises.push(
+                this.requestManager.schedule(section.request, 1)
+                    .then(response => {
+                        const $ = this.cheerio.load(response.data as string)
+                        const items = parseManga($, this)
+                        section.section.items = items
+                        sectionCallback(section.section)
+                    })
+            )
         }
     }
 
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const request = App.createRequest({
             url: `${mangaId}`,
-            method: 'GET',
+            method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -232,15 +242,13 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
         return parseChapterDetails($, mangaId, chapterId, this)
     }
 
-    /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     async getViewMoreItems(homePageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
 
         const request = App.createRequest({
             url: new URLBuilder(this.baseURL)
-                .addPathComponent(this.mangaListPath)
+                .addPathComponent(`${this.mangaListPath}/${page}`)
                 .addQueryParameter('type', homePageSectionId)
-                .addQueryParameter('page', page)
                 .buildUrl(),
             method: 'GET'
         })
@@ -249,13 +257,12 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
         const $ = this.cheerio.load(response.data as string)
         const results = parseManga($, this)
 
-        metadata = !isLastPage($) ? {page: page + 1} : undefined
+        metadata = !isLastPage($) ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: results,
             metadata: metadata
         })
     }
-    /* eslint-enable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
 
     async supportsTagExclusion(): Promise<boolean> {
         return true
@@ -274,7 +281,6 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
         return parseTags($, this)
     }
 
-    /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
 
@@ -293,11 +299,10 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
         const $ = this.cheerio.load(response.data as string)
         const results = parseManga($, this)
 
-        metadata = !isLastPage($) ? {page: page + 1} : undefined
+        metadata = !isLastPage($) ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: results,
             metadata: metadata
         })
     }
-    /* eslint-enable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
 }
