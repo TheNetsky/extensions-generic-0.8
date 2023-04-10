@@ -28,9 +28,9 @@ import {
 
 const SITE_DOMAIN = 'https://mangakakalot.com'
 
-export const MangaKakalotInfo: SourceInfo = {
+export const MangakakalotInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'MangaKakalot',
+    name: 'Mangakakalot',
     icon: 'icon.png',
     author: 'Batmeow',
     authorWebsite: 'https://github.com/Batmeow',
