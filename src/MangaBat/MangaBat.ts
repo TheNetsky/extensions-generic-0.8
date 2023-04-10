@@ -35,7 +35,7 @@ export class MangaBat extends MangaBox {
     baseURL = SITE_DOMAIN
 
     // Language code supported by the source.
-    languageCode = '🇺🇸'
+    languageCode = '🇬🇧'
 
     // Path for manga list.
     mangaListPath = 'manga-list-all'

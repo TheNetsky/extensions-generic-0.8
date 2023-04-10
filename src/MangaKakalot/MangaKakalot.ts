@@ -1,7 +1,6 @@
 import {
     BadgeColor,
     ContentRating,
-    DUISection,
     PagedResults,
     PartialSourceManga,
     SearchRequest,
@@ -17,8 +16,6 @@ import {
     MangaBox,
     getExportVersion,
 } from '../MangaBox'
-
-import { chapterSettings } from '../MangaBoxSettings'
 
 import { URLBuilder } from '../MangaBoxHelpers'
 
@@ -44,7 +41,7 @@ export const MangaKakalotInfo: SourceInfo = {
             type: BadgeColor.GREEN
         }
     ],
-    intents: SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
+    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
 }
 
 export class MangaKakalot extends MangaBox {
@@ -52,7 +49,7 @@ export class MangaKakalot extends MangaBox {
     baseURL = SITE_DOMAIN
 
     // Language code supported by the source.
-    languageCode = '🇺🇸'
+    languageCode = '🇬🇧'
 
     // Path for manga list.
     mangaListPath = 'manga_list'
@@ -62,16 +59,6 @@ export class MangaKakalot extends MangaBox {
 
     // Selector for subtitle in manga list.
     mangaSubtitleSelector = 'a.list-story-item-wrap-chapter'
-
-    // Site generates a key when switching image servers.
-    override async getSourceMenu(): Promise<DUISection> {
-        return App.createDUISection({
-            id: 'main',
-            header: 'Source Settings',
-            isHidden: true,
-            rows: async () => [chapterSettings(this.stateManager)],
-        })
-    }
 
     override async supportsTagExclusion(): Promise<boolean> {
         return false

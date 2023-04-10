@@ -71,16 +71,12 @@ export const parseMangaDetails = ($: cheerio.Root, mangaId: string, source: Mang
 
     const desc = decodeHTML($(source.mangaDescSelector).first().children().remove().end().text().trim())
 
-    let hentai = false
-
     const tags: Tag[] = []
     for (const tag of $(source.mangaGenresSelector, mangaRootSelector).toArray()) {
         const id = $(tag).attr('href')
         const label = $(tag).text().trim()
 
         if (!id || !label) continue
-        if (['ADULT', 'SMUT', 'MATURE'].includes(label.toUpperCase())) hentai = true
-
         tags.push({ id: id, label: label })
     }
     const TagSection: TagSection[] = [
@@ -99,7 +95,6 @@ export const parseMangaDetails = ($: cheerio.Root, mangaId: string, source: Mang
             status: status,
             author: author ? author : 'Unkown',
             desc: desc,
-            hentai: hentai,
             tags: TagSection,
         }),
     })
@@ -123,7 +118,7 @@ export const parseChapters = ($: cheerio.Root, source: MangaBox): Chapter[] => {
             id: id,
             chapNum: isNaN(chapNum) ? 0 : chapNum,
             name: name,
-            group: 'Aggragator',
+            group: '',
             time: time,
             langCode: source.languageCode,
         }))

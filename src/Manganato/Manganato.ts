@@ -35,7 +35,7 @@ export class Manganato extends MangaBox {
     baseURL = SITE_DOMAIN
 
     // Language code supported by the source.
-    languageCode = '🇺🇸'
+    languageCode = '🇬🇧'
 
     // Path for manga list.
     mangaListPath = 'genre-all'
