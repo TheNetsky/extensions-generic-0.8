@@ -1086,13 +1086,14 @@ class MangaBat extends MangaBox_1.MangaBox {
         // Selector for manga in manga list.
         this.mangaListSelector = 'div.panel-list-story div.list-story-item';
         // Selector for subtitle in manga list.
-        this.mangaSubtitleSelector = 'a.genres-item-chap.text-nowrap, div.item-right a.item-chapter';
+        this.mangaSubtitleSelector = 'div.item-right > a.item-chapter';
     }
 }
 exports.MangaBat = MangaBat;
 
 },{"../MangaBox":69,"@paperback/types":59}],69:[function(require,module,exports){
 "use strict";
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaBox = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
@@ -1216,17 +1217,22 @@ class MangaBox {
                 })
             }
         ];
+        const promises = [];
         for (const section of sections) {
-            const response = await this.requestManager.schedule(section.request, 1);
-            const $ = this.cheerio.load(response.data);
-            section.section.items = (0, MangaBoxParser_1.parseManga)($, this);
             sectionCallback(section.section);
+            promises.push(this.requestManager.schedule(section.request, 1)
+                .then(response => {
+                const $ = this.cheerio.load(response.data);
+                const items = (0, MangaBoxParser_1.parseManga)($, this);
+                section.section.items = items;
+                sectionCallback(section.section);
+            }));
         }
     }
     async getMangaDetails(mangaId) {
         const request = App.createRequest({
             url: `${mangaId}`,
-            method: 'GET',
+            method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         const $ = this.cheerio.load(response.data);
@@ -1260,14 +1266,12 @@ class MangaBox {
         const $ = this.cheerio.load(response.data);
         return (0, MangaBoxParser_1.parseChapterDetails)($, mangaId, chapterId, this);
     }
-    /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     async getViewMoreItems(homePageSectionId, metadata) {
         const page = metadata?.page ?? 1;
         const request = App.createRequest({
             url: new MangaBoxHelpers_1.URLBuilder(this.baseURL)
-                .addPathComponent(this.mangaListPath)
+                .addPathComponent(`${this.mangaListPath}/${page}`)
                 .addQueryParameter('type', homePageSectionId)
-                .addQueryParameter('page', page)
                 .buildUrl(),
             method: 'GET'
         });
@@ -1280,7 +1284,6 @@ class MangaBox {
             metadata: metadata
         });
     }
-    /* eslint-enable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     async supportsTagExclusion() {
         return true;
     }
@@ -1295,7 +1298,6 @@ class MangaBox {
         const $ = this.cheerio.load(response.data);
         return (0, MangaBoxParser_1.parseTags)($, this);
     }
-    /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     async getSearchResults(query, metadata) {
         const page = metadata?.page ?? 1;
         const request = App.createRequest({
@@ -1322,26 +1324,23 @@ exports.MangaBox = MangaBox;
 
 },{"./MangaBoxHelpers":70,"./MangaBoxParser":71,"./MangaBoxSettings":72,"@paperback/types":59}],70:[function(require,module,exports){
 "use strict";
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
 class URLBuilder {
     constructor(baseUrl) {
-        /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
         this.parameters = {};
         this.pathComponents = [];
         this.baseUrl = baseUrl.replace(/(^\/)?(?=.*)(\/$)?/gim, '');
     }
-    /* eslint-enable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     addPathComponent(component) {
         this.pathComponents.push(component.replace(/(^\/)?(?=.*)(\/$)?/gim, ''));
         return this;
     }
-    /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     addQueryParameter(key, value) {
         this.parameters[key] = value;
         return this;
     }
-    /* eslint-enable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     buildUrl({ addTrailingSlash, includeUndefinedParameters } = { addTrailingSlash: false, includeUndefinedParameters: false }) {
         let finalUrl = this.baseUrl + '/';
         finalUrl += this.pathComponents.join('/');
