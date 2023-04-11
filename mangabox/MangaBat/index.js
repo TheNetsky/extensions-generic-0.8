@@ -1100,7 +1100,7 @@ const types_1 = require("@paperback/types");
 const MangaBoxParser_1 = require("./MangaBoxParser");
 const MangaBoxSettings_1 = require("./MangaBoxSettings");
 const MangaBoxHelpers_1 = require("./MangaBoxHelpers");
-const BASE_VERSION = '4.0.0';
+const BASE_VERSION = '4.0.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1303,7 +1303,7 @@ class MangaBox {
         const request = App.createRequest({
             url: new MangaBoxHelpers_1.URLBuilder(this.baseURL)
                 .addPathComponent('advanced_search')
-                .addQueryParameter('keyw', encodeURI(query?.title || ''))
+                .addQueryParameter('keyw', query.title?.replace(/[^a-zA-Z0-9 ]/g, '').replace(/ +/g, '_').toLowerCase() ?? '')
                 .addQueryParameter('g_i', `_${query.includedTags?.map(t => t.id).join('_')}_`)
                 .addQueryParameter('g_e', `_${query.excludedTags?.map(t => t.id).join('_')}_`)
                 .addQueryParameter('page', page)
