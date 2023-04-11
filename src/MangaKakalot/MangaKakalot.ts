@@ -89,7 +89,7 @@ export class MangaKakalot extends MangaBox {
                 url: new URLBuilder(this.baseURL)
                     .addPathComponent('search')
                     .addPathComponent('story')
-                    .addPathComponent(encodeURI(query?.title || ''))
+                    .addPathComponent(query.title?.replace(/[^a-zA-Z0-9 ]/g, '').replace(/ +/g, '_').toLowerCase() ?? '')
                     .addQueryParameter('page', page)
                     .buildUrl(),
                 method: 'GET'
