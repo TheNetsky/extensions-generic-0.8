@@ -33,7 +33,7 @@ import {
 
 import { URLBuilder } from './MangaBoxHelpers'
 
-const BASE_VERSION = '4.0.0'
+const BASE_VERSION = '4.0.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -287,7 +287,7 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
         const request = App.createRequest({
             url: new URLBuilder(this.baseURL)
                 .addPathComponent('advanced_search')
-                .addQueryParameter('keyw', encodeURI(query?.title || ''))
+                .addQueryParameter('keyw', query.title?.replace(/[^a-zA-Z0-9 ]/g, '').replace(/ +/g, '_').toLowerCase() ?? '')
                 .addQueryParameter('g_i', `_${query.includedTags?.map(t => t.id).join('_')}_`)
                 .addQueryParameter('g_e', `_${query.excludedTags?.map(t => t.id).join('_')}_`)
                 .addQueryParameter('page', page)
