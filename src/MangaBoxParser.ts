@@ -4,14 +4,14 @@ import {
     PartialSourceManga,
     SourceManga,
     Tag,
-    TagSection,
+    TagSection
 } from '@paperback/types'
 
 import { decodeHTML } from 'entities'
 
 import { MangaBox } from './MangaBox'
 
-export const parseManga = ($: cheerio.Root, source: MangaBox): PartialSourceManga[] => {
+export const parseManga = ($: CheerioStatic, source: MangaBox): PartialSourceManga[] => {
     const mangaItems: PartialSourceManga[] = []
     const collecedIds: string[] = []
 
@@ -34,7 +34,7 @@ export const parseManga = ($: cheerio.Root, source: MangaBox): PartialSourceMang
     return mangaItems
 }
 
-export const parseMangaDetails = ($: cheerio.Root, mangaId: string, source: MangaBox): SourceManga => {
+export const parseMangaDetails = ($: CheerioStatic, mangaId: string, source: MangaBox): SourceManga => {
     const mangaRootSelector = $(source.mangaRootSelector)
 
     const image = $(source.mangaThumbnailSelector).attr('src') ?? ''
@@ -100,7 +100,7 @@ export const parseMangaDetails = ($: cheerio.Root, mangaId: string, source: Mang
     })
 }
 
-export const parseChapters = ($: cheerio.Root, source: MangaBox): Chapter[] => {
+export const parseChapters = ($: CheerioStatic, source: MangaBox): Chapter[] => {
     const chapters: Chapter[] = []
 
     for (const chapter of $(source.chapterListSelector).toArray()) {
@@ -123,16 +123,10 @@ export const parseChapters = ($: cheerio.Root, source: MangaBox): Chapter[] => {
             langCode: source.languageCode,
         }))
     }
-
     return chapters
 }
 
-export const parseChapterDetails = async (
-    $: cheerio.Root,
-    mangaId: string,
-    chapterId: string,
-    source: MangaBox
-): Promise<ChapterDetails> => {
+export const parseChapterDetails = async ($: CheerioStatic, mangaId: string, chapterId: string, source: MangaBox): Promise<ChapterDetails> => {
     const pages: string[] = []
 
     for (const img of $(source.chapterImagesSelector).toArray()) {
@@ -151,13 +145,13 @@ export const parseChapterDetails = async (
     return chapterDetails
 }
 
-export const parseTags = ($: cheerio.Root, source: MangaBox): TagSection[] => {
+export const parseTags = ($: CheerioStatic, source: MangaBox): TagSection[] => {
     const genres: Tag[] = []
     for (const genre of $(source.genreListSelector).toArray()) {
         const id = $(genre).attr('data-i')
         const label = $(genre).text().trim()
         if (!id || !label) continue
-        genres.push({id: id, label: label})
+        genres.push({ id: id, label: label })
     }
 
     const TagSection: TagSection[] = [
@@ -190,7 +184,7 @@ const parseDate = (date: string): Date => {
     return time
 }
 
-export const isLastPage = ($: cheerio.Root): boolean => {
+export const isLastPage = ($: CheerioStatic): boolean => {
     const currentPage = $('.page-select, .page_select').text()
     let totalPages = $('.page-last, .page_last').text()
 

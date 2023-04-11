@@ -1,24 +1,22 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
+
 export class URLBuilder {
-    /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     parameters: Record<string, any | any[]> = {}
     pathComponents: string[] = []
     baseUrl: string
     constructor(baseUrl: string) {
         this.baseUrl = baseUrl.replace(/(^\/)?(?=.*)(\/$)?/gim, '')
     }
-    /* eslint-enable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
 
     addPathComponent(component: string): URLBuilder {
         this.pathComponents.push(component.replace(/(^\/)?(?=.*)(\/$)?/gim, ''))
         return this
     }
 
-    /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
     addQueryParameter(key: string, value: any | any[]): URLBuilder {
         this.parameters[key] = value
         return this
     }
-    /* eslint-enable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
 
     buildUrl({ addTrailingSlash, includeUndefinedParameters } = { addTrailingSlash: false, includeUndefinedParameters: false }): string {
         let finalUrl = this.baseUrl + '/'

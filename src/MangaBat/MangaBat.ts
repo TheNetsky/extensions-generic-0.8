@@ -44,5 +44,5 @@ export class MangaBat extends MangaBox {
     mangaListSelector = 'div.panel-list-story div.list-story-item'
 
     // Selector for subtitle in manga list.
-    mangaSubtitleSelector = 'a.genres-item-chap.text-nowrap, div.item-right a.item-chapter'
+    mangaSubtitleSelector = 'div.item-right > a.item-chapter'
 }

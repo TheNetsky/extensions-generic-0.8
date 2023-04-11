@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
+
 import {
     BadgeColor,
     ContentRating,
@@ -26,9 +28,9 @@ import {
 
 const SITE_DOMAIN = 'https://mangakakalot.com'
 
-export const MangaKakalotInfo: SourceInfo = {
+export const MangakakalotInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'MangaKakalot',
+    name: 'Mangakakalot',
     icon: 'icon.png',
     author: 'Batmeow',
     authorWebsite: 'https://github.com/Batmeow',
@@ -44,7 +46,7 @@ export const MangaKakalotInfo: SourceInfo = {
     intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
 }
 
-export class MangaKakalot extends MangaBox {
+export class Mangakakalot extends MangaBox {
     // Website base URL.
     baseURL = SITE_DOMAIN
 
@@ -64,7 +66,29 @@ export class MangaKakalot extends MangaBox {
         return false
     }
 
-    /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
+    override async getViewMoreItems(homePageSectionId: string, metadata: any): Promise<PagedResults> {
+        const page: number = metadata?.page ?? 1
+
+        const request = App.createRequest({
+            url: new URLBuilder(this.baseURL)
+                .addPathComponent(this.mangaListPath)
+                .addQueryParameter('type', homePageSectionId)
+                .addQueryParameter('page', page)
+                .buildUrl(),
+            method: 'GET'
+        })
+
+        const response = await this.requestManager.schedule(request, 1)
+        const $ = this.cheerio.load(response.data as string)
+        const results = parseManga($, this)
+
+        metadata = !isLastPage($) ? { page: page + 1 } : undefined
+        return App.createPagedResults({
+            results: results,
+            metadata: metadata
+        })
+    }
+
     override async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         let results: PartialSourceManga[] = []
@@ -83,7 +107,7 @@ export class MangaKakalot extends MangaBox {
             const $ = this.cheerio.load(response.data as string)
 
             results = parseManga($, this)
-            metadata = !isLastPage($) ? {page: page + 1} : undefined
+            metadata = !isLastPage($) ? { page: page + 1 } : undefined
         } else {
             const request = App.createRequest({
                 url: new URLBuilder(this.baseURL)
@@ -115,7 +139,7 @@ export class MangaKakalot extends MangaBox {
                 }))
                 collecedIds.push(mangaId)
             }
-            metadata = !isLastPage($) ? {page: page + 1} : undefined
+            metadata = !isLastPage($) ? { page: page + 1 } : undefined
         }
 
         return App.createPagedResults({
@@ -144,7 +168,7 @@ export class MangaKakalot extends MangaBox {
             const id = this.parseTagId($(tag).attr('href') ?? '')
             const label = $(tag).text().trim()
             if (!id || !label) continue
-            tags.push({id: id, label: label})
+            tags.push({ id: id, label: label })
         }
 
         const TagSection: TagSection[] = [
