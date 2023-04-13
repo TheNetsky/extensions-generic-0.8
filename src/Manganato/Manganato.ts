@@ -13,7 +13,7 @@ import {
 const SITE_DOMAIN = 'https://manganato.com'
 
 export const ManganatoInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.2'),
     name: 'Manganato',
     icon: 'icon.png',
     author: 'Batmeow',
