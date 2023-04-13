@@ -44,5 +44,5 @@ export class Manganato extends MangaBox {
     mangaListSelector = 'div.panel-content-genres div.content-genres-item'
 
     // Selector for subtitle in manga list.
-    mangaSubtitleSelector = 'a.text-nowrap, a.genres-item-chap'
+    mangaSubtitleSelector = 'a.genres-item-chap.text-nowrap'
 }

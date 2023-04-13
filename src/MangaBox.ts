@@ -17,21 +17,14 @@ import {
     TagSection
 } from '@paperback/types'
 
-import {
-    isLastPage,
-    parseChapterDetails,
-    parseChapters,
-    parseMangaDetails,
-    parseManga,
-    parseTags
-} from './MangaBoxParser'
+import { MangaBoxParser } from './MangaBoxParser'
+
+import { URLBuilder } from './MangaBoxHelpers'
 
 import {
     chapterSettings,
     getImageServer,
 } from './MangaBoxSettings'
-
-import { URLBuilder } from './MangaBoxHelpers'
 
 const BASE_VERSION = '4.0.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
@@ -99,6 +92,8 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
     chapterImagesSelector = 'div.container-chapter-reader img'
 
     constructor(public cheerio: CheerioAPI) { }
+
+    parser = new MangaBoxParser()
 
     stateManager = App.createSourceStateManager()
 
@@ -190,7 +185,7 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
                 this.requestManager.schedule(section.request, 1)
                     .then(response => {
                         const $ = this.cheerio.load(response.data as string)
-                        const items = parseManga($, this)
+                        const items = this.parser.parseManga($, this)
                         section.section.items = items
                         sectionCallback(section.section)
                     })
@@ -206,7 +201,7 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        return parseMangaDetails($, mangaId, this)
+        return this.parser.parseMangaDetails($, mangaId, this)
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
@@ -217,7 +212,7 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        return parseChapters($, this)
+        return this.parser.parseChapters($, this)
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
@@ -239,7 +234,7 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        return parseChapterDetails($, mangaId, chapterId, this)
+        return this.parser.parseChapterDetails($, mangaId, chapterId, this)
     }
 
     async getViewMoreItems(homePageSectionId: string, metadata: any): Promise<PagedResults> {
@@ -255,9 +250,9 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        const results = parseManga($, this)
+        const results = this.parser.parseManga($, this)
 
-        metadata = !isLastPage($) ? { page: page + 1 } : undefined
+        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: results,
             metadata: metadata
@@ -278,7 +273,7 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        return parseTags($, this)
+        return this.parser.parseTags($, this)
     }
 
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
@@ -297,9 +292,9 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        const results = parseManga($, this)
+        const results = this.parser.parseManga($, this)
 
-        metadata = !isLastPage($) ? { page: page + 1 } : undefined
+        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: results,
             metadata: metadata

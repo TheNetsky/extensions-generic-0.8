@@ -21,11 +21,6 @@ import {
 
 import { URLBuilder } from '../MangaBoxHelpers'
 
-import {
-    isLastPage,
-    parseManga,
-} from '../MangaBoxParser'
-
 const SITE_DOMAIN = 'https://mangakakalot.com'
 
 export const MangakakalotInfo: SourceInfo = {
@@ -80,9 +75,9 @@ export class Mangakakalot extends MangaBox {
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        const results = parseManga($, this)
+        const results = this.parser.parseManga($, this)
 
-        metadata = !isLastPage($) ? { page: page + 1 } : undefined
+        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: results,
             metadata: metadata
@@ -106,8 +101,8 @@ export class Mangakakalot extends MangaBox {
             const response = await this.requestManager.schedule(request, 1)
             const $ = this.cheerio.load(response.data as string)
 
-            results = parseManga($, this)
-            metadata = !isLastPage($) ? { page: page + 1 } : undefined
+            results = this.parser.parseManga($, this)
+            metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
         } else {
             const request = App.createRequest({
                 url: new URLBuilder(this.baseURL)
@@ -139,7 +134,7 @@ export class Mangakakalot extends MangaBox {
                 }))
                 collecedIds.push(mangaId)
             }
-            metadata = !isLastPage($) ? { page: page + 1 } : undefined
+            metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
         }
 
         return App.createPagedResults({
