@@ -12,7 +12,6 @@ import {
 import entities = require('entities')
 
 export class Parser {
-
     async parseMangaDetails($: CheerioStatic, mangaId: string, source: any): Promise<SourceManga> {
         const title: string = this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim())
         const author: string = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', '')
@@ -56,7 +55,7 @@ export class Parser {
         })
     }
 
-
+	
     parseChapterList($: CheerioSelector, mangaId: string, source: any): Chapter[] {
         const chapters: Chapter[] = []
         let sortingIndex = 0
@@ -66,11 +65,11 @@ export class Parser {
             const id = this.idCleaner($('a', obj).first().attr('href') ?? '')
 
             const chapName = $('a', obj).first().text().trim() ?? ''
-            const byChapter = id.match(/(?:chapter|ch.*?)[-_](\d+\.?\d?(?:[-_]\d+)?)/)
-            const chapNumRegex = (byChapter && byChapter[1]) ? byChapter[1].replace(/[-_]/gm,".") : '0';
+            const chapNumRegex = id.match(/(?:chapter|ch.*?)(\d+\.?\d?(?:[-_]\d+)?)|(\d+\.?\d?(?:[-_]\d+)?)$/);
+            let chapNum = chapNumRegex && chapNumRegex[1] ? chapNumRegex[1].replace(/[-_]/gm, '.') : chapNumRegex?.[2] ?? '0';
 
             // make sure the chapter number is a number and not NaN
-            let chapNum = parseFloat(chapNumRegex) ?? 0
+            chapNum = parseFloat(chapNumRegex) ?? 0
 
             let mangaTime: Date
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title')
@@ -196,14 +195,12 @@ export class Parser {
         return items
     }
 
-
     // UTILITY METHODS
     protected decodeHTMLEntity(str: string): string {
         return entities.decodeHTML(str)
     }
 
     async getImageSrc(imageObj: Cheerio | undefined, source: any): Promise<string> {
-
         let image: string | undefined
         if ((typeof imageObj?.attr('data-src')) != 'undefined') {
             image = imageObj?.attr('data-src')
