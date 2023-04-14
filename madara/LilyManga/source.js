@@ -1056,7 +1056,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LilyManga = exports.LilyMangaInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://lilymanga.com';
+const DOMAIN = 'https://lilymanga.net';
 exports.LilyMangaInfo = {
     version: (0, Madara_1.getExportVersion)('0.0.0'),
     name: 'LilyManga',
@@ -1157,7 +1157,7 @@ class Madara {
         /**
          * The language code the source's content is served in in string form.
          */
-        this.language = 'ENG';
+        this.language = '🇬🇧';
         /**
          * Different Madara sources might have a slightly different selector which is required to parse out
          * each manga object while on a search result page. This is the selector
@@ -1699,7 +1699,7 @@ class Parser {
             }
             chapters.push({
                 id: id,
-                langCode: source.language ?? 'Unknown',
+                langCode: source.language,
                 chapNum: chapNum,
                 name: chapName ? this.decodeHTMLEntity(chapName) : '',
                 time: mangaTime,

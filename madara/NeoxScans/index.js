@@ -1123,7 +1123,7 @@ class Madara {
         /**
          * The language code the source's content is served in in string form.
          */
-        this.language = 'ENG';
+        this.language = '🇬🇧';
         /**
          * Different Madara sources might have a slightly different selector which is required to parse out
          * each manga object while on a search result page. This is the selector
@@ -1665,7 +1665,7 @@ class Parser {
             }
             chapters.push({
                 id: id,
-                langCode: source.language ?? 'Unknown',
+                langCode: source.language,
                 chapNum: chapNum,
                 name: chapName ? this.decodeHTMLEntity(chapName) : '',
                 time: mangaTime,
@@ -1840,7 +1840,7 @@ class NeoxScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.language = 'PT';
+        this.language = '🇵🇹';
         this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;
     }
