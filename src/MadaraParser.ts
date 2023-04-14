@@ -55,7 +55,7 @@ export class Parser {
         })
     }
 
-	
+
     parseChapterList($: CheerioSelector, mangaId: string, source: any): Chapter[] {
         const chapters: Chapter[] = []
         let sortingIndex = 0
@@ -66,10 +66,10 @@ export class Parser {
 
             const chapName = $('a', obj).first().text().trim() ?? ''
             const chapNumRegex = id.match(/(?:chapter|ch.*?)(\d+\.?\d?(?:[-_]\d+)?)|(\d+\.?\d?(?:[-_]\d+)?)$/);
-            let chapNum = chapNumRegex && chapNumRegex[1] ? chapNumRegex[1].replace(/[-_]/gm, '.') : chapNumRegex?.[2] ?? '0';
+            let chapNum:string|number = chapNumRegex && chapNumRegex[1] ? chapNumRegex[1].replace(/[-_]/gm, '.') : chapNumRegex?.[2] ?? '0';
 
             // make sure the chapter number is a number and not NaN
-            chapNum = parseFloat(chapNumRegex) ?? 0
+            chapNum = parseFloat(chapNum) ?? 0
 
             let mangaTime: Date
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title')
