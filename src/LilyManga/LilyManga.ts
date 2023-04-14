@@ -10,7 +10,7 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://lilymanga.com'
+const DOMAIN = 'https://lilymanga.net'
 
 export const LilyMangaInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),

@@ -40,7 +40,7 @@ export class AzoraWorld extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override language = 'AR'
+    override language = '🇦🇪'
 
     override alternativeChapterAjaxEndpoint = true
 

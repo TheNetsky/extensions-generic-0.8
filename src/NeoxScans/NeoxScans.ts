@@ -38,7 +38,7 @@ export class NeoxScans extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override language = 'PT'
+    override language = '🇵🇹'
 
     override alternativeChapterAjaxEndpoint = true
 

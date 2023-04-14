@@ -92,7 +92,7 @@ export class Parser {
 
             chapters.push({
                 id: id,
-                langCode: source.language ?? 'Unknown',
+                langCode: source.language,
                 chapNum: chapNum,
                 name: chapName ? this.decodeHTMLEntity(chapName) : '',
                 time: mangaTime,
