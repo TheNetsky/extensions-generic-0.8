@@ -10,7 +10,8 @@ import {
     Response,
     Searchable,
     MangaProviding,
-    ChapterProviding
+    ChapterProviding,
+    HomeSectionType
 } from '@paperback/types'
 
 import {
@@ -123,8 +124,7 @@ export abstract class BuddyComplex implements Searchable, MangaProviding, Chapte
             .addPathComponent('search')
             .addQueryParameter('page', page)
             .addQueryParameter('q', encodeURI(query?.title || ''))
-            .addQueryParameter('genre', query.includedTags?.map((x: any) => x.id).join('%5B%5D'))
-            .buildUrl()
+            .buildUrl() + query.includedTags?.map((x: any) => `&genre%5B%5D=${x.id}`).join('')
 
         const request = App.createRequest({
             url: url,
@@ -144,11 +144,11 @@ export abstract class BuddyComplex implements Searchable, MangaProviding, Chapte
     }
 
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: 'singleRowNormal', containsMoreItems: true })
-        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: 'singleRowNormal', containsMoreItems: true })
-        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: 'singleRowNormal', containsMoreItems: true })
-        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: 'singleRowNormal', containsMoreItems: true })
-        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: 'singleRowNormal', containsMoreItems: true })
+        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
+        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
+        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
+        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
+        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
 
         const sections: HomeSection[] = [section1, section2, section3, section4, section5]
 
@@ -218,7 +218,7 @@ export abstract class BuddyComplex implements Searchable, MangaProviding, Chapte
 
 
     CloudFlareError(status: number): Error | void {
-        if (status == 503) {
+        if (status > 400) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${this.baseUrl} and press Cloudflare Bypass`)
         }
     }

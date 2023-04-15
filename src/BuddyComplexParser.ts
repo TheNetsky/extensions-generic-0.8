@@ -64,12 +64,12 @@ export class BuddyComplexParser {
                 image: image,
                 status: status,
                 author: authors.length > 0 ? authors.join(', ') : 'Unknown',
+                artist: authors.length > 0 ? authors.join(', ') : 'Unknown',
                 tags: tagSections,
                 desc: description
             })
         })
     }
-
 
     parseChapterList($: CheerioSelector): Chapter[] {
         const chapters: Chapter[] = []
@@ -96,7 +96,7 @@ export class BuddyComplexParser {
                 time: date,
                 volume: 0,
                 sortingIndex,
-                langCode: 'ENG',
+                langCode: '🇬🇧',
                 group: ''
             })
             sortingIndex--
@@ -107,7 +107,6 @@ export class BuddyComplexParser {
             return App.createChapter(chapter)
         })
     }
-
 
     parseChapterDetails($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails {
         const pages: string[] = []
@@ -144,7 +143,6 @@ export class BuddyComplexParser {
         return chapterDetails
     }
 
-
     parseTags($: CheerioSelector): TagSection[] {
         const arrayTags: Tag[] = []
 
@@ -158,7 +156,6 @@ export class BuddyComplexParser {
         const tagSections: TagSection[] = [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })]
         return tagSections
     }
-
 
     parseHomeSections($: CheerioStatic, sections: HomeSection[], sectionCallback: (section: HomeSection) => void): void {
         for (const section of sections) {
@@ -271,7 +268,6 @@ export class BuddyComplexParser {
         }
     }
 
-
     parseViewMore = ($: CheerioStatic): PartialSourceManga[] => {
         const mangas: PartialSourceManga[] = []
         const collectedIds: string[] = []
@@ -282,7 +278,7 @@ export class BuddyComplexParser {
             const image = this.getImageSrc($('img', manga))
             const subtitle = $('span.latest-chapter', manga).text().trim()
 
-            if (collectedIds.includes(id) || !id || !title) continue
+            if (!id || !title || collectedIds.includes(id)) continue
             mangas.push(App.createPartialSourceManga({
                 mangaId: id,
                 image: image,
@@ -293,7 +289,6 @@ export class BuddyComplexParser {
         }
         return mangas
     }
-
 
     isLastPage = ($: CheerioStatic): boolean => {
         let isLast = false
@@ -311,7 +306,6 @@ export class BuddyComplexParser {
         if (currentPage >= lastPage) isLast = true
         return isLast
     }
-
 
     protected getImageSrc(imageObj: Cheerio | undefined): string {
         let image: string | undefined
@@ -338,11 +332,9 @@ export class BuddyComplexParser {
         return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')))
     }
 
-
     protected decodeHTMLEntity(str: string): string {
         return entities.decodeHTML(str)
     }
-
 
     protected parseDate = (date: string): Date => {
         date = date.toUpperCase()
@@ -371,7 +363,6 @@ export class BuddyComplexParser {
         }
         return time
     }
-
 
     idCleaner(str: string): string {
         let cleanId: string | null = str

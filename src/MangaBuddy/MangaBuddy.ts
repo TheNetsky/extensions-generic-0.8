@@ -3,7 +3,8 @@ import {
     SourceInfo,
     BadgeColor,
     SourceIntents,
-    HomeSection
+    HomeSection,
+    HomeSectionType
 } from '@paperback/types'
 
 import {
@@ -36,11 +37,11 @@ export class MangaBuddy extends BuddyComplex {
     baseUrl: string = DOMAIN
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: 'singleRowNormal', containsMoreItems: true })
-        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: 'singleRowNormal', containsMoreItems: true })
-        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: 'singleRowNormal', containsMoreItems: true })
-        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: 'singleRowNormal', containsMoreItems: true })
-        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: 'singleRowNormal', containsMoreItems: true })
+        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
+        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
+        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
+        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
+        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
 
         const sections: HomeSection[] = [section1, section2, section3, section4, section5]
 
