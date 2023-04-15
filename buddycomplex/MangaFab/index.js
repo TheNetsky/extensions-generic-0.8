@@ -1617,13 +1617,13 @@ exports.BuddyComplexParser = BuddyComplexParser;
 },{"entities":67}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MangaBuddy = exports.MangaBuddyInfo = void 0;
+exports.MangaFab = exports.MangaFabInfo = void 0;
 const types_1 = require("@paperback/types");
 const BuddyComplex_1 = require("../BuddyComplex");
-const DOMAIN = 'https://mangabuddy.com';
-exports.MangaBuddyInfo = {
+const DOMAIN = 'https://mangafab.com';
+exports.MangaFabInfo = {
     version: (0, BuddyComplex_1.getExportVersion)('0.0.0'),
-    name: 'MangaBuddy',
+    name: 'MangaFab',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -1638,29 +1638,13 @@ exports.MangaBuddyInfo = {
     ],
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 };
-class MangaBuddy extends BuddyComplex_1.BuddyComplex {
+class MangaFab extends BuddyComplex_1.BuddyComplex {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
     }
-    async getHomePageSections(sectionCallback) {
-        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const sections = [section1, section2, section3, section4, section5];
-        const request = App.createRequest({
-            url: `${this.baseUrl}/home`,
-            method: 'GET'
-        });
-        const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        this.parser.parseHomeSections($, sections, sectionCallback);
-    }
 }
-exports.MangaBuddy = MangaBuddy;
+exports.MangaFab = MangaFab;
 
 },{"../BuddyComplex":68,"@paperback/types":59}]},{},[71])(71)
 });

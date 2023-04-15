@@ -1054,6 +1054,7 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuddyComplex = exports.getExportVersion = void 0;
+const types_1 = require("@paperback/types");
 const BuddyComplexParser_1 = require("./BuddyComplexParser");
 const BuddyComplexHelper_1 = require("./BuddyComplexHelper");
 // Set the version for the base, changing this version will change the versions of all sources
@@ -1135,8 +1136,7 @@ class BuddyComplex {
             .addPathComponent('search')
             .addQueryParameter('page', page)
             .addQueryParameter('q', encodeURI(query?.title || ''))
-            .addQueryParameter('genre', query.includedTags?.map((x) => x.id).join('%5B%5D'))
-            .buildUrl();
+            .buildUrl() + query.includedTags?.map((x) => `&genre%5B%5D=${x.id}`).join('');
         const request = App.createRequest({
             url: url,
             method: 'GET'
@@ -1152,11 +1152,11 @@ class BuddyComplex {
         });
     }
     async getHomePageSections(sectionCallback) {
-        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: 'singleRowNormal', containsMoreItems: true });
-        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: 'singleRowNormal', containsMoreItems: true });
-        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: 'singleRowNormal', containsMoreItems: true });
-        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: 'singleRowNormal', containsMoreItems: true });
-        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: 'singleRowNormal', containsMoreItems: true });
+        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
+        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
+        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
+        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
+        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
         const sections = [section1, section2, section3, section4, section5];
         const request = App.createRequest({
             url: `${this.baseUrl}/`,
@@ -1215,14 +1215,14 @@ class BuddyComplex {
         });
     }
     CloudFlareError(status) {
-        if (status == 503) {
+        if (status > 400) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${this.baseUrl} and press Cloudflare Bypass`);
         }
     }
 }
 exports.BuddyComplex = BuddyComplex;
 
-},{"./BuddyComplexHelper":69,"./BuddyComplexParser":70}],69:[function(require,module,exports){
+},{"./BuddyComplexHelper":69,"./BuddyComplexParser":70,"@paperback/types":59}],69:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -1281,7 +1281,7 @@ class BuddyComplexParser {
                 const title = $('div.title', manga).text().trim();
                 const image = this.getImageSrc($('img', manga));
                 const subtitle = $('span.latest-chapter', manga).text().trim();
-                if (collectedIds.includes(id) || !id || !title)
+                if (!id || !title || collectedIds.includes(id))
                     continue;
                 mangas.push(App.createPartialSourceManga({
                     mangaId: id,
@@ -1389,6 +1389,7 @@ class BuddyComplexParser {
                 image: image,
                 status: status,
                 author: authors.length > 0 ? authors.join(', ') : 'Unknown',
+                artist: authors.length > 0 ? authors.join(', ') : 'Unknown',
                 tags: tagSections,
                 desc: description
             })
@@ -1416,7 +1417,7 @@ class BuddyComplexParser {
                 time: date,
                 volume: 0,
                 sortingIndex,
-                langCode: 'ENG',
+                langCode: '🇬🇧',
                 group: ''
             });
             sortingIndex--;
@@ -1643,11 +1644,11 @@ class MangaBuddy extends BuddyComplex_1.BuddyComplex {
         this.baseUrl = DOMAIN;
     }
     async getHomePageSections(sectionCallback) {
-        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: 'singleRowNormal', containsMoreItems: true });
-        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: 'singleRowNormal', containsMoreItems: true });
-        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: 'singleRowNormal', containsMoreItems: true });
-        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: 'singleRowNormal', containsMoreItems: true });
-        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: 'singleRowNormal', containsMoreItems: true });
+        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
+        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
+        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
+        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
+        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
         const sections = [section1, section2, section3, section4, section5];
         const request = App.createRequest({
             url: `${this.baseUrl}/home`,

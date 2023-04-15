@@ -1053,6 +1053,38 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":60,"./encode.js":62,"./escape.js":63}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BoxManhwa = exports.BoxManhwaInfo = void 0;
+const types_1 = require("@paperback/types");
+const BuddyComplex_1 = require("../BuddyComplex");
+const DOMAIN = 'https://boxmanhwa.com';
+exports.BoxManhwaInfo = {
+    version: (0, BuddyComplex_1.getExportVersion)('0.0.0'),
+    name: 'BoxManhwa',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: types_1.ContentRating.MATURE,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [
+        {
+            text: 'Notifications',
+            type: types_1.BadgeColor.GREEN
+        }
+    ],
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
+};
+class BoxManhwa extends BuddyComplex_1.BuddyComplex {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+    }
+}
+exports.BoxManhwa = BoxManhwa;
+
+},{"../BuddyComplex":69,"@paperback/types":59}],69:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuddyComplex = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const BuddyComplexParser_1 = require("./BuddyComplexParser");
@@ -1222,7 +1254,7 @@ class BuddyComplex {
 }
 exports.BuddyComplex = BuddyComplex;
 
-},{"./BuddyComplexHelper":69,"./BuddyComplexParser":70,"@paperback/types":59}],69:[function(require,module,exports){
+},{"./BuddyComplexHelper":70,"./BuddyComplexParser":71,"@paperback/types":59}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -1266,7 +1298,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuddyComplexParser = void 0;
@@ -1614,53 +1646,5 @@ class BuddyComplexParser {
 }
 exports.BuddyComplexParser = BuddyComplexParser;
 
-},{"entities":67}],71:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MangaBuddy = exports.MangaBuddyInfo = void 0;
-const types_1 = require("@paperback/types");
-const BuddyComplex_1 = require("../BuddyComplex");
-const DOMAIN = 'https://mangabuddy.com';
-exports.MangaBuddyInfo = {
-    version: (0, BuddyComplex_1.getExportVersion)('0.0.0'),
-    name: 'MangaBuddy',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: types_1.ContentRating.MATURE,
-    websiteBaseURL: DOMAIN,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        }
-    ],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
-};
-class MangaBuddy extends BuddyComplex_1.BuddyComplex {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-    }
-    async getHomePageSections(sectionCallback) {
-        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const sections = [section1, section2, section3, section4, section5];
-        const request = App.createRequest({
-            url: `${this.baseUrl}/home`,
-            method: 'GET'
-        });
-        const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        this.parser.parseHomeSections($, sections, sectionCallback);
-    }
-}
-exports.MangaBuddy = MangaBuddy;
-
-},{"../BuddyComplex":68,"@paperback/types":59}]},{},[71])(71)
+},{"entities":67}]},{},[68])(68)
 });
