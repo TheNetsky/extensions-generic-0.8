@@ -1056,7 +1056,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '3.0.1';
+const BASE_VERSION = '3.0.2';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1794,7 +1794,10 @@ class Parser {
         image = image
             ?.trim()
             .replace(/(\s{2,})/gi, '');
+        image = image?.replace(/http:\/\/\//g, 'http://'); // only changes urls with http protocol
         image = image?.replace(/http:\/\//g, 'https://');
+        // Malforumed url fix (Turns https:///example.com into https://example.com (or the http:// equivalent))
+        image = image?.replace(/https:\/\/\//g, 'https://'); // only changes urls with https protocol
         return decodeURI(this.decodeHTMLEntity(image ?? ''));
     }
     idCleaner(str) {
