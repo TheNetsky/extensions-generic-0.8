@@ -242,7 +242,10 @@ export class Parser {
             ?.trim()
             .replace(/(\s{2,})/gi, '')
 
+        image = image?.replace(/http:\/\/\//g, 'http://') // only changes urls with http protocol
         image = image?.replace(/http:\/\//g, 'https://')
+        // Malforumed url fix (Turns https:///example.com into https://example.com (or the http:// equivalent))
+        image = image?.replace(/https:\/\/\//g, 'https://') // only changes urls with https protocol
 
         return decodeURI(this.decodeHTMLEntity(image ?? ''))
     }
