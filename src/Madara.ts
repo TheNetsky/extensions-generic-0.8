@@ -15,7 +15,8 @@ import {
     MangaProviding,
     ChapterProviding,
     DUISection,
-    Tag
+    Tag,
+    HomePageSectionsProviding
 } from '@paperback/types'
 
 import { Parser } from './MadaraParser'
@@ -26,7 +27,7 @@ export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
-export abstract class Madara implements SearchResultsProviding, MangaProviding, ChapterProviding {
+export abstract class Madara implements SearchResultsProviding, MangaProviding, ChapterProviding, HomePageSectionsProviding {
 
     constructor(public cheerio: CheerioAPI) { }
 
