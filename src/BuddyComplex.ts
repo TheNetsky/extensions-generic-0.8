@@ -8,10 +8,12 @@ import {
     TagSection,
     Request,
     Response,
-    Searchable,
+    SearchResultsProviding,
     MangaProviding,
     ChapterProviding,
-    HomeSectionType
+    HomeSectionType,
+    HomePageSectionsProviding,
+    Tag
 } from '@paperback/types'
 
 import {
@@ -21,12 +23,12 @@ import {
 import { URLBuilder } from './BuddyComplexHelper'
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.0.0'
+const BASE_VERSION = '2.0.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
-export abstract class BuddyComplex implements Searchable, MangaProviding, ChapterProviding {
+export abstract class BuddyComplex implements SearchResultsProviding, MangaProviding, ChapterProviding, HomePageSectionsProviding {
 
     constructor(public cheerio: CheerioAPI) { }
 
@@ -124,7 +126,7 @@ export abstract class BuddyComplex implements Searchable, MangaProviding, Chapte
             .addPathComponent('search')
             .addQueryParameter('page', page)
             .addQueryParameter('q', encodeURI(query?.title || ''))
-            .buildUrl() + query.includedTags?.map((x: any) => `&genre%5B%5D=${x.id}`).join('')
+            .buildUrl() + query.includedTags?.map((x: Tag) => `&genre%5B%5D=${x.id}`).join('')
 
         const request = App.createRequest({
             url: url,
@@ -187,9 +189,8 @@ export abstract class BuddyComplex implements Searchable, MangaProviding, Chapte
         }
 
         const request = App.createRequest({
-            url: `${this.baseUrl}/`,
-            method: 'GET',
-            param: `${param}?page=${page}`
+            url: `${this.baseUrl}/${param}?page=${page}`,
+            method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -218,7 +219,7 @@ export abstract class BuddyComplex implements Searchable, MangaProviding, Chapte
 
 
     CloudFlareError(status: number): Error | void {
-        if (status > 400) {
+        if (status == 503 || status == 403) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${this.baseUrl} and press Cloudflare Bypass`)
         }
     }
