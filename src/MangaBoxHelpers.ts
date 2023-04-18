@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
-
 export class URLBuilder {
     parameters: Record<string, any | any[]> = {}
     pathComponents: string[] = []

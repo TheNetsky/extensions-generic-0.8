@@ -84,8 +84,8 @@ export class MangaBoxParser {
             App.createTagSection({
                 id: '0',
                 label: 'genres',
-                tags: tags.map(t => App.createTag(t)),
-            }),
+                tags: tags.map(t => App.createTag(t))
+            })
         ]
 
         return App.createSourceManga({
@@ -96,8 +96,8 @@ export class MangaBoxParser {
                 status: status,
                 author: author ? author : 'Unkown',
                 desc: desc,
-                tags: TagSection,
-            }),
+                tags: TagSection
+            })
         })
     }
 
@@ -167,7 +167,7 @@ export class MangaBoxParser {
             App.createTagSection({
                 id: '0',
                 label: 'genres',
-                tags: genres.map(t => App.createTag(t)),
+                tags: genres.map(t => App.createTag(t))
             })
         ]
         return TagSection
