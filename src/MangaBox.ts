@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any */
-
 import {
     Chapter,
     ChapterDetails,
     ChapterProviding,
     DUISection,
+    HomePageSectionsProviding,
     HomeSection,
     HomeSectionType,
     MangaProviding,
@@ -12,7 +11,7 @@ import {
     Request,
     Response,
     SearchRequest,
-    Searchable,
+    SearchResultsProviding,
     SourceManga,
     TagSection
 } from '@paperback/types'
@@ -28,17 +27,17 @@ import {
 
 import {
     chapterSettings,
-    getImageServer,
+    getImageServer
 } from './MangaBoxSettings'
 
 import { URLBuilder } from './MangaBoxHelpers'
 
-const BASE_VERSION = '4.0.1'
+const BASE_VERSION = '4.0.2'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
-export abstract class MangaBox implements Searchable, MangaProviding, ChapterProviding {
+export abstract class MangaBox implements SearchResultsProviding, MangaProviding, ChapterProviding, HomePageSectionsProviding {
     // Website base URL. Eg. https://manganato.com
     abstract baseURL: string
 
@@ -127,7 +126,7 @@ export abstract class MangaBox implements Searchable, MangaProviding, ChapterPro
             id: 'main',
             header: 'Source Settings',
             isHidden: false,
-            rows: async () => [chapterSettings(this.stateManager)],
+            rows: async () => [chapterSettings(this.stateManager)]
         })
     }
 

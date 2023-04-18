@@ -83,8 +83,8 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string, source: Man
         App.createTagSection({
             id: '0',
             label: 'genres',
-            tags: tags.map(t => App.createTag(t)),
-        }),
+            tags: tags.map(t => App.createTag(t))
+        })
     ]
 
     return App.createSourceManga({
@@ -95,8 +95,8 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string, source: Man
             status: status,
             author: author ? author : 'Unkown',
             desc: desc,
-            tags: TagSection,
-        }),
+            tags: TagSection
+        })
     })
 }
 
@@ -120,7 +120,7 @@ export const parseChapters = ($: CheerioStatic, source: MangaBox): Chapter[] => 
             name: name,
             group: '',
             time: time,
-            langCode: source.languageCode,
+            langCode: source.languageCode
         }))
     }
     return chapters
@@ -158,7 +158,7 @@ export const parseTags = ($: CheerioStatic, source: MangaBox): TagSection[] => {
         App.createTagSection({
             id: '0',
             label: 'genres',
-            tags: genres.map(t => App.createTag(t)),
+            tags: genres.map(t => App.createTag(t))
         })
     ]
     return TagSection

@@ -1,6 +1,6 @@
 import {
     DUINavigationButton,
-    SourceStateManager,
+    SourceStateManager
 } from '@paperback/types'
 
 export const getImageServer = async (stateManager: SourceStateManager): Promise<string> => {
