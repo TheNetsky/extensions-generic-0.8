@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Chapter,
     ChapterDetails,
@@ -13,21 +11,22 @@ import {
     SourceStateManager,
     DUINavigationButton,
     PartialSourceManga,
-    Searchable,
+    SearchResultsProviding,
     MangaProviding,
     ChapterProviding,
-    DUISection
+    DUISection,
+    Tag
 } from '@paperback/types'
 
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '3.0.2'
+const BASE_VERSION = '3.0.3'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
-export abstract class Madara implements Searchable, MangaProviding, ChapterProviding {
+export abstract class Madara implements SearchResultsProviding, MangaProviding, ChapterProviding {
 
     constructor(public cheerio: CheerioAPI) { }
 
@@ -97,7 +96,7 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
                                 value: App.createDUIBinding({
                                     get: async () => await stateManager.retrieve('HQthumb') ?? false,
                                     set: async (newValue) => await stateManager.store('HQthumb', newValue)
-                                }),
+                                })
                             })
                         ]
                     })
@@ -304,7 +303,7 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
                     title: 'Recently Updated',
                     type: 'singleRowNormal',
                     containsMoreItems: true
-                }),
+                })
             },
             {
                 request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_week_views_value'),
@@ -347,7 +346,7 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
                     const $ = this.cheerio.load(response.data as string)
                     section.section.items = await this.parser.parseHomeSection($, this)
                     sectionCallback(section.section)
-                }),
+                })
             )
 
         }
@@ -396,6 +395,7 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
         })
     }
 
+    // Utility
     constructSearchRequest(page: number, query: SearchRequest): any {
         return App.createRequest({
             url: new URLBuilder(this.baseUrl)
@@ -403,7 +403,7 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
                 .addPathComponent(page.toString())
                 .addQueryParameter('s', encodeURIComponent(query?.title ?? ''))
                 .addQueryParameter('post_type', 'wp-manga')
-                .addQueryParameter('genre', query?.includedTags?.map((x: any) => x.id))
+                .addQueryParameter('genre', query?.includedTags?.map((x: Tag) => x.id))
                 .buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
             method: 'GET'
         })
@@ -544,8 +544,8 @@ export abstract class Madara implements Searchable, MangaProviding, ChapterProvi
         })
     }
 
-    CloudFlareError(status: any) {
-        if (status > 400) {
+    CloudFlareError(status: number): void {
+        if (status == 503 || status == 403) {
             throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${this.baseUrl} and press Cloudflare Bypass`)
         }
     }
