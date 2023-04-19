@@ -7,13 +7,13 @@ import {
 
 import {
     getExportVersion,
-    MangaBox,
+    MangaBox
 } from '../MangaBox'
 
 const SITE_DOMAIN = 'https://manganato.com'
 
 export const ManganatoInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'Manganato',
     icon: 'icon.png',
     author: 'Batmeow',

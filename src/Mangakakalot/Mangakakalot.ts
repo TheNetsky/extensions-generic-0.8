@@ -9,14 +9,14 @@ import {
     SourceInfo,
     SourceIntents,
     Tag,
-    TagSection,
+    TagSection
 } from '@paperback/types'
 
 import { decodeHTML } from 'entities'
 
 import {
     MangaBox,
-    getExportVersion,
+    getExportVersion
 } from '../MangaBox'
 
 import { URLBuilder } from '../MangaBoxHelpers'
@@ -24,7 +24,7 @@ import { URLBuilder } from '../MangaBoxHelpers'
 const SITE_DOMAIN = 'https://mangakakalot.com'
 
 export const MangakakalotInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'Mangakakalot',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -170,8 +170,8 @@ export class Mangakakalot extends MangaBox {
             App.createTagSection({
                 id: '0',
                 label: 'genres',
-                tags: tags.map(t => App.createTag(t)),
-            }),
+                tags: tags.map(t => App.createTag(t))
+            })
         ]
         return TagSection
     }
