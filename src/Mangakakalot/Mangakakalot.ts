@@ -9,27 +9,22 @@ import {
     SourceInfo,
     SourceIntents,
     Tag,
-    TagSection,
+    TagSection
 } from '@paperback/types'
 
 import { decodeHTML } from 'entities'
 
 import {
     MangaBox,
-    getExportVersion,
+    getExportVersion
 } from '../MangaBox'
 
 import { URLBuilder } from '../MangaBoxHelpers'
 
-import {
-    isLastPage,
-    parseManga,
-} from '../MangaBoxParser'
-
 const SITE_DOMAIN = 'https://mangakakalot.com'
 
 export const MangakakalotInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.3'),
     name: 'Mangakakalot',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -80,9 +75,9 @@ export class Mangakakalot extends MangaBox {
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        const results = parseManga($, this)
+        const results = this.parser.parseManga($, this)
 
-        metadata = !isLastPage($) ? { page: page + 1 } : undefined
+        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
         return App.createPagedResults({
             results: results,
             metadata: metadata
@@ -106,8 +101,8 @@ export class Mangakakalot extends MangaBox {
             const response = await this.requestManager.schedule(request, 1)
             const $ = this.cheerio.load(response.data as string)
 
-            results = parseManga($, this)
-            metadata = !isLastPage($) ? { page: page + 1 } : undefined
+            results = this.parser.parseManga($, this)
+            metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
         } else {
             const request = App.createRequest({
                 url: new URLBuilder(this.baseURL)
@@ -139,7 +134,7 @@ export class Mangakakalot extends MangaBox {
                 }))
                 collecedIds.push(mangaId)
             }
-            metadata = !isLastPage($) ? { page: page + 1 } : undefined
+            metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
         }
 
         return App.createPagedResults({
@@ -175,8 +170,8 @@ export class Mangakakalot extends MangaBox {
             App.createTagSection({
                 id: '0',
                 label: 'genres',
-                tags: tags.map(t => App.createTag(t)),
-            }),
+                tags: tags.map(t => App.createTag(t))
+            })
         ]
         return TagSection
     }

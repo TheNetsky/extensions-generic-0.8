@@ -7,13 +7,13 @@ import {
 
 import {
     getExportVersion,
-    MangaBox,
+    MangaBox
 } from '../MangaBox'
 
 const SITE_DOMAIN = 'https://manganato.com'
 
 export const ManganatoInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.3'),
     name: 'Manganato',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -44,5 +44,5 @@ export class Manganato extends MangaBox {
     mangaListSelector = 'div.panel-content-genres div.content-genres-item'
 
     // Selector for subtitle in manga list.
-    mangaSubtitleSelector = 'a.text-nowrap, a.genres-item-chap'
+    mangaSubtitleSelector = 'a.genres-item-chap.text-nowrap'
 }
