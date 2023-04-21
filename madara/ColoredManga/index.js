@@ -2062,11 +2062,10 @@ class Parser {
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = this.idCleaner($('a', obj).first().attr('href') ?? '');
             const chapName = $('a', obj).first().text().trim() ?? '';
-            const byChapter = id.match(/(?:chapter|ch)-((\d+)(?:[-.]\d+)?)/);
-            const byNumber = (id.split('-').pop() ?? '').match(/(\d+)(?:[-.]\d+)?/);
-            const chapNumRegex = (byChapter && byChapter[1]) ? byChapter[1] : byNumber ? byNumber[0] : '0';
-            let chapNum = Number(chapNumRegex.replace('-', '.'));
-            chapNum = isNaN(chapNum) ? 0 : chapNum;
+            const chapNumRegex = id.match(/(?:chapter|ch.*?)(\d+\.?\d?(?:[-_]\d+)?)|(\d+\.?\d?(?:[-_]\d+)?)$/);
+            let chapNum = chapNumRegex && chapNumRegex[1] ? chapNumRegex[1].replace(/[-_]/gm, '.') : chapNumRegex?.[2] ?? '0';
+            // make sure the chapter number is a number and not NaN
+            chapNum = parseFloat(chapNum) ?? 0;
             let mangaTime;
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
