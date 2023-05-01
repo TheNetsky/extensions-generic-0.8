@@ -81,6 +81,11 @@ export class AsuraScans extends MangaStream {
     override homescreen_TopMonthly_enabled = true
     override homescreen_TopWeekly_enabled = true
 
+    override tags_selector_box: string = "ul.genrez"
+    override tags_selector_label: string = "label"
+    override tags_SubdirectoryPathName: string = "/manga/"
+    override tags_use_label_as_id: boolean = true
+
     /*
     ----TAG SELECTORS
     PRESET 1 (default): Genres are on homepage ex. https://mangagenki.com/

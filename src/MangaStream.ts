@@ -51,7 +51,7 @@ interface StatusTypes {
 
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.1.5'
+const BASE_VERSION = '2.1.6'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -176,6 +176,11 @@ export abstract class MangaStream extends Source {
 
     //----TAGS SELECTORS----
     /**
+     * Use the Tag Label as Id (Some Sites dont have an Id for their Tags)
+     * Default = false
+     */
+    tags_use_label_as_id = false
+    /**
      * The selector to select the subdirectory for the genre page
      * Eg. https://mangadark.com/genres/ needs this selector to be set to "/genres/"
      * Default = ""
@@ -292,7 +297,7 @@ export abstract class MangaStream extends Source {
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
 
-    override async getTags(): Promise<TagSection[]> {
+    override async getSearchTags(): Promise<TagSection[]> {
         const request = createRequestObject({
             url: `${this.baseUrl}/`,
             method: 'GET',

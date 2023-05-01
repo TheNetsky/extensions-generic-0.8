@@ -142,7 +142,7 @@ export class MangaStreamParser {
         const arrayTags: Tag[] = []
         for (const tag of $(source.tags_selector_item, source.tags_selector_box).toArray()) {
             const label = source.tags_selector_label ? $(source.tags_selector_label, tag).text().trim() : $(tag).text().trim()
-            const id = encodeURI($('a', tag).attr('href')?.replace(`${source.baseUrl}/genres/`, '').replace(/\//g, '') ?? '')
+            const id = source.tags_use_label_as_id ? label : encodeURI($('a', tag).attr('href')?.replace(`${source.baseUrl}/genres/`, '').replace(/\//g, '') ?? '')
             if (!id || !label) continue
             arrayTags.push({ id: id, label: label })
         }
