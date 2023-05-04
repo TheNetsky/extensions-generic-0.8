@@ -92,7 +92,7 @@ export class MangaStreamParser {
         // if (mangaId.toUpperCase().endsWith('-RAW') && source.languageCode == 'gb')
         // langCode = LanguageCode.KOREAN
 
-        for (const chapter of $(source.chapter_selector_item, source.chapter_selector_box).toArray()) {
+        for (const chapter of $('li', 'div#chapterlist').toArray()) {
             const title = $('span.chapternum', chapter).text().trim()
             const id = this.idCleaner($('a', chapter).attr('href') ?? '')
             const date = convertDate($('span.chapterdate', chapter).text().trim(), source)

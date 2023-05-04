@@ -49,9 +49,6 @@ export class LelManga extends MangaStream {
         this.newMangaSection.enabled = false
     }
 
-    override async supportsTagExclusion(): Promise<boolean> {
-        console.log('supportsTagExclusion')
-        return true
-    }
+    override supportsTagExclusion = async (): Promise<boolean> => true
 
 }

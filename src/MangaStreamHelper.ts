@@ -48,7 +48,6 @@ export function getIncludedTagBySection(section: string, tags: Tag[]): any {
 }
 
 export function getFilterTagsBySection(section: string, tags: Tag[], included: boolean, supportsExclusion: boolean = false): string[] {
-
     if (!included && !supportsExclusion) {
         return []
     }

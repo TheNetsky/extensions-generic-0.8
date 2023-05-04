@@ -13,7 +13,6 @@ import {
     SearchRequest,
     SearchResultsProviding,
     SourceManga,
-    Tag,
     TagSection
 } from '@paperback/types'
 
@@ -74,6 +73,34 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
     stateManager = App.createSourceStateManager()
     parser = new MangaStreamParser()
+
+    // ----REQUEST MANAGER----
+    requestManager = App.createRequestManager({
+        requestsPerSecond: 5,
+        requestTimeout: 15000,
+        interceptor: {
+            interceptRequest: async (request: Request): Promise<Request> => {
+                request.headers = {
+                    ...(request.headers ?? {}), ...{
+                        'user-agent': await this.requestManager.getDefaultUserAgent(),
+                        referer: `${this.baseUrl}/`, ...((request.url.includes('wordpress.com') || request.url.includes('wp.com')) && {
+                            Accept: 'image/avif,image/webp,*/*'
+                        }) // Used for images hosted on Wordpress blogs
+                    }
+                }
+
+                return request
+            },
+
+            interceptResponse: async (response: Response): Promise<Response> => {
+                this.interceptResponse(response)
+                return response
+            }
+        }
+    })
+
+    interceptResponse(response: Response): void {
+    }
 
     /**
      * The URL of the website. Eg. https://mangadark.com without a trailing slash
@@ -187,20 +214,6 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         seconds: ['second']
     }
 
-    // ----CHAPTER SELECTORS----
-    /**
-     * The selector for the chapter box
-     * This box contains all the chapter items
-     * Default = "div#chapterlist.eplister"
-     */
-    chapter_selector_box = 'div#chapterlist'
-    /**
-     * The selector for each individual chapter element
-     * This is the element for each small box containing the chapter information
-     * Default = "li"
-     */
-    chapter_selector_item = 'li'
-
     // ----HOMESCREEN SELECTORS----
     /**
      * Enable or disable the "Popular Today" section on the homescreen
@@ -261,50 +274,13 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         containsMoreItems: false
     }
 
-    // ----REQUEST MANAGER----
-    requestManager = App.createRequestManager({
-        requestsPerSecond: 5,
-        requestTimeout: 15000,
-        interceptor: {
-            interceptRequest: async (request: Request): Promise<Request> => {
-                request.headers = {
-                    ...(request.headers ?? {}), ...{
-                        'user-agent': await this.requestManager.getDefaultUserAgent(),
-                        referer: `${this.baseUrl}/`, ...((request.url.includes('wordpress.com') || request.url.includes('wp.com')) && {
-                            Accept: 'image/avif,image/webp,*/*'
-                        }) // Used for images hosted on Wordpress blogs
-                    }
-                }
-
-                return request
-            },
-
-            interceptResponse: async (response: Response): Promise<Response> => {
-                this.interceptResponse(response)
-                return response
-            }
-        }
-    })
-
-    interceptResponse(response: Response): void {
-    }
-
     getMangaShareUrl(mangaId: string): string {
         return this.usePostIds
                ? `${this.baseUrl}/?p=${mangaId}/`
                : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`
     }
 
-    async getMangaData(mangaId: string): Promise<CheerioStatic> {
-        const request = App.createRequest({
-            url: this.getMangaShareUrl(mangaId),
-            method: 'GET'
-        })
-
-        const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
-        return this.cheerio.load(response.data as string)
-    }
+    getMangaData = async (mangaId: string): Promise<CheerioStatic> => await this.loadRequestData(this.getMangaShareUrl(mangaId))
 
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const $ = await this.getMangaData(mangaId)
@@ -317,27 +293,12 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
-        const request = App.createRequest({
-            url: `${this.baseUrl}/${chapterId}/`,
-            method: 'GET'
-        })
-
-        const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = await this.loadRequestData(`${this.baseUrl}/${chapterId}/`)
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
 
     async getSearchTags(): Promise<TagSection[]> {
-        const request = App.createRequest({
-            url: `${this.baseUrl}/`,
-            method: 'GET',
-            param: this.sourceTraversalPathName
-        })
-
-        const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = await this.loadRequestData(`${this.baseUrl}/${this.sourceTraversalPathName}`)
         return this.parser.parseTags($, this)
     }
 
@@ -414,14 +375,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         addHomeSection(sections, this.topMonthlySection)
         addHomeSection(sections, this.topWeeklySection)
 
-        const request = App.createRequest({
-            url: `${this.baseUrl}/`,
-            method: 'GET'
-        })
-
-        const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = await this.loadRequestData(`${this.baseUrl}/`)
 
         const promises: Promise<void>[] = []
         for (const section of sections) {
@@ -446,26 +400,19 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         let param = ''
         switch (homepageSectionId) {
             case 'new_titles':
-                param = `/${this.sourceTraversalPathName}/?page=${page}&order=latest`
+                param = `${this.sourceTraversalPathName}/?page=${page}&order=latest`
                 break
             case 'latest_update':
-                param = `/${this.sourceTraversalPathName}/?page=${page}&order=update`
+                param = `${this.sourceTraversalPathName}/?page=${page}&order=update`
                 break
             case 'popular_today':
-                param = `/${this.sourceTraversalPathName}/?page=${page}&order=popular`
+                param = `${this.sourceTraversalPathName}/?page=${page}&order=popular`
                 break
             default:
                 throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
         }
 
-        const request = App.createRequest({
-            url: `${this.baseUrl}`,
-            method: 'GET',
-            param
-        })
-
-        const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = await this.loadRequestData(`${this.baseUrl}/${param}`)
 
         const items: PartialSourceManga[] = await this.parser.parseViewMore($, this)
         metadata = !this.parser.isLastPage($, 'view_more')
@@ -499,13 +446,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
     }
 
     async convertPostIdToSlug(postId: number): Promise<any> {
-        const request = App.createRequest({
-            url: `${this.baseUrl}/?p=${postId}`,
-            method: 'GET'
-        })
-
-        const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = await this.loadRequestData(`${this.baseUrl}/?p=${postId}`)
 
         let parseSlug: any
         // Step 1: Try to get slug from og-url
@@ -551,14 +492,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
             return postId?.toString()
         }
 
-        const request = App.createRequest({
-            url: `${this.baseUrl}/${path}/${slug}/`,
-            method: 'GET'
-        })
-
-        const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = await this.loadRequestData(`${this.baseUrl}/${path}/${slug}/`)
 
         // Step 1: Try to get postId from shortlink
         postId = Number($('link[rel="shortlink"]')?.attr('href')?.split('/?p=')[1])
@@ -582,6 +516,17 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         }
 
         return postId.toString()
+    }
+
+    async loadRequestData(url: string, method: string = 'GET'): Promise<CheerioStatic> {
+        const request = App.createRequest({
+            url,
+            method
+        })
+
+        const response = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(response.status)
+        return this.cheerio.load(response.data as string)
     }
 
     async getCloudflareBypassRequestAsync(): Promise<Request> {
