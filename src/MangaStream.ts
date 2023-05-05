@@ -19,7 +19,7 @@ import {
 import { MangaStreamParser } from './MangaStreamParser'
 import { URLBuilder } from './UrlBuilder'
 import {
-    addHomeSection,
+    createHomeSection,
     DefaultHomeSectionData,
     getFilterTagsBySection,
     getIncludedTagBySection,
@@ -59,7 +59,7 @@ interface StatusTypes {
 }
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.1.6.3'
+const BASE_VERSION = '2.2.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.')
                        .map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index]))
@@ -225,53 +225,50 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
     configureSections(): void {
     }
 
-    popularTodaySection: HomeSectionData = {
-        ...DefaultHomeSectionData,
-        id: 'popular_today',
-        title: 'Popular Today',
-        selectorFunc: ($: CheerioStatic) => $('div.bsx', $('h2:contains(Popular Today)')?.parent()?.next()),
-        titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('a', element).attr('title'),
-        subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('div.epxs', element).text().trim()
-    }
-
-    latestUpdateSection: HomeSectionData = {
-        ...DefaultHomeSectionData,
-        id: 'latest_update',
-        title: 'Latest Updates',
-        selectorFunc: ($: CheerioStatic) => $('div.uta', $('h2:contains(Latest Update)')?.parent()?.next()),
-        titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('a', element).attr('title'),
-        subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('li > span', $('div.luf', element)).first().text().trim()
-    }
-
-    newMangaSection: HomeSectionData = {
-        ...DefaultHomeSectionData,
-        id: 'new_titles',
-        title: 'New Titles',
-        selectorFunc: ($: CheerioStatic) => $('li', $('h3:contains(New Series)')?.parent()?.next())
-    }
-
-    topAllTimeSection: HomeSectionData = {
-        ...DefaultHomeSectionData,
-        id: 'top_alltime',
-        title: 'Top All Time',
-        selectorFunc: ($: CheerioStatic) => $('li', $('div.serieslist.pop.wpop.wpop-alltime')),
-        containsMoreItems: false
-    }
-
-    topMonthlySection: HomeSectionData = {
-        ...DefaultHomeSectionData,
-        id: 'top_monthly',
-        title: 'Top Monthly',
-        selectorFunc: ($: CheerioStatic) => $('li', $('div.serieslist.pop.wpop.wpop-monthly')),
-        containsMoreItems: false
-    }
-
-    topWeeklySection: HomeSectionData = {
-        ...DefaultHomeSectionData,
-        id: 'top_weekly',
-        title: 'Top Weekly',
-        selectorFunc: ($: CheerioStatic) => $('li', $('div.serieslist.pop.wpop.wpop-weekly')),
-        containsMoreItems: false
+    sections: Record<string, HomeSectionData> = {
+        'popular_today': {
+            ...DefaultHomeSectionData,
+            section: createHomeSection('popular_today', 'Popular Today'),
+            selectorFunc: ($: CheerioStatic) => $('div.bsx', $('h2:contains(Popular Today)')?.parent()?.next()),
+            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('a', element).attr('title'),
+            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('div.epxs', element).text().trim(),
+            getViewMoreItemsFunc: (page: string) => `${this.sourceTraversalPathName}/?page=${page}&order=popular`,
+            sortIndex: 10
+        },
+        'latest_update': {
+            ...DefaultHomeSectionData,
+            section: createHomeSection('latest_update', 'Latest Updates'),
+            selectorFunc: ($: CheerioStatic) => $('div.uta', $('h2:contains(Latest Update)')?.parent()?.next()),
+            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('a', element).attr('title'),
+            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('li > span', $('div.luf', element)).first().text().trim(),
+            getViewMoreItemsFunc: (page: string) => `${this.sourceTraversalPathName}/?page=${page}&order=update`,
+            sortIndex: 20
+        },
+        'new_titles': {
+            ...DefaultHomeSectionData,
+            section: createHomeSection('new_titles', 'New Titles'),
+            selectorFunc: ($: CheerioStatic) => $('li', $('h3:contains(New Series)')?.parent()?.next()),
+            getViewMoreItemsFunc: (page: string) => `${this.sourceTraversalPathName}/?page=${page}&order=latest`,
+            sortIndex: 30
+        },
+        'top_alltime': {
+            ...DefaultHomeSectionData,
+            section: createHomeSection('top_alltime', 'Top All Time', false),
+            selectorFunc: ($: CheerioStatic) => $('li', $('div.serieslist.pop.wpop.wpop-alltime')),
+            sortIndex: 40
+        },
+        'top_monthly': {
+            ...DefaultHomeSectionData,
+            section: createHomeSection('top_monthly', 'Top Monthly', false),
+            selectorFunc: ($: CheerioStatic) => $('li', $('div.serieslist.pop.wpop.wpop-monthly')),
+            sortIndex: 50
+        },
+        'top_weekly': {
+            ...DefaultHomeSectionData,
+            section: createHomeSection('top_weekly', 'Top Weekly', false),
+            selectorFunc: ($: CheerioStatic) => $('li', $('div.serieslist.pop.wpop.wpop-weekly')),
+            sortIndex: 60
+        }
     }
 
     getMangaShareUrl(mangaId: string): string {
@@ -366,27 +363,26 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
     }
 
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-        const sections: any[] = []
-
-        addHomeSection(sections, this.popularTodaySection)
-        addHomeSection(sections, this.latestUpdateSection)
-        addHomeSection(sections, this.newMangaSection)
-        addHomeSection(sections, this.topAllTimeSection)
-        addHomeSection(sections, this.topMonthlySection)
-        addHomeSection(sections, this.topWeeklySection)
-
         const $ = await this.loadRequestData(`${this.baseUrl}/`)
 
         const promises: Promise<void>[] = []
-        for (const section of sections) {
+        const sectionValues = Object.values(this.sections).sort((n1,n2) => n1.sortIndex - n2.sortIndex)
+        for (const section of sectionValues) {
+            if (!section.enabled) {
+                continue
+            }
             // Let the app load empty sections
-            sectionCallback(section.sectionData)
+            sectionCallback(section.section)
         }
 
-        for (const section of sections) {
+        for (const section of sectionValues) {
+            if (!section.enabled) {
+                continue
+            }
+
             promises.push(new Promise(async () => {
-                section.sectionData.items = await this.parser.parseHomeSection($, section, this)
-                sectionCallback(section.sectionData)
+                section.section.items = await this.parser.parseHomeSection($, section, this)
+                sectionCallback(section.section)
             }))
         }
 
@@ -397,19 +393,9 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
 
-        let param = ''
-        switch (homepageSectionId) {
-            case 'new_titles':
-                param = `${this.sourceTraversalPathName}/?page=${page}&order=latest`
-                break
-            case 'latest_update':
-                param = `${this.sourceTraversalPathName}/?page=${page}&order=update`
-                break
-            case 'popular_today':
-                param = `${this.sourceTraversalPathName}/?page=${page}&order=popular`
-                break
-            default:
-                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
+        let param = this.sections[homepageSectionId]!.getViewMoreItemsFunc(page) ?? undefined
+        if (!param) {
+            throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
         }
 
         const $ = await this.loadRequestData(`${this.baseUrl}/${param}`)

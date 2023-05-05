@@ -37,11 +37,10 @@ export class InfernalVoidScans extends MangaStream {
     language: string = '🇬🇧'
 
     override configureSections() {
-        this.latestUpdateSection.selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Project Update)')?.parent()?.next())
-        this.newMangaSection.selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New series)')?.parent()?.next())
-        this.topAllTimeSection.enabled = false
-        this.topMonthlySection.enabled = false
-        this.topWeeklySection.enabled = false
+        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Project Update)')?.parent()?.next())
+        this.sections['new_titles']!.selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New series)')?.parent()?.next())
+        this.sections['top_alltime']!.enabled = false
+        this.sections['top_monthly']!.enabled = false
+        this.sections['top_weekly']!.enabled = false
     }
-
 }

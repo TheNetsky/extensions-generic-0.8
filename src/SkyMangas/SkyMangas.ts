@@ -10,6 +10,11 @@ import {
     getExportVersion,
     MangaStream
 } from '../MangaStream'
+import {
+    createHomeSection,
+    DefaultHomeSectionData
+} from '../MangaStreamHelper'
+import { SkyMangasParser } from './SkyMangasParser'
 
 const SKYMANGAS_DOMAIN = 'https://skymangas.com'
 
@@ -39,6 +44,8 @@ export class SkyMangas extends MangaStream {
 
     baseUrl: string = SKYMANGAS_DOMAIN
     language: string = '🇪🇸'
+
+    override parser = new SkyMangasParser()
 
     //----DATE SETTINGS
     override dateMonths = {
@@ -90,12 +97,21 @@ export class SkyMangas extends MangaStream {
     override manga_selector_status = 'Estado'
 
     override configureSections() {
-        //this.popularTodaySection.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Popular Today)')?.parent()?.next())
-        this.latestUpdateSection.selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Latest Updates)')?.parent()?.next())
-        this.newMangaSection.enabled = false
-        this.topMonthlySection.enabled
-        this.topWeeklySection.enabled
-        this.topAllTimeSection.enabled
-    }
+        this.sections['popular_today']!.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Popular Today)')?.parent()?.next())
+        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
+        this.sections['new_titles']!.enabled = false
+        this.sections['top_alltime']!.enabled = false
+        this.sections['top_monthly']!.enabled = false
+        this.sections['top_weekly']!.enabled = false
 
+        this.sections['project_updates'] = {
+            ...DefaultHomeSectionData,
+            section: createHomeSection('project_updates', 'Project Updates', true),
+            selectorFunc: ($: CheerioStatic) => $('div.bsx', $('h2:contains(Project Update)')?.parent()?.next()),
+            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('a', element).attr('title'),
+            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('div.epxs', element).text().trim(),
+            getViewMoreItemsFunc: (page: string) => `project/page/${page}`,
+            sortIndex: 11,
+        }
+    }
 }

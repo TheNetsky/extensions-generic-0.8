@@ -47,7 +47,7 @@ export class CosmicScans extends MangaStream {
     }
 
     override configureSections() {
-        this.newMangaSection.enabled = false
+        this.sections['new_titles']!.enabled = false
     }
 
 }

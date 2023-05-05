@@ -41,7 +41,6 @@ export class MangaGenki extends MangaStream {
     language: string = '🇬🇧'
 
     override configureSections() {
-        this.newMangaSection.selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New Titles)')?.parent()?.next())
+        this.sections['new_titles']!.selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New Titles)')?.parent()?.next())
     }
-
 }

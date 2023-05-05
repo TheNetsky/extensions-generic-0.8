@@ -44,11 +44,10 @@ export class LelManga extends MangaStream {
     override manga_selector_artist = 'Artiste'
 
     override configureSections() {
-        this.popularTodaySection.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Top Managa Aujourd\'hui)')?.parent()?.next())
-        this.latestUpdateSection.selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Dernières Sorties)')?.parent()?.next())
-        this.newMangaSection.enabled = false
+        this.sections['popular_today']!.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Top Managa Aujourd\'hui)')?.parent()?.next())
+        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Dernières Sorties)')?.parent()?.next())
+        this.sections['new_titles']!.enabled = false
     }
 
     override supportsTagExclusion = async (): Promise<boolean> => true
-
 }

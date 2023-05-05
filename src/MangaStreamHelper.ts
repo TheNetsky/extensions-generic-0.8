@@ -5,41 +5,28 @@ import {
 } from '@paperback/types'
 
 export interface HomeSectionData {
-    id: string
-    title: string
-    containsMoreItems: boolean
-    type: string
     selectorFunc: Function
     titleSelectorFunc: Function
     subtitleSelectorFunc: Function
+    getViewMoreItemsFunc: Function
+    section: HomeSection
     enabled: boolean
+    sortIndex: number
 }
 
 export const DefaultHomeSectionData = {
-    containsMoreItems: true,
-    type: HomeSectionType.singleRowNormal,
     titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('h2', element).text().trim(),
     subtitleSelectorFunc: () => undefined,
+    getViewMoreItemsFunc: () => undefined,
     enabled: true
 }
 
-export function addHomeSection(sections: any[], homeSectionData: HomeSectionData): void {
-    if (homeSectionData.enabled) {
-        sections.push({
-            selectorFunc: homeSectionData.selectorFunc,
-            titleSelectorFunc: homeSectionData.titleSelectorFunc,
-            subtitleSelectorFunc: homeSectionData.subtitleSelectorFunc,
-            sectionData: createHomeSection(homeSectionData)
-        })
-    }
-}
-
-export function createHomeSection(homeSectionData: HomeSectionData): HomeSection {
+export function createHomeSection(id: string, title: string, containsMoreItems: boolean = true, type: string = HomeSectionType.singleRowNormal): HomeSection {
     return App.createHomeSection({
-        id: homeSectionData.id,
-        title: homeSectionData.title,
-        type: homeSectionData.type,
-        containsMoreItems: homeSectionData.containsMoreItems
+        id,
+        title,
+        type,
+        containsMoreItems
     })
 }
 

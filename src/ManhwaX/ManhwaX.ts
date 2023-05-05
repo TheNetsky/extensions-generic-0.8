@@ -41,9 +41,8 @@ export class ManhwaX extends MangaStream {
     language: string = '🇬🇧'
 
     override configureSections() {
-        this.popularTodaySection.enabled = false
-        this.newMangaSection.enabled = false
-        this.latestUpdateSection.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
+        this.sections['popular_today']!.enabled = false
+        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
+        this.sections['new_titles']!.enabled = false
     }
-
 }

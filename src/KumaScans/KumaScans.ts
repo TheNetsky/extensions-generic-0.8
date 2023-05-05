@@ -37,7 +37,6 @@ export class KumaScans extends MangaStream {
     language: string = '🇬🇧'
 
     override configureSections() {
-        this.latestUpdateSection.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
+        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
     }
-
 }

@@ -39,7 +39,6 @@ export class LuminousScans extends MangaStream {
     override sourceTraversalPathName = 'series'
 
     override configureSections() {
-        this.newMangaSection.enabled = false
+        this.sections['new_titles']!.enabled = false
     }
-
 }

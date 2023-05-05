@@ -37,7 +37,7 @@ export class xCalibrScans extends MangaStream {
     language: string = '🇬🇧'
 
     override configureSections() {
-        this.newMangaSection.enabled = false
+        this.sections['new_titles']!.enabled = false
     }
 
 }

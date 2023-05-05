@@ -56,7 +56,7 @@ export class AsuraScans extends MangaStream {
     override sourceTraversalPathName = 'manga'
 
     override configureSections(): void {
-        this.newMangaSection.enabled = false
+        this.sections['new_titles']!.enabled = false
     }
 
 }

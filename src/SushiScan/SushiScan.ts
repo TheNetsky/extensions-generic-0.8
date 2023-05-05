@@ -94,8 +94,8 @@ export class SushiScan extends MangaStream {
     }
 
     override configureSections() {
-        this.popularTodaySection.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Populaire Aujourd\'hui)')?.parent()?.next())
-        this.latestUpdateSection.selectorFunc = ($: CheerioStatic) => $('div.utao', $('h2:contains(Dernières Sorties)')?.parent()?.next())
-        this.newMangaSection.enabled = false
+        this.sections['popular_today']!.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Populaire Aujourd\'hui)')?.parent()?.next())
+        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.utao', $('h2:contains(Dernières Sorties)')?.parent()?.next())
+        this.sections['new_titles']!.enabled = false
     }
 }

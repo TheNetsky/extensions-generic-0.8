@@ -37,11 +37,11 @@ export class eDoujin extends MangaStream {
     language: string = '🇬🇧'
 
     override configureSections() {
-        this.latestUpdateSection.selectorFunc = ($: CheerioStatic) => $('div.utao', $('h2:contains(Latest Update)')?.parent()?.next())
-        this.newMangaSection.enabled = false
-        this.topAllTimeSection.enabled = false
-        this.topMonthlySection.enabled = false
-        this.topWeeklySection.enabled = false
+        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.utao', $('h2:contains(Latest Update)')?.parent()?.next())
+        this.sections['new_titles']!.enabled = false
+        this.sections['top_alltime']!.enabled = false
+        this.sections['top_monthly']!.enabled = false
+        this.sections['top_weekly']!.enabled = false
     }
 
 }

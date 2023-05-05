@@ -265,12 +265,13 @@ export class MangaStreamParser {
 
         const mangas = section.selectorFunc($)
         if (!mangas.length) {
-            console.log(`Unable to parse valid ${section.title} section!`)
+            console.log(`Unable to parse valid ${section.section.title} section!`)
             return items
         }
 
         for (const manga of mangas.toArray()) {
             const title = section.titleSelectorFunc($, manga)
+
             const image = this.getImageSrc($('img', manga))?.split('?resize')[0] ?? ''
             const subtitle = section.subtitleSelectorFunc($, manga) ?? ''
 
@@ -284,7 +285,7 @@ export class MangaStreamParser {
                                     : slug
 
             if (!mangaId || !title) {
-                console.log(`Failed to parse homepage sections for ${source.baseUrl}`)
+                console.log(`Failed to parse homepage sections for ${source.baseUrl} title (${title}) mangaId (${mangaId})`)
                 continue
             }
 
