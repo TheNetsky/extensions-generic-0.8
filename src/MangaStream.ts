@@ -339,7 +339,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         .addQueryParameter('page', page.toString())
 
         if (query?.title) {
-            urlBuilder = urlBuilder.addQueryParameter('s', encodeURIComponent(query?.title ?? ''))
+            urlBuilder = urlBuilder.addQueryParameter('s', encodeURIComponent(query?.title.replace(/[’–][a-z]*/g, '') ?? ''))
         } else {
             urlBuilder = urlBuilder
             .addQueryParameter('genre', getFilterTagsBySection('genres', query?.includedTags, true))
@@ -366,7 +366,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         const $ = await this.loadRequestData(`${this.baseUrl}/`)
 
         const promises: Promise<void>[] = []
-        const sectionValues = Object.values(this.sections).sort((n1,n2) => n1.sortIndex - n2.sortIndex)
+        const sectionValues = Object.values(this.sections).sort((n1, n2) => n1.sortIndex - n2.sortIndex)
         for (const section of sectionValues) {
             if (!section.enabled) {
                 continue
