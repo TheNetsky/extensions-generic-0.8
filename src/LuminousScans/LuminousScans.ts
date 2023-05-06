@@ -22,7 +22,7 @@ export const LuminousScansInfo: SourceInfo = {
     icon: 'logo.png',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: LUMINOUSSCANS_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: [
         {
             text: 'Notifications',
@@ -37,6 +37,7 @@ export class LuminousScans extends MangaStream {
     language: string = '🇬🇧'
 
     override sourceTraversalPathName = 'series'
+    override usePostIds = false
 
     override configureSections() {
         this.sections['new_titles']!.enabled = false
