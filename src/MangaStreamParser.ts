@@ -14,6 +14,8 @@ import { HomeSectionData } from './MangaStreamHelper'
 
 import entities = require('entities')
 
+const url = require('simple-url')
+
 export class MangaStreamParser {
     parseMangaDetails($: CheerioStatic, mangaId: string, source: any): SourceManga {
         const titles = []
@@ -151,6 +153,12 @@ export class MangaStreamParser {
             }
 
             index.images.map((p: string) => {
+                const path: any = url.parse(p, true)
+                if (!path.protocol) {
+                    path.protocol = 'https'
+                }
+                p = url.create(path)
+
                 if (this.renderChapterImage(p)) {
                     pages.push(encodeURI(p))
                 }
