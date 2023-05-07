@@ -42,7 +42,7 @@ export function getFilterTagsBySection(section: string, tags: Tag[], included: b
     return tags?.filter((x: Tag) => x.id.startsWith(`${section}:`)).map((x: Tag) => {
         let id: string = x.id.replace(`${section}:`, '')
         if (!included) {
-            id = `-${id}`
+            id = encodeURI(`-${id}`)
         }
         return id
     })
