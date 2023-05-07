@@ -286,11 +286,28 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const $ = await this.getMangaData(mangaId)
-        return this.parser.parseChapterList($, mangaId, this)
+        return await this.parser.parseChapterList($, mangaId, this)
+    }
+
+    async getChapterSlug(mangaId: string, chapterId: string): Promise<string> {
+        const chapterKey = `${mangaId}:${chapterId}`
+        let existingMappedChapterLink = await this.stateManager.retrieve(chapterKey)
+        // If the Chapter List wasn't retrieved since the app was opened, retrieve it first and initialize it for all chapters
+        if (existingMappedChapterLink == null) {
+            await this.getChapters(mangaId)
+        }
+
+        existingMappedChapterLink = await this.stateManager.retrieve(chapterKey)
+        if (existingMappedChapterLink == null) {
+            throw new Error(`Could not parse out Chapter Link when getting chapter details for postId: ${mangaId} chapterId: ${chapterId}`)
+        }
+
+        return existingMappedChapterLink
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
-        const $ = await this.loadRequestData(`${this.baseUrl}/${chapterId}/`)
+        let chapterLink: string = await this.getChapterSlug(mangaId, chapterId)
+        const $ = await this.loadRequestData(`${this.baseUrl}/${chapterLink}/`)
         return this.parser.parseChapterDetails($, mangaId, chapterId)
     }
 

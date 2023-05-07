@@ -87,7 +87,7 @@ export class MangaStreamParser {
         })
     }
 
-    parseChapterList($: CheerioSelector, mangaId: string, source: any): Chapter[] {
+    async parseChapterList($: CheerioSelector, mangaId: string, source: any): Promise<Chapter[]> {
         const chapters: Chapter[] = []
         let sortingIndex = 0
 
@@ -96,7 +96,7 @@ export class MangaStreamParser {
 
         for (const chapter of $('li', 'div#chapterlist').toArray()) {
             const title = $('span.chapternum', chapter).text().trim()
-            const id = this.idCleaner($('a', chapter).attr('href') ?? '')
+            const link = this.idCleaner($('a', chapter).attr('href') ?? '')
             const date = convertDate($('span.chapterdate', chapter).text().trim(), source)
             const getNumber = chapter.attribs['data-num'] ?? ''
             const chapterNumberRegex = getNumber.match(/(\d+\.?\d?)+/)
@@ -105,12 +105,15 @@ export class MangaStreamParser {
                 chapterNumber = Number(chapterNumberRegex[1])
             }
 
+            let id = chapterNumber.toString()
             if (!id || typeof id === 'undefined') {
                 throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`)
             }
 
+            await source.stateManager.store(`${mangaId}:${id}`, link)
+
             chapters.push({
-                id,
+                id: chapterNumber.toString(),
                 langCode: source.language,
                 chapNum: chapterNumber,
                 name: title,
