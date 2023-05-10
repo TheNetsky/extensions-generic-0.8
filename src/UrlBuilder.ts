@@ -49,7 +49,7 @@ export class URLBuilder {
 
             if (Array.isArray(entry[1]) && entry[1].length) {
                 return entry[1].map(value => value || includeUndefinedParameters
-                                             ? `${entry[0]}[]=${value}`
+                                             ? `${entry[0]}${encodeURI('[]')}=${value}`
                                              : undefined)
                                .filter(x => x !== undefined)
                                .join('&')
