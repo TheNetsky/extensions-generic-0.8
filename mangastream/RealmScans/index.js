@@ -3559,67 +3559,6 @@ function isEmptyObj(obj) {
 },{"qs":81}],87:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AsuraScans = exports.AsuraScansInfo = void 0;
-/* eslint-disable linebreak-style */
-const types_1 = require("@paperback/types");
-const MangaStream_1 = require("../MangaStream");
-const AsuraScansParser_1 = require("./AsuraScansParser");
-const ASURASCANS_DOMAIN = 'https://www.asurascans.com';
-exports.AsuraScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.8'),
-    name: 'AsuraScans',
-    description: 'Extension that pulls manga from AsuraScans',
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: types_1.ContentRating.MATURE,
-    websiteBaseURL: ASURASCANS_DOMAIN,
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
-        {
-            text: 'CloudFlare',
-            type: types_1.BadgeColor.RED
-        }
-    ]
-};
-class AsuraScans extends MangaStream_1.MangaStream {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = ASURASCANS_DOMAIN;
-        this.language = '🇬🇧';
-        this.parser = new AsuraScansParser_1.AsuraScansParser();
-        this.requestManager = App.createRequestManager({
-            requestsPerSecond: 2,
-            requestTimeout: 15000
-        });
-    }
-    configureSections() {
-        this.sections['new_titles'].enabled = false;
-    }
-}
-exports.AsuraScans = AsuraScans;
-
-},{"../MangaStream":90,"./AsuraScansParser":88,"@paperback/types":61}],88:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AsuraScansParser = void 0;
-/* eslint-disable linebreak-style */
-const MangaStreamParser_1 = require("../MangaStreamParser");
-class AsuraScansParser extends MangaStreamParser_1.MangaStreamParser {
-    renderChapterImage(path) {
-        //Asura has a dead link at the start of each of their chapters (Thanks to pandeynmn for noticing)
-        return path != 'https://www.asurascans.com/wp-content/uploads/2021/04/page100-10.jpg';
-    }
-}
-exports.AsuraScansParser = AsuraScansParser;
-
-},{"../MangaStreamParser":92}],89:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertDateAgo = exports.convertDate = void 0;
 /* eslint-disable linebreak-style */
 function convertDate(rawDate, source) {
@@ -3700,7 +3639,7 @@ function convertDateAgo(date, source) {
 }
 exports.convertDateAgo = convertDateAgo;
 
-},{}],90:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaStream = exports.getExportVersion = void 0;
@@ -4106,7 +4045,7 @@ class MangaStream {
 }
 exports.MangaStream = MangaStream;
 
-},{"./MangaStreamHelper":91,"./MangaStreamParser":92,"./UrlBuilder":93}],91:[function(require,module,exports){
+},{"./MangaStreamHelper":89,"./MangaStreamParser":90,"./UrlBuilder":92}],89:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFilterTagsBySection = exports.getIncludedTagBySection = exports.createHomeSection = exports.DefaultHomeSectionData = void 0;
@@ -4144,7 +4083,7 @@ function getFilterTagsBySection(section, tags, included, supportsExclusion = fal
 }
 exports.getFilterTagsBySection = getFilterTagsBySection;
 
-},{"@paperback/types":61}],92:[function(require,module,exports){
+},{"@paperback/types":61}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaStreamParser = void 0;
@@ -4454,7 +4393,45 @@ class MangaStreamParser {
 }
 exports.MangaStreamParser = MangaStreamParser;
 
-},{"./LanguageUtils":89,"entities":72,"simple-url":86}],93:[function(require,module,exports){
+},{"./LanguageUtils":87,"entities":72,"simple-url":86}],91:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RealmScans = exports.RealmScansInfo = void 0;
+/* eslint-disable linebreak-style */
+const types_1 = require("@paperback/types");
+const MangaStream_1 = require("../MangaStream");
+const REALMSCANS_DOMAIN = 'https://realmscans.com';
+exports.RealmScansInfo = {
+    version: (0, MangaStream_1.getExportVersion)('0.0.8'),
+    name: 'RealmScans',
+    description: 'Extension that pulls manga from RealmScans',
+    author: 'Seyden',
+    authorWebsite: 'http://github.com/Seyden',
+    icon: 'icon.webp',
+    contentRating: types_1.ContentRating.MATURE,
+    websiteBaseURL: REALMSCANS_DOMAIN,
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS,
+    sourceTags: [
+        {
+            text: 'Notifications',
+            type: types_1.BadgeColor.GREEN
+        }
+    ]
+};
+class RealmScans extends MangaStream_1.MangaStream {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = REALMSCANS_DOMAIN;
+        this.language = '🇬🇧';
+        this.sourceTraversalPathName = 'series';
+    }
+    configureSections() {
+        this.sections['new_titles'].enabled = false;
+    }
+}
+exports.RealmScans = RealmScans;
+
+},{"../MangaStream":88,"@paperback/types":61}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -4515,5 +4492,5 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}]},{},[87])(87)
+},{}]},{},[91])(91)
 });

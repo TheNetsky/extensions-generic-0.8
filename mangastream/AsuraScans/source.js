@@ -3583,10 +3583,6 @@ exports.AsuraScansInfo = {
         {
             text: 'CloudFlare',
             type: types_1.BadgeColor.RED
-        },
-        {
-            text: 'Buggy',
-            type: types_1.BadgeColor.RED
         }
     ]
 };
@@ -3600,7 +3596,6 @@ class AsuraScans extends MangaStream_1.MangaStream {
             requestsPerSecond: 2,
             requestTimeout: 15000
         });
-        this.sourceTraversalPathName = 'manga';
     }
     configureSections() {
         this.sections['new_titles'].enabled = false;
