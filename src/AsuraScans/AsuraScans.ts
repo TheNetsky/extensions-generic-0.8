@@ -33,10 +33,6 @@ export const AsuraScansInfo: SourceInfo = {
         {
             text: 'CloudFlare',
             type: BadgeColor.RED
-        },
-        {
-            text: 'Buggy',
-            type: BadgeColor.RED
         }
     ]
 }
@@ -52,8 +48,6 @@ export class AsuraScans extends MangaStream {
         requestsPerSecond: 2,
         requestTimeout: 15000
     })
-
-    override sourceTraversalPathName = 'manga'
 
     override configureSections(): void {
         this.sections['new_titles']!.enabled = false
