@@ -4076,7 +4076,7 @@ function getFilterTagsBySection(section, tags, included, supportsExclusion = fal
     return tags?.filter((x) => x.id.startsWith(`${section}:`)).map((x) => {
         let id = x.id.replace(`${section}:`, '');
         if (!included) {
-            id = `-${id}`;
+            id = encodeURI(`-${id}`);
         }
         return id;
     });
@@ -4476,7 +4476,7 @@ class URLBuilder {
             }
             if (Array.isArray(entry[1]) && entry[1].length) {
                 return entry[1].map(value => value || includeUndefinedParameters
-                    ? `${entry[0]}[]=${value}`
+                    ? `${entry[0]}${encodeURI('[]')}=${value}`
                     : undefined)
                     .filter(x => x !== undefined)
                     .join('&');
