@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 import {
     BadgeColor,
     ContentRating,
@@ -13,18 +12,18 @@ import {
 
 import { AsuraScansParser } from './AsuraScansParser'
 
-const ASURASCANS_DOMAIN = 'https://www.asurascans.com'
+const DOMAIN = 'https://www.asurascans.com'
 
 export const AsuraScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.8'),
+    version: getExportVersion('0.0.0'),
     name: 'AsuraScans',
-    description: 'Extension that pulls manga from AsuraScans',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: ASURASCANS_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    websiteBaseURL: DOMAIN,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
             text: 'Notifications',
@@ -39,18 +38,11 @@ export const AsuraScansInfo: SourceInfo = {
 
 export class AsuraScans extends MangaStream {
 
-    baseUrl: string = ASURASCANS_DOMAIN
-    language: string = '🇬🇧'
+    baseUrl: string = DOMAIN
 
     override readonly parser: AsuraScansParser = new AsuraScansParser()
 
-    override requestManager = App.createRequestManager({
-        requestsPerSecond: 2,
-        requestTimeout: 15000
-    })
-
     override configureSections(): void {
-        this.sections['new_titles']!.enabled = false
+        this.homescreen_sections['new_titles'].enabled = false
     }
-
 }

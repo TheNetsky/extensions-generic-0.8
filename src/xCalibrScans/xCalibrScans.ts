@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+
 import {
     BadgeColor,
     ContentRating,
@@ -11,18 +11,18 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const XCALIBRSCANS_DOMAIN = 'https://xcalibrscans.com'
+const DOMAIN = 'https://xcalibrscans.com'
 
 export const xCalibrScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'xCalibrScans',
-    description: 'Extension that pulls manga from xCalibrScans',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: XCALIBRSCANS_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    websiteBaseURL: DOMAIN,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
             text: 'Notifications',
@@ -33,11 +33,9 @@ export const xCalibrScansInfo: SourceInfo = {
 
 export class xCalibrScans extends MangaStream {
 
-    baseUrl: string = XCALIBRSCANS_DOMAIN
-    language: string = '🇬🇧'
+    baseUrl: string = DOMAIN
 
     override configureSections() {
-        this.sections['new_titles']!.enabled = false
+        this.homescreen_sections['new_titles'].enabled = false
     }
-
 }

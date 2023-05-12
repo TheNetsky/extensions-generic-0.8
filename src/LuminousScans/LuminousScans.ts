@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+
 import {
     BadgeColor,
     ContentRating,
@@ -11,18 +11,18 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const LUMINOUSSCANS_DOMAIN = 'https://luminousscans.com'
+const DOMAIN = 'https://luminousscans.com'
 
 export const LuminousScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'LuminousScans',
-    description: 'Extension that pulls manga from LuminousScans',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'yehru',
     authorWebsite: 'http://github.com/yehrupx',
     icon: 'logo.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: LUMINOUSSCANS_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
+    websiteBaseURL: DOMAIN,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
             text: 'Notifications',
@@ -33,13 +33,12 @@ export const LuminousScansInfo: SourceInfo = {
 
 export class LuminousScans extends MangaStream {
 
-    baseUrl: string = LUMINOUSSCANS_DOMAIN
-    language: string = '🇬🇧'
+    baseUrl: string = DOMAIN
 
-    override sourceTraversalPathName = 'series'
+    override directoryPath = 'series'
     override usePostIds = false
 
     override configureSections() {
-        this.sections['new_titles']!.enabled = false
+        this.homescreen_sections['new_titles'].enabled = false
     }
 }

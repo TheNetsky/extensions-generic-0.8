@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+
 import {
     BadgeColor,
     ContentRating,
@@ -11,18 +11,18 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const MANGAGENKI_DOMAIN = 'https://mangagenki.com'
+const DOMAIN = 'https://mangagenki.com'
 
 export const MangaGenkiInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'MangaGenki',
-    description: 'Extension that pulls manga from MangaGenki',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.ADULT,
-    websiteBaseURL: MANGAGENKI_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    websiteBaseURL: DOMAIN,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
             text: 'Notifications',
@@ -37,10 +37,9 @@ export const MangaGenkiInfo: SourceInfo = {
 
 export class MangaGenki extends MangaStream {
 
-    baseUrl: string = MANGAGENKI_DOMAIN
-    language: string = '🇬🇧'
+    baseUrl: string = DOMAIN
 
     override configureSections() {
-        this.sections['new_titles']!.selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New Titles)')?.parent()?.next())
+        this.homescreen_sections['new_titles'].selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New Titles)')?.parent()?.next())
     }
 }

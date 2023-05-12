@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+
 import {
     BadgeColor,
     ContentRating,
@@ -11,18 +11,18 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const INFERNALVOIDSCANS_DOMAIN = 'https://void-scans.com'
+const DOMAIN = 'https://void-scans.com'
 
 export const InfernalVoidScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.0'),
     name: 'InfernalVoidScans',
-    description: 'Extension that pulls manga from InfernalVoidScans',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'nicknitewolf',
     authorWebsite: 'http://github.com/nicknitewolf',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: INFERNALVOIDSCANS_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
+    websiteBaseURL: DOMAIN,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
             text: 'Notifications',
@@ -33,14 +33,13 @@ export const InfernalVoidScansInfo: SourceInfo = {
 
 export class InfernalVoidScans extends MangaStream {
 
-    baseUrl: string = INFERNALVOIDSCANS_DOMAIN
-    language: string = '🇬🇧'
+    baseUrl: string = DOMAIN
 
     override configureSections() {
-        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Project Update)')?.parent()?.next())
-        this.sections['new_titles']!.selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New series)')?.parent()?.next())
-        this.sections['top_alltime']!.enabled = false
-        this.sections['top_monthly']!.enabled = false
-        this.sections['top_weekly']!.enabled = false
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Project Update)')?.parent()?.next())
+        this.homescreen_sections['new_titles'].selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New series)')?.parent()?.next())
+        this.homescreen_sections['top_alltime'].enabled = false
+        this.homescreen_sections['top_monthly'].enabled = false
+        this.homescreen_sections['top_weekly'].enabled = false
     }
 }

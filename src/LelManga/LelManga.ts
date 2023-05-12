@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+
 import {
     BadgeColor,
     ContentRating,
@@ -11,18 +11,18 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const LELMANGA_DOMAIN = 'https://www.lelmanga.com'
+const DOMAIN = 'https://www.lelmanga.com'
 
 export const LelMangaInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'LelManga',
-    description: 'Extension that pulls manga from LelManga',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: LELMANGA_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    websiteBaseURL: DOMAIN,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
             text: 'Notifications',
@@ -37,16 +37,16 @@ export const LelMangaInfo: SourceInfo = {
 
 export class LelManga extends MangaStream {
 
-    baseUrl: string = LELMANGA_DOMAIN
-    language: string = '🇫🇷'
+    baseUrl: string = DOMAIN
+    override language = '🇫🇷'
 
     override manga_selector_author = 'Autheur'
     override manga_selector_artist = 'Artiste'
 
     override configureSections() {
-        this.sections['popular_today']!.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Top Managa Aujourd\'hui)')?.parent()?.next())
-        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Dernières Sorties)')?.parent()?.next())
-        this.sections['new_titles']!.enabled = false
+        this.homescreen_sections['popular_today'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Top Managa Aujourd\'hui)')?.parent()?.next())
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Dernières Sorties)')?.parent()?.next())
+        this.homescreen_sections['new_titles'].enabled = false
     }
 
     override supportsTagExclusion = async (): Promise<boolean> => true

@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+
 import {
     BadgeColor,
     ContentRating,
@@ -11,18 +11,18 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const RAWKUMA_DOMAIN = 'https://rawkuma.com'
+const DOMAIN = 'https://rawkuma.com'
 
 export const RawKumaInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'RawKuma',
-    description: 'Extension that pulls manga from RawKuma',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: RAWKUMA_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    websiteBaseURL: DOMAIN,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
             text: 'Notifications',
@@ -37,7 +37,6 @@ export const RawKumaInfo: SourceInfo = {
 
 export class RawKuma extends MangaStream {
 
-    baseUrl: string = RAWKUMA_DOMAIN
-    language: string = '🇯🇵'
-
+    baseUrl: string = DOMAIN
+    override language = '🇯🇵'
 }

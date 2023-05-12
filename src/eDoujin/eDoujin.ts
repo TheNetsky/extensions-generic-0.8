@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+
 import {
     BadgeColor,
     ContentRating,
@@ -11,18 +11,18 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const EDOUJIN_DOMAIN = 'https://edoujin.net'
+const DOMAIN = 'https://edoujin.net'
 
 export const eDoujinInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'eDoujin',
-    description: 'Extension that pulls manga from eDoujin',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.ADULT,
-    websiteBaseURL: EDOUJIN_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    websiteBaseURL: DOMAIN,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
             text: '18+',
@@ -33,15 +33,13 @@ export const eDoujinInfo: SourceInfo = {
 
 export class eDoujin extends MangaStream {
 
-    baseUrl: string = EDOUJIN_DOMAIN
-    language: string = '🇬🇧'
+    baseUrl: string = DOMAIN
 
     override configureSections() {
-        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.utao', $('h2:contains(Latest Update)')?.parent()?.next())
-        this.sections['new_titles']!.enabled = false
-        this.sections['top_alltime']!.enabled = false
-        this.sections['top_monthly']!.enabled = false
-        this.sections['top_weekly']!.enabled = false
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.utao', $('h2:contains(Latest Update)')?.parent()?.next())
+        this.homescreen_sections['new_titles'].enabled = false
+        this.homescreen_sections['top_alltime'].enabled = false
+        this.homescreen_sections['top_monthly'].enabled = false
+        this.homescreen_sections['top_weekly'].enabled = false
     }
-
 }

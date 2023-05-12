@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+
 export function convertDate(rawDate: string, source: any) {
     const dateString: string = rawDate.toLowerCase()
     const monthObject = source.dateMonths

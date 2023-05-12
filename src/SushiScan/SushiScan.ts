@@ -1,4 +1,4 @@
-/* eslint-disable linebreak-style */
+
 import {
     BadgeColor,
     ContentRating,
@@ -11,18 +11,18 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const SUSHI_SCAN_DOMAIN = 'https://sushiscan.net'
+const DOMAIN = 'https://sushiscan.net'
 
 export const SushiScanInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.0'),
     name: 'Sushi Scan',
-    description: 'Extension that pulls manga from sushiscan.su',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'btylerh7',
     authorWebsite: 'http://github.com/btylerh7',
     icon: 'logo.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: SUSHI_SCAN_DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
+    websiteBaseURL: DOMAIN,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
             text: 'Notifications',
@@ -36,8 +36,8 @@ export const SushiScanInfo: SourceInfo = {
 }
 
 export class SushiScan extends MangaStream {
-    baseUrl: string = SUSHI_SCAN_DOMAIN
-    language: string = '🇫🇷'
+    baseUrl: string = DOMAIN
+    override language = '🇫🇷'
 
     override manga_tag_selector_box = 'div.seriestugenre'
 
@@ -50,7 +50,7 @@ export class SushiScan extends MangaStream {
         COMPLETED: 'Terminé'
     }
 
-    override sourceTraversalPathName = 'manga'
+    override directoryPath = 'manga'
 
     // ----DATE SELECTORS----
     /**
@@ -94,8 +94,8 @@ export class SushiScan extends MangaStream {
     }
 
     override configureSections() {
-        this.sections['popular_today']!.selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Populaire Aujourd\'hui)')?.parent()?.next())
-        this.sections['latest_update']!.selectorFunc = ($: CheerioStatic) => $('div.utao', $('h2:contains(Dernières Sorties)')?.parent()?.next())
-        this.sections['new_titles']!.enabled = false
+        this.homescreen_sections['popular_today'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Populaire Aujourd\'hui)')?.parent()?.next())
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.utao', $('h2:contains(Dernières Sorties)')?.parent()?.next())
+        this.homescreen_sections['new_titles'].enabled = false
     }
 }
