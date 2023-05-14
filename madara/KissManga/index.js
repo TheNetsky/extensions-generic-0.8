@@ -1438,9 +1438,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.KissManga = exports.KissMangaInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://1stkissmanga.io';
+const DOMAIN = 'https://1stkissmanga.me';
 exports.KissMangaInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'KissManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
