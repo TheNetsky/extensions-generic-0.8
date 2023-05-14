@@ -10,10 +10,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://1stkissmanga.io'
+const DOMAIN = 'https://1stkissmanga.me'
 
 export const KissMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'KissManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
