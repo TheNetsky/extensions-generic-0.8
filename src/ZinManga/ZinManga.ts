@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://zinmanga.com'
 
 export const ZinMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ZinManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -37,4 +37,6 @@ export class ZinManga extends Madara {
     override alternativeChapterAjaxEndpoint = true
 
     override hasAdvancedSearchPage = true
+
+    override usePostIds = false
 }
