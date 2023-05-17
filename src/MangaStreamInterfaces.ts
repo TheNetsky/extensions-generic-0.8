@@ -1,14 +1,3 @@
-export interface TimeAgo {
-    now: string[];
-    yesterday: string[];
-    years: string[];
-    months: string[];
-    weeks: string[];
-    days: string[];
-    hours: string[];
-    minutes: string[];
-    seconds: string[];
-}
 export interface Months {
     january: string;
     february: string;

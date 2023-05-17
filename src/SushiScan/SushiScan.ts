@@ -71,27 +71,6 @@ export class SushiScan extends MangaStream {
         november: 'novembre',
         december: 'décembre'
     }
-    /**
-     * In this object, add the site's translations for the following time formats, case insensitive.
-     * If the site uses "12 hours ago" or "1 hour ago", only adding "hour" will be enough since "hours" includes "hour".
-     * Default =  English Translation
-     */
-    override dateTimeAgo = {
-        now: [
-            'moins d’une heure',
-            'tout à l\'heure',
-            'moment',
-            'maintenant'
-        ], // The "now" quotes are not confirmed
-        yesterday: ['hier'],
-        years: ['an'],
-        months: ['mois'],
-        weeks: ['semaine'],
-        days: ['jour'],
-        hours: ['heur'],
-        minutes: ['min'],
-        seconds: ['second']
-    }
 
     override configureSections() {
         this.homescreen_sections['popular_today'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Populaire Aujourd\'hui)')?.parent()?.next())

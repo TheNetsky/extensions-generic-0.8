@@ -63,34 +63,6 @@ export class SkyMangas extends MangaStream {
         december: 'diciembre'
     }
 
-    override dateTimeAgo = {
-        now: [
-            'less than an hour',
-            'just now'
-        ],
-        yesterday: ['ayer'],
-        years: [
-            'año',
-            'ano'
-        ],
-        months: [
-            'mes',
-            'meses'
-        ],
-        weeks: [
-            'semana',
-            'semanas'
-        ],
-        days: [
-            'día',
-            'dia',
-            'dias'
-        ],
-        hours: ['hora'],
-        minutes: ['minutre'],
-        seconds: ['segundo']
-    }
-
     //----MANGA DETAILS SELECTORS
     override manga_selector_author = 'Autor'
     override manga_selector_artist = 'Artista'

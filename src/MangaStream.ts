@@ -225,27 +225,6 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         december: 'December'
     }
 
-    /**
-     * In this object, add the site's translations for the following time formats, case insensitive.
-     * If the site uses "12 hours ago" or "1 hour ago", only adding "hour" will be enough since "hours" includes "hour".
-     * Default =  English Translation
-     */
-
-    dateTimeAgo: TimeAgo = {
-        now: [
-            'less than an hour',
-            'just now'
-        ],
-        yesterday: ['yesterday'],
-        years: ['year'],
-        months: ['month'],
-        weeks: ['week'],
-        days: ['day'],
-        hours: ['hour'],
-        minutes: ['min'],
-        seconds: ['second']
-    }
-
     // ----HOMESCREEN SELECTORS----
     /**
      * Enable or disable the "Popular Today" section on the homescreen
