@@ -19,7 +19,7 @@ export class MangaStreamParser {
         const titles = []
         titles.push(this.decodeHTMLEntity($('h1.entry-title').text().trim()))
 
-        const altTitles = $(`span:contains(${source.manga_selector_AlternativeTitles}), b:contains(${source.manga_selector_AlternativeTitles})+span, .imptdt:contains(${source.manga_selector_AlternativeTitles}) i, h1.entry-title+span`).contents().remove().last().text().split(',') //Language dependant
+        const altTitles = $(`span:contains(${source.manga_selector_AlternativeTitles}), b:contains(${source.manga_selector_AlternativeTitles})+span, .imptdt:contains(${source.manga_selector_AlternativeTitles}) i, h1.entry-title+span`).contents().remove().last().text().split(',') // Language dependant
         for (const title of altTitles) {
             if (title == '') {
                 continue
@@ -27,8 +27,8 @@ export class MangaStreamParser {
             titles.push(this.decodeHTMLEntity(title.trim()))
         }
 
-        const author = $(`span:contains(${source.manga_selector_author}), .fmed b:contains(${source.manga_selector_author})+span, .imptdt:contains(${source.manga_selector_author}) i`).contents().remove().last().text().trim() //Language dependant
-        const artist = $(`span:contains(${source.manga_selector_artist}), .fmed b:contains(${source.manga_selector_artist})+span, .imptdt:contains(${source.manga_selector_artist}) i`).contents().remove().last().text().trim() //Language dependant
+        const author = $(`span:contains(${source.manga_selector_author}), .fmed b:contains(${source.manga_selector_author})+span, .imptdt:contains(${source.manga_selector_author}) i`).contents().remove().last().text().trim() // Language dependant
+        const artist = $(`span:contains(${source.manga_selector_artist}), .fmed b:contains(${source.manga_selector_artist})+span, .imptdt:contains(${source.manga_selector_artist}) i`).contents().remove().last().text().trim() // Language dependant
         const image = this.getImageSrc($('img', 'div[itemprop="image"]'))
         const description = this.decodeHTMLEntity($('div[itemprop="description"]  p').text().trim())
 
@@ -81,10 +81,10 @@ export class MangaStreamParser {
     parseChapterList($: CheerioSelector, mangaId: string, source: any): Chapter[] {
         const chapters: Chapter[] = []
         let sortingIndex = 0
-        let langCode = source.languageCode
+        let language = source.language
 
         // Usually for Manhwa sites
-        if (mangaId.toUpperCase().endsWith('-RAW') && source.languageCode == '🇬🇧') langCode = '🇰🇷'
+        if (mangaId.toUpperCase().endsWith('-RAW') && source.language == '🇬🇧') language = '🇰🇷'
 
         for (const chapter of $('li', 'div#chapterlist').toArray()) {
             const title = $('span.chapternum', chapter).text().trim()
@@ -103,7 +103,7 @@ export class MangaStreamParser {
 
             chapters.push({
                 id: id, // Store chapterNumber as id
-                langCode: langCode,
+                langCode: language,
                 chapNum: chapterNumber,
                 name: title,
                 time: date,
@@ -312,6 +312,9 @@ export class MangaStreamParser {
         }
 
         image = image?.split('?resize')[0] ?? ''
+        image = image.replace(/^\/\//, 'https://')
+        image = image.replace(/^\//, 'https:/')
+
 
         return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')))
     }

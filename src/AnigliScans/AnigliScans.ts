@@ -1,3 +1,4 @@
+
 import {
     BadgeColor,
     ContentRating,
@@ -10,11 +11,11 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://www.asurascans.com'
+const DOMAIN = 'https://anigliscans.com'
 
-export const AsuraScansInfo: SourceInfo = {
+export const AnigliScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'AsuraScans',
+    name: 'AnigliScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -26,17 +27,17 @@ export const AsuraScansInfo: SourceInfo = {
         {
             text: 'Notifications',
             type: BadgeColor.GREEN
-        },
-        {
-            text: 'CloudFlare',
-            type: BadgeColor.RED
         }
     ]
 }
 
-export class AsuraScans extends MangaStream {
+export class AnigliScans extends MangaStream {
 
     baseUrl: string = DOMAIN
+
+    override usePostIds = false
+
+    override directoryPath = 'series'
 
     override configureSections(): void {
         this.homescreen_sections['new_titles'].enabled = false

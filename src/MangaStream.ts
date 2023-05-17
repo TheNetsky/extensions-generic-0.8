@@ -62,12 +62,14 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
                     }
                 }
 
+                request.url = request.url.replace(/^http:/, 'https:')
+
                 return request
             },
 
             interceptResponse: async (response: Response): Promise<Response> => {
                 if (response.headers.location) {
-                    response.headers.location = response.headers.location.replace('http://', 'https://')
+                    response.headers.location = response.headers.location.replace(/^http:/, 'https:')
                 }
                 return response
             }
@@ -228,6 +230,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
      * If the site uses "12 hours ago" or "1 hour ago", only adding "hour" will be enough since "hours" includes "hour".
      * Default =  English Translation
      */
+
     dateTimeAgo: TimeAgo = {
         now: [
             'less than an hour',
@@ -268,7 +271,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
             section: createHomeSection('latest_update', 'Latest Updates'),
             selectorFunc: ($: CheerioStatic) => $('div.uta', $('h2:contains(Latest Update)')?.parent()?.next()),
             titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('a', element).attr('title'),
-            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('li > a', $('div.luf', element)).first().text().trim(),
+            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('li > a, div.epxs', $('div.luf, div.bigor', element)).first().text().trim(),
             getViewMoreItemsFunc: (page: string) => `${this.directoryPath}/?page=${page}&order=update`,
             sortIndex: 20
         },

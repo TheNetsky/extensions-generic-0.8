@@ -33,6 +33,7 @@ export const CosmicScansInfo: SourceInfo = {
 export class CosmicScans extends MangaStream {
 
     baseUrl: string = DOMAIN
+
     override usePostIds = false
 
     override configureSections() {

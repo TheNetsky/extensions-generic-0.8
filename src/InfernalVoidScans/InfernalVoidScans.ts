@@ -38,8 +38,6 @@ export class InfernalVoidScans extends MangaStream {
     override configureSections() {
         this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Project Update)')?.parent()?.next())
         this.homescreen_sections['new_titles'].selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New series)')?.parent()?.next())
-        this.homescreen_sections['top_alltime'].enabled = false
-        this.homescreen_sections['top_monthly'].enabled = false
-        this.homescreen_sections['top_weekly'].enabled = false
+        this.homescreen_sections['new_titles'].enabled = false
     }
 }

@@ -1,3 +1,4 @@
+
 import {
     BadgeColor,
     ContentRating,
@@ -10,11 +11,11 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://www.asurascans.com'
+const DOMAIN = 'https://elarcpage.com'
 
-export const AsuraScansInfo: SourceInfo = {
+export const ElarcPageInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'AsuraScans',
+    name: 'ElarcPage',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -26,17 +27,15 @@ export const AsuraScansInfo: SourceInfo = {
         {
             text: 'Notifications',
             type: BadgeColor.GREEN
-        },
-        {
-            text: 'CloudFlare',
-            type: BadgeColor.RED
         }
     ]
 }
 
-export class AsuraScans extends MangaStream {
+export class ElarcPage extends MangaStream {
 
     baseUrl: string = DOMAIN
+
+    override directoryPath = 'series'
 
     override configureSections(): void {
         this.homescreen_sections['new_titles'].enabled = false
