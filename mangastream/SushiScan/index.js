@@ -1435,7 +1435,7 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":62,"./encode.js":64,"./escape.js":65}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertDateAgo = exports.convertDate = void 0;
+exports.convertDate = void 0;
 function convertDate(dateString, source) {
     // Parsed date string
     dateString = dateString.toLowerCase();
@@ -1454,73 +1454,6 @@ function convertDate(dateString, source) {
     return date;
 }
 exports.convertDate = convertDate;
-// No longer being used since this was used to check for updates, however keeping this here in case for future updates
-function convertDateAgo(dateString, source) {
-    // Parsed date string
-    dateString = dateString.toLowerCase();
-    // Time ago formats provided by the source
-    const dateTimeAgo = source.dateTimeAgo;
-    // Fetch the type of time
-    let timeType = null;
-    Object.entries(dateTimeAgo).forEach(([key, value]) => {
-        // For each type, loop through all available strings
-        for (const type of value) {
-            if (dateString.toLowerCase().includes(type?.toLowerCase())) {
-                timeType = key;
-            }
-        }
-    });
-    // Now we have the type of time that has passed, this can be anything from a "week" to a "year".
-    // Now we need to get the amount of time that has passed.
-    let timeAgoAmount = null;
-    const RegExAgoAmount = /(\d+)/.exec(dateString);
-    if (RegExAgoAmount && RegExAgoAmount[1])
-        timeAgoAmount = Number(RegExAgoAmount[1]);
-    if (!timeAgoAmount || isNaN(timeAgoAmount) || !timeType) {
-        console.log(`Failed to parse time ago format! Either timeType:${timeType} or timeAgoAmount:${timeAgoAmount} is null.`);
-        //Since this isn't really important, log it and return null. These titles will just be excluded from the updated section.
-        return null;
-    }
-    // Now we have the time type and number.
-    // Now we generate the new date!
-    let time = null;
-    switch (timeType) {
-        case 'now':
-            time = new Date(Date.now());
-            break;
-        case 'yesterday':
-            time = new Date(Date.now() - 86400000);
-            break;
-        case 'years':
-            time = new Date(Date.now() - (timeAgoAmount * 31556952000));
-            break;
-        case 'months':
-            time = new Date(Date.now() - (timeAgoAmount * 2592000000));
-            break;
-        case 'weeks':
-            time = new Date(Date.now() - (timeAgoAmount * 604800000));
-            break;
-        case 'days':
-            time = new Date(Date.now() - (timeAgoAmount * 86400000));
-            break;
-        case 'hours':
-            time = new Date(Date.now() - (timeAgoAmount * 3600000));
-            break;
-        case 'minutes':
-            time = new Date(Date.now() - (timeAgoAmount * 3600000));
-            break;
-        case 'seconds':
-            time = new Date(Date.now() - (timeAgoAmount * 3600000));
-            break;
-        default:
-            time = null;
-            break;
-    }
-    if (String(time) == 'Invalid Date')
-        time = null; // Check if it's valid or not, if not return null, parser will know what to do!
-    return time;
-}
-exports.convertDateAgo = convertDateAgo;
 
 },{}],71:[function(require,module,exports){
 "use strict";
@@ -1675,25 +1608,6 @@ class MangaStream {
             october: 'October',
             november: 'November',
             december: 'December'
-        };
-        /**
-         * In this object, add the site's translations for the following time formats, case insensitive.
-         * If the site uses "12 hours ago" or "1 hour ago", only adding "hour" will be enough since "hours" includes "hour".
-         * Default =  English Translation
-         */
-        this.dateTimeAgo = {
-            now: [
-                'less than an hour',
-                'just now'
-            ],
-            yesterday: ['yesterday'],
-            years: ['year'],
-            months: ['month'],
-            weeks: ['week'],
-            days: ['day'],
-            hours: ['hour'],
-            minutes: ['min'],
-            seconds: ['second']
         };
         this.homescreen_sections = {
             'popular_today': {
@@ -2412,27 +2326,6 @@ class SushiScan extends MangaStream_1.MangaStream {
             october: 'octobre',
             november: 'novembre',
             december: 'décembre'
-        };
-        /**
-         * In this object, add the site's translations for the following time formats, case insensitive.
-         * If the site uses "12 hours ago" or "1 hour ago", only adding "hour" will be enough since "hours" includes "hour".
-         * Default =  English Translation
-         */
-        this.dateTimeAgo = {
-            now: [
-                'moins d’une heure',
-                'tout à l\'heure',
-                'moment',
-                'maintenant'
-            ],
-            yesterday: ['hier'],
-            years: ['an'],
-            months: ['mois'],
-            weeks: ['semaine'],
-            days: ['jour'],
-            hours: ['heur'],
-            minutes: ['min'],
-            seconds: ['second']
         };
     }
     configureSections() {
