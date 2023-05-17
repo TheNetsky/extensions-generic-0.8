@@ -1435,6 +1435,42 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":62,"./encode.js":64,"./escape.js":65}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ElarcPage = exports.ElarcPageInfo = void 0;
+const types_1 = require("@paperback/types");
+const MangaStream_1 = require("../MangaStream");
+const DOMAIN = 'https://elarcpage.com';
+exports.ElarcPageInfo = {
+    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    name: 'ElarcPage',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: types_1.ContentRating.MATURE,
+    websiteBaseURL: DOMAIN,
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI,
+    sourceTags: [
+        {
+            text: 'Notifications',
+            type: types_1.BadgeColor.GREEN
+        }
+    ]
+};
+class ElarcPage extends MangaStream_1.MangaStream {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+        this.directoryPath = 'series';
+    }
+    configureSections() {
+        this.homescreen_sections['new_titles'].enabled = false;
+    }
+}
+exports.ElarcPage = ElarcPage;
+
+},{"../MangaStream":72,"@paperback/types":61}],71:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertDateAgo = exports.convertDate = void 0;
 function convertDate(dateString, source) {
     // Parsed date string
@@ -1522,7 +1558,7 @@ function convertDateAgo(dateString, source) {
 }
 exports.convertDateAgo = convertDateAgo;
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaStream = exports.getExportVersion = void 0;
@@ -2038,7 +2074,7 @@ class MangaStream {
 }
 exports.MangaStream = MangaStream;
 
-},{"./MangaStreamHelper":72,"./MangaStreamParser":73,"./UrlBuilder":75,"@paperback/types":61}],72:[function(require,module,exports){
+},{"./MangaStreamHelper":73,"./MangaStreamParser":74,"./UrlBuilder":75,"@paperback/types":61}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFilterTagsBySection = exports.getIncludedTagBySection = exports.createHomeSection = exports.DefaultHomeSectionData = void 0;
@@ -2077,7 +2113,7 @@ function getFilterTagsBySection(section, tags, included, supportsExclusion = fal
 }
 exports.getFilterTagsBySection = getFilterTagsBySection;
 
-},{"@paperback/types":61}],73:[function(require,module,exports){
+},{"@paperback/types":61}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaStreamParser = void 0;
@@ -2352,42 +2388,7 @@ class MangaStreamParser {
 }
 exports.MangaStreamParser = MangaStreamParser;
 
-},{"./LanguageUtils":70,"entities":69}],74:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReadKomik = exports.ReadKomikInfo = void 0;
-const types_1 = require("@paperback/types");
-const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://readkomik.com';
-exports.ReadKomikInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
-    name: 'ReadKomik',
-    description: 'Extension that pulls manga from ReadKomik',
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: types_1.ContentRating.MATURE,
-    websiteBaseURL: DOMAIN,
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        }
-    ]
-};
-class ReadKomik extends MangaStream_1.MangaStream {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-    }
-    configureSections() {
-        this.homescreen_sections['new_titles'].enabled = false;
-    }
-}
-exports.ReadKomik = ReadKomik;
-
-},{"../MangaStream":71,"@paperback/types":61}],75:[function(require,module,exports){
+},{"./LanguageUtils":71,"entities":69}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -2448,5 +2449,5 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}]},{},[74])(74)
+},{}]},{},[70])(70)
 });

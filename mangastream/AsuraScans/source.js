@@ -1438,7 +1438,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AsuraScans = exports.AsuraScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const AsuraScansParser_1 = require("./AsuraScansParser");
 const DOMAIN = 'https://www.asurascans.com';
 exports.AsuraScansInfo = {
     version: (0, MangaStream_1.getExportVersion)('0.0.0'),
@@ -1465,7 +1464,6 @@ class AsuraScans extends MangaStream_1.MangaStream {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.parser = new AsuraScansParser_1.AsuraScansParser();
     }
     configureSections() {
         this.homescreen_sections['new_titles'].enabled = false;
@@ -1473,53 +1471,48 @@ class AsuraScans extends MangaStream_1.MangaStream {
 }
 exports.AsuraScans = AsuraScans;
 
-},{"../MangaStream":73,"./AsuraScansParser":71,"@paperback/types":61}],71:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AsuraScansParser = void 0;
-const MangaStreamParser_1 = require("../MangaStreamParser");
-class AsuraScansParser extends MangaStreamParser_1.MangaStreamParser {
-    renderChapterImage(path) {
-        // Asura has a dead link at the start of each of their chapters (Thanks to pandeynmn for noticing)
-        return path != 'https://www.asurascans.com/wp-content/uploads/2021/04/page100-10.jpg';
-    }
-}
-exports.AsuraScansParser = AsuraScansParser;
-
-},{"../MangaStreamParser":75}],72:[function(require,module,exports){
+},{"../MangaStream":72,"@paperback/types":61}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertDateAgo = exports.convertDate = void 0;
-function convertDate(rawDate, source) {
-    const dateString = rawDate.toLowerCase();
-    const monthObject = source.dateMonths;
+function convertDate(dateString, source) {
+    // Parsed date string
+    dateString = dateString.toLowerCase();
+    // Month formats provided by the source
+    const dateMonths = source.dateMonths;
     let date = null;
-    for (const typeOfTime in monthObject) {
-        if (dateString.includes(monthObject[typeOfTime].toLowerCase())) {
-            date = dateString.replace(monthObject[typeOfTime].toLowerCase(), typeOfTime.toLowerCase());
+    Object.entries(dateMonths).forEach(([key, value]) => {
+        if (dateString.toLowerCase().includes(value?.toLowerCase())) {
+            date = new Date(dateString.replace(value, key ?? ''));
         }
+    });
+    if (!date || String(date) == 'Invalid Date') {
+        console.log('Failed to parse chapter date! TO DEV: Please check if the entered months reflect the sites months');
+        return new Date();
     }
-    if (!date || String(date) == 'Invalid Date')
-        throw new Error('Failed to parse chapter date! TO DEV: Please check if the entered months reflect the sites months');
-    return new Date(date);
+    return date;
 }
 exports.convertDate = convertDate;
-function convertDateAgo(date, source) {
-    const dateString = date.toLowerCase();
-    const timeObject = source.dateTimeAgo;
-    //Get type of time that has passed
+// No longer being used since this was used to check for updates, however keeping this here in case for future updates
+function convertDateAgo(dateString, source) {
+    // Parsed date string
+    dateString = dateString.toLowerCase();
+    // Time ago formats provided by the source
+    const dateTimeAgo = source.dateTimeAgo;
+    // Fetch the type of time
     let timeType = null;
-    for (const typeOfTime in timeObject) {
-        for (const item of timeObject[typeOfTime]) {
-            if (dateString.includes(item.toLowerCase())) {
-                timeType = typeOfTime;
+    Object.entries(dateTimeAgo).forEach(([key, value]) => {
+        // For each type, loop through all available strings
+        for (const type of value) {
+            if (dateString.toLowerCase().includes(type?.toLowerCase())) {
+                timeType = key;
             }
         }
-    }
-    //Now we have the type of time that has passed, this can be anything from a "week" to a "year".
-    //Now we need to get the amount of time that has passed.
+    });
+    // Now we have the type of time that has passed, this can be anything from a "week" to a "year".
+    // Now we need to get the amount of time that has passed.
     let timeAgoAmount = null;
-    const RegExAgoAmount = /(\d+)/.exec(date);
+    const RegExAgoAmount = /(\d+)/.exec(dateString);
     if (RegExAgoAmount && RegExAgoAmount[1])
         timeAgoAmount = Number(RegExAgoAmount[1]);
     if (!timeAgoAmount || isNaN(timeAgoAmount) || !timeType) {
@@ -1527,8 +1520,8 @@ function convertDateAgo(date, source) {
         //Since this isn't really important, log it and return null. These titles will just be excluded from the updated section.
         return null;
     }
-    //Now we have the time type and number.
-    //Now we generate the new date!
+    // Now we have the time type and number.
+    // Now we generate the new date!
     let time = null;
     switch (timeType) {
         case 'now':
@@ -1563,12 +1556,12 @@ function convertDateAgo(date, source) {
             break;
     }
     if (String(time) == 'Invalid Date')
-        time = null; //Check if it's valid or not, if not return null, parser will know what to do!
+        time = null; // Check if it's valid or not, if not return null, parser will know what to do!
     return time;
 }
 exports.convertDateAgo = convertDateAgo;
 
-},{}],73:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaStream = exports.getExportVersion = void 0;
@@ -1599,11 +1592,12 @@ class MangaStream {
                             }) // Used for images hosted on Wordpress blogs
                         }
                     };
+                    request.url = request.url.replace(/^http:/, 'https:');
                     return request;
                 },
                 interceptResponse: async (response) => {
                     if (response.headers.location) {
-                        response.headers.location = response.headers.location.replace('http://', 'https://');
+                        response.headers.location = response.headers.location.replace(/^http:/, 'https:');
                     }
                     return response;
                 }
@@ -1755,7 +1749,7 @@ class MangaStream {
                 section: (0, MangaStreamHelper_1.createHomeSection)('latest_update', 'Latest Updates'),
                 selectorFunc: ($) => $('div.uta', $('h2:contains(Latest Update)')?.parent()?.next()),
                 titleSelectorFunc: ($, element) => $('a', element).attr('title'),
-                subtitleSelectorFunc: ($, element) => $('li > a', $('div.luf', element)).first().text().trim(),
+                subtitleSelectorFunc: ($, element) => $('li > a, div.epxs', $('div.luf, div.bigor', element)).first().text().trim(),
                 getViewMoreItemsFunc: (page) => `${this.directoryPath}/?page=${page}&order=update`,
                 sortIndex: 20
             },
@@ -2083,7 +2077,7 @@ class MangaStream {
 }
 exports.MangaStream = MangaStream;
 
-},{"./MangaStreamHelper":74,"./MangaStreamParser":75,"./UrlBuilder":76,"@paperback/types":61}],74:[function(require,module,exports){
+},{"./MangaStreamHelper":73,"./MangaStreamParser":74,"./UrlBuilder":75,"@paperback/types":61}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFilterTagsBySection = exports.getIncludedTagBySection = exports.createHomeSection = exports.DefaultHomeSectionData = void 0;
@@ -2122,7 +2116,7 @@ function getFilterTagsBySection(section, tags, included, supportsExclusion = fal
 }
 exports.getFilterTagsBySection = getFilterTagsBySection;
 
-},{"@paperback/types":61}],75:[function(require,module,exports){
+},{"@paperback/types":61}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaStreamParser = void 0;
@@ -2150,15 +2144,15 @@ class MangaStreamParser {
     parseMangaDetails($, mangaId, source) {
         const titles = [];
         titles.push(this.decodeHTMLEntity($('h1.entry-title').text().trim()));
-        const altTitles = $(`span:contains(${source.manga_selector_AlternativeTitles}), b:contains(${source.manga_selector_AlternativeTitles})+span, .imptdt:contains(${source.manga_selector_AlternativeTitles}) i, h1.entry-title+span`).contents().remove().last().text().split(','); //Language dependant
+        const altTitles = $(`span:contains(${source.manga_selector_AlternativeTitles}), b:contains(${source.manga_selector_AlternativeTitles})+span, .imptdt:contains(${source.manga_selector_AlternativeTitles}) i, h1.entry-title+span`).contents().remove().last().text().split(','); // Language dependant
         for (const title of altTitles) {
             if (title == '') {
                 continue;
             }
             titles.push(this.decodeHTMLEntity(title.trim()));
         }
-        const author = $(`span:contains(${source.manga_selector_author}), .fmed b:contains(${source.manga_selector_author})+span, .imptdt:contains(${source.manga_selector_author}) i`).contents().remove().last().text().trim(); //Language dependant
-        const artist = $(`span:contains(${source.manga_selector_artist}), .fmed b:contains(${source.manga_selector_artist})+span, .imptdt:contains(${source.manga_selector_artist}) i`).contents().remove().last().text().trim(); //Language dependant
+        const author = $(`span:contains(${source.manga_selector_author}), .fmed b:contains(${source.manga_selector_author})+span, .imptdt:contains(${source.manga_selector_author}) i`).contents().remove().last().text().trim(); // Language dependant
+        const artist = $(`span:contains(${source.manga_selector_artist}), .fmed b:contains(${source.manga_selector_artist})+span, .imptdt:contains(${source.manga_selector_artist}) i`).contents().remove().last().text().trim(); // Language dependant
         const image = this.getImageSrc($('img', 'div[itemprop="image"]'));
         const description = this.decodeHTMLEntity($('div[itemprop="description"]  p').text().trim());
         const arrayTags = [];
@@ -2206,10 +2200,10 @@ class MangaStreamParser {
     parseChapterList($, mangaId, source) {
         const chapters = [];
         let sortingIndex = 0;
-        let langCode = source.languageCode;
+        let language = source.language;
         // Usually for Manhwa sites
-        if (mangaId.toUpperCase().endsWith('-RAW') && source.languageCode == '🇬🇧')
-            langCode = '🇰🇷';
+        if (mangaId.toUpperCase().endsWith('-RAW') && source.language == '🇬🇧')
+            language = '🇰🇷';
         for (const chapter of $('li', 'div#chapterlist').toArray()) {
             const title = $('span.chapternum', chapter).text().trim();
             const date = (0, LanguageUtils_1.convertDate)($('span.chapterdate', chapter).text().trim(), source);
@@ -2225,7 +2219,7 @@ class MangaStreamParser {
             }
             chapters.push({
                 id: id,
-                langCode: langCode,
+                langCode: language,
                 chapNum: chapterNumber,
                 name: title,
                 time: date,
@@ -2381,6 +2375,8 @@ class MangaStreamParser {
             image = '';
         }
         image = image?.split('?resize')[0] ?? '';
+        image = image.replace(/^\/\//, 'https://');
+        image = image.replace(/^\//, 'https:/');
         return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')));
     }
     decodeHTMLEntity(str) {
@@ -2395,7 +2391,7 @@ class MangaStreamParser {
 }
 exports.MangaStreamParser = MangaStreamParser;
 
-},{"./LanguageUtils":72,"entities":69}],76:[function(require,module,exports){
+},{"./LanguageUtils":71,"entities":69}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
