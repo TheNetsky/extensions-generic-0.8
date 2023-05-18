@@ -1737,7 +1737,7 @@ class MangaStream {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseMangaDetails($, mangaId, this);
     }
@@ -1747,7 +1747,7 @@ class MangaStream {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseChapterList($, mangaId, this);
     }
@@ -1758,7 +1758,7 @@ class MangaStream {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         const chapter = $('div#chapterlist').find('li[data-num="' + chapterId + '"]');
         if (!chapter) {
@@ -1775,7 +1775,7 @@ class MangaStream {
             method: 'GET'
         });
         const _response = await this.requestManager.schedule(_request, 1);
-        this.CloudFlareError(_response.status);
+        this.checkResponseError(_response);
         const _$ = this.cheerio.load(_response.data);
         return this.parser.parseChapterDetails(_$, mangaId, chapterId);
     }
@@ -1785,7 +1785,7 @@ class MangaStream {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseTags($);
     }
@@ -1793,7 +1793,7 @@ class MangaStream {
         const page = metadata?.page ?? 1;
         const request = await this.constructSearchRequest(page, query);
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         const results = await this.parser.parseSearchResults($, this);
         const manga = [];
@@ -1844,7 +1844,7 @@ class MangaStream {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         const promises = [];
         const sectionValues = Object.values(this.homescreen_sections).sort((n1, n2) => n1.sortIndex - n2.sortIndex);
@@ -1938,7 +1938,7 @@ class MangaStream {
             method: 'HEAD'
         });
         const headResponse = await this.requestManager.schedule(headRequest, 1);
-        this.CloudFlareError(headResponse.status);
+        this.checkResponseError(headResponse);
         let postId;
         const postIdRegex = headResponse?.headers.Link?.match(/\?p=(\d+)/);
         if (postIdRegex?.[1]) {
@@ -1983,9 +1983,14 @@ class MangaStream {
             }
         });
     }
-    CloudFlareError(status) {
-        if (status == 503 || status == 403) {
-            throw new Error('CLOUDFLARE DETECTED:\nDo the Cloudflare bypass by clicking the cloud icon!');
+    checkResponseError(response) {
+        const status = response.status;
+        switch (status) {
+            case 403:
+            case 503:
+                throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
+            case 404:
+                throw new Error(`The requested page ${response.request.url} was not found!`);
         }
     }
 }
