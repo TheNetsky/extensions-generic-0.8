@@ -22,7 +22,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '3.0.3'
+const BASE_VERSION = '3.0.4'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -175,7 +175,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseMangaDetails($, mangaId, this)
@@ -208,7 +208,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseChapterList($, mangaId, this)
@@ -230,7 +230,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector, this)
@@ -252,7 +252,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         }
 
         const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseTags($, this.hasAdvancedSearchPage)
@@ -264,7 +264,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
 
         const request = this.constructSearchRequest(page, query)
         const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
         const results = await this.parser.parseSearchResults($, this)
 
@@ -343,7 +343,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
             // Get the section data
             promises.push(
                 this.requestManager.schedule(section.request, 1).then(async response => {
-                    this.CloudFlareError(response.status)
+                    this.checkResponseError(response)
                     const $ = this.cheerio.load(response.data as string)
                     section.section.items = await this.parser.parseHomeSection($, this)
                     sectionCallback(section.section)
@@ -381,7 +381,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
 
         const request = this.constructAjaxHomepageRequest(page, 50, sortBy[0], sortBy[1])
         const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
         const items: PartialSourceManga[] = await this.parser.parseHomeSection($, this)
 
@@ -545,9 +545,14 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         })
     }
 
-    CloudFlareError(status: number): void {
-        if (status == 503 || status == 403) {
-            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${this.baseUrl} and press Cloudflare Bypass`)
+    checkResponseError(response: Response): void {
+        const status = response.status
+        switch (status) {
+            case 403:
+            case 503:
+                throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`)
+            case 404:
+                throw new Error(`The requested page ${response.request.url} was not found!`)
         }
     }
 }
