@@ -1438,7 +1438,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '3.0.3';
+const BASE_VERSION = '3.0.4';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1565,7 +1565,7 @@ class Madara {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseMangaDetails($, mangaId, this);
     }
@@ -1595,7 +1595,7 @@ class Madara {
             }
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseChapterList($, mangaId, this);
     }
@@ -1613,7 +1613,7 @@ class Madara {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector, this);
     }
@@ -1632,7 +1632,7 @@ class Madara {
             });
         }
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseTags($, this.hasAdvancedSearchPage);
     }
@@ -1641,7 +1641,7 @@ class Madara {
         const page = metadata?.page ?? 1;
         const request = this.constructSearchRequest(page, query);
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         const results = await this.parser.parseSearchResults($, this);
         const manga = [];
@@ -1714,7 +1714,7 @@ class Madara {
             sectionCallback(section.section);
             // Get the section data
             promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
-                this.CloudFlareError(response.status);
+                this.checkResponseError(response);
                 const $ = this.cheerio.load(response.data);
                 section.section.items = await this.parser.parseHomeSection($, this);
                 sectionCallback(section.section);
@@ -1746,7 +1746,7 @@ class Madara {
         }
         const request = this.constructAjaxHomepageRequest(page, 50, sortBy[0], sortBy[1]);
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         const items = await this.parser.parseHomeSection($, this);
         let mData = { page: (page + 1) };
@@ -1884,9 +1884,14 @@ class Madara {
             }
         });
     }
-    CloudFlareError(status) {
-        if (status == 503 || status == 403) {
-            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${this.baseUrl} and press Cloudflare Bypass`);
+    checkResponseError(response) {
+        const status = response.status;
+        switch (status) {
+            case 403:
+            case 503:
+                throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
+            case 404:
+                throw new Error(`The requested page ${response.request.url} was not found!`);
         }
     }
 }
