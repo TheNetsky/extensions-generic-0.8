@@ -17,7 +17,7 @@ import entities = require('entities')
 export class MangaStreamParser {
 
     parseMangaDetails($: CheerioStatic, mangaId: string, source: any): SourceManga {
-        const titles = []
+        const titles: string[] = []
         titles.push(this.decodeHTMLEntity($('h1.entry-title').text().trim()))
 
         const altTitles = $(`span:contains(${source.manga_selector_AlternativeTitles}), b:contains(${source.manga_selector_AlternativeTitles})+span, .imptdt:contains(${source.manga_selector_AlternativeTitles}) i, h1.entry-title+span`).contents().remove().last().text().split(',') // Language dependant
@@ -112,6 +112,11 @@ export class MangaStreamParser {
                 group: ''
             })
             sortingIndex--
+        }
+
+        // If there are no chapters, throw error to avoid losing progress
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`)
         }
 
         return chapters.map((chapter) => {
