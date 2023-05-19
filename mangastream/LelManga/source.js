@@ -1618,13 +1618,6 @@ class MangaStream {
         this.manga_selector_status = 'Status';
         //----MANGA TAG SELECTORS----
         this.manga_tag_selector_box = 'span.mgen';
-        //----TAGS SELECTORS----
-        /**
-         * The selector to select the subdirectory for the genre page
-         * Eg. https://mangadark.com/genres/ needs this selector to be set to "/genres/"
-         * Default = ""
-        */
-        this.tags_SubdirectoryPathName = '';
         // ----STATUS SELECTORS----
         /**
          * The selector for the manga status.
@@ -1787,7 +1780,7 @@ class MangaStream {
     }
     async getSearchTags() {
         const request = App.createRequest({
-            url: `${this.baseUrl}/${this.tags_SubdirectoryPathName}/`,
+            url: `${this.baseUrl}/${this.directoryPath}/`,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
@@ -2132,13 +2125,12 @@ class MangaStreamParser {
         for (const chapter of $('li', 'div#chapterlist').toArray()) {
             const title = $('span.chapternum', chapter).text().trim();
             const date = (0, LanguageUtils_1.convertDate)($('span.chapterdate', chapter).text().trim(), source);
-            const getNumber = chapter.attribs['data-num'] ?? '';
-            const chapterNumberRegex = getNumber.match(/(\d+\.?\d?)+/);
+            const id = chapter.attribs['data-num'] ?? ''; // Set data-num attribute as id
+            const chapterNumberRegex = id.match(/(\d+\.?\d?)+/);
             let chapterNumber = 0;
             if (chapterNumberRegex && chapterNumberRegex[1]) {
                 chapterNumber = Number(chapterNumberRegex[1]);
             }
-            const id = chapterNumber.toString();
             if (!id || typeof id === 'undefined') {
                 throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`);
             }
