@@ -15,6 +15,7 @@ import { HomeSectionData } from './MangaStreamHelper'
 import entities = require('entities')
 
 export class MangaStreamParser {
+
     parseMangaDetails($: CheerioStatic, mangaId: string, source: any): SourceManga {
         const titles = []
         titles.push(this.decodeHTMLEntity($('h1.entry-title').text().trim()))
@@ -89,14 +90,13 @@ export class MangaStreamParser {
         for (const chapter of $('li', 'div#chapterlist').toArray()) {
             const title = $('span.chapternum', chapter).text().trim()
             const date = convertDate($('span.chapterdate', chapter).text().trim(), source)
-            const getNumber = chapter.attribs['data-num'] ?? ''
-            const chapterNumberRegex = getNumber.match(/(\d+\.?\d?)+/)
+            const id = chapter.attribs['data-num'] ?? '' // Set data-num attribute as id
+            const chapterNumberRegex = id.match(/(\d+\.?\d?)+/)
             let chapterNumber = 0
             if (chapterNumberRegex && chapterNumberRegex[1]) {
                 chapterNumber = Number(chapterNumberRegex[1])
             }
 
-            const id = chapterNumber.toString()
             if (!id || typeof id === 'undefined') {
                 throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`)
             }

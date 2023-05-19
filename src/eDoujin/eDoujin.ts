@@ -36,7 +36,7 @@ export class eDoujin extends MangaStream {
     baseUrl: string = DOMAIN
 
     override configureSections() {
-        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
+        this.homescreen_sections['latest_update'].enabled = false
         this.homescreen_sections['new_titles'].enabled = false
     }
 }

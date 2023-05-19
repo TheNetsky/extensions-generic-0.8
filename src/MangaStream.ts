@@ -185,14 +185,6 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
     //----MANGA TAG SELECTORS----
     manga_tag_selector_box = 'span.mgen'
 
-    //----TAGS SELECTORS----
-    /**
-     * The selector to select the subdirectory for the genre page
-     * Eg. https://mangadark.com/genres/ needs this selector to be set to "/genres/"
-     * Default = ""
-    */
-    tags_SubdirectoryPathName = ''
-
     // ----STATUS SELECTORS----
     /**
      * The selector for the manga status.
@@ -353,7 +345,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
     async getSearchTags(): Promise<TagSection[]> {
         const request = App.createRequest({
-            url: `${this.baseUrl}/${this.tags_SubdirectoryPathName}/`,
+            url: `${this.baseUrl}/${this.directoryPath}/`,
             method: 'GET'
         })
 
