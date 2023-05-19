@@ -2101,6 +2101,10 @@ class MangaStreamParser {
             });
             sortingIndex--;
         }
+        // If there are no chapters, throw error to avoid losing progress
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`);
+        }
         return chapters.map((chapter) => {
             chapter.sortingIndex += chapters.length;
             return App.createChapter(chapter);
