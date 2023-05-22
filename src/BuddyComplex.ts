@@ -23,7 +23,7 @@ import {
 import { URLBuilder } from './BuddyComplexHelper'
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.0.1'
+const BASE_VERSION = '2.0.2'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -91,7 +91,7 @@ export abstract class BuddyComplex implements SearchResultsProviding, MangaProvi
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
 
-        return this.parser.parseChapterList($)
+        return this.parser.parseChapterList($, mangaId)
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
