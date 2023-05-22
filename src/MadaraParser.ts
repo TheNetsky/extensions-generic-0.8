@@ -63,8 +63,8 @@ export class Parser {
             const id = this.idCleaner($('a', obj).first().attr('href') ?? '')
 
             const chapName = $('a', obj).first().text().trim() ?? ''
-            const chapNumRegex = id.match(/(?:chapter|ch.*?)(\d+\.?\d?(?:[-_]\d+)?)|(\d+\.?\d?(?:[-_]\d+)?)$/);
-            let chapNum:string|number = chapNumRegex && chapNumRegex[1] ? chapNumRegex[1].replace(/[-_]/gm, '.') : chapNumRegex?.[2] ?? '0';
+            const chapNumRegex = id.match(/(?:chapter|ch.*?)(\d+\.?\d?(?:[-_]\d+)?)|(\d+\.?\d?(?:[-_]\d+)?)$/)
+            let chapNum: string | number = chapNumRegex && chapNumRegex[1] ? chapNumRegex[1].replace(/[-_]/gm, '.') : chapNumRegex?.[2] ?? '0'
 
             // make sure the chapter number is a number and not NaN
             chapNum = parseFloat(chapNum) ?? 0
@@ -97,6 +97,10 @@ export class Parser {
                 group: ''
             })
             sortingIndex--
+        }
+
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`)
         }
 
         return chapters.map(chapter => {

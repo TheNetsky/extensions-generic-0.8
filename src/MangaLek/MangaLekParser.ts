@@ -1,5 +1,5 @@
 import {
-    Parser,
+    Parser
 } from '../MadaraParser'
 
 export class MangaLekParser extends Parser {

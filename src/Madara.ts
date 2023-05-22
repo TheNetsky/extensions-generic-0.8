@@ -16,13 +16,14 @@ import {
     ChapterProviding,
     DUISection,
     Tag,
-    HomePageSectionsProviding
+    HomePageSectionsProviding,
+    HomeSectionType
 } from '@paperback/types'
 
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '3.0.4'
+const BASE_VERSION = '3.0.5'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -302,7 +303,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
                 section: App.createHomeSection({
                     id: '0',
                     title: 'Recently Updated',
-                    type: 'singleRowNormal',
+                    type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -311,7 +312,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
                 section: App.createHomeSection({
                     id: '1',
                     title: 'Currently Trending',
-                    type: 'singleRowNormal',
+                    type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -320,7 +321,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
                 section: App.createHomeSection({
                     id: '2',
                     title: 'Most Popular',
-                    type: 'singleRowNormal',
+                    type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -329,7 +330,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
                 section: App.createHomeSection({
                     id: '3',
                     title: 'Completed',
-                    type: 'singleRowNormal',
+                    type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             }

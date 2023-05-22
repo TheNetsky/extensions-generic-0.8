@@ -5,7 +5,8 @@ import {
     SourceIntents,
     PagedResults,
     PartialSourceManga,
-    HomeSection
+    HomeSection,
+    HomeSectionType
 } from '@paperback/types'
 
 import {
@@ -16,7 +17,7 @@ import {
 const DOMAIN = 'https://www.toongod.org'
 
 export const ToonGodInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ToonGod',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -49,7 +50,6 @@ export class ToonGod extends Madara {
 
     override hasAdvancedSearchPage = true
 
-
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
             {
@@ -60,9 +60,9 @@ export class ToonGod extends Madara {
                 section: App.createHomeSection({
                     id: '0',
                     title: 'Recently Updated',
-                    type: 'singleRowNormal',
+                    type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
-                }),
+                })
             },
             {
                 request: App.createRequest({
@@ -72,7 +72,7 @@ export class ToonGod extends Madara {
                 section: App.createHomeSection({
                     id: '1',
                     title: 'Currently Trending',
-                    type: 'singleRowNormal',
+                    type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -84,7 +84,7 @@ export class ToonGod extends Madara {
                 section: App.createHomeSection({
                     id: '2',
                     title: 'Most Popular',
-                    type: 'singleRowNormal',
+                    type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -96,7 +96,7 @@ export class ToonGod extends Madara {
                 section: App.createHomeSection({
                     id: '3',
                     title: 'New Manga',
-                    type: 'singleRowNormal',
+                    type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             }
@@ -110,11 +110,11 @@ export class ToonGod extends Madara {
             // Get the section data
             promises.push(
                 this.requestManager.schedule(section.request, 1).then(async response => {
-                    this.CloudFlareError(response.status)
+                    this.checkResponseError(response)
                     const $ = this.cheerio.load(response.data as string)
                     section.section.items = await this.parser.parseHomeSection($, this)
                     sectionCallback(section.section)
-                }),
+                })
             )
 
         }
@@ -122,7 +122,6 @@ export class ToonGod extends Madara {
         // Make sure the function completes
         await Promise.all(promises)
     }
-
 
     override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page = metadata?.page ?? 1
@@ -155,7 +154,7 @@ export class ToonGod extends Madara {
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(response.status)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
         const items: PartialSourceManga[] = await this.parser.parseHomeSection($, this)
 
