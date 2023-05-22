@@ -71,7 +71,7 @@ export class BuddyComplexParser {
         })
     }
 
-    parseChapterList($: CheerioSelector): Chapter[] {
+    parseChapterList($: CheerioSelector, mangaId: string): Chapter[] {
         const chapters: Chapter[] = []
         let sortingIndex = 0
 
@@ -100,6 +100,11 @@ export class BuddyComplexParser {
                 group: ''
             })
             sortingIndex--
+        }
+
+        // If there are no chapters, throw error to avoid losing progress
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`)
         }
 
         return chapters.map(chapter => {
