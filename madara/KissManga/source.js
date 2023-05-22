@@ -1475,9 +1475,10 @@ exports.KissManga = KissManga;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
+const types_1 = require("@paperback/types");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '3.0.4';
+const BASE_VERSION = '3.0.5';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1715,7 +1716,7 @@ class Madara {
                 section: App.createHomeSection({
                     id: '0',
                     title: 'Recently Updated',
-                    type: 'singleRowNormal',
+                    type: types_1.HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -1724,7 +1725,7 @@ class Madara {
                 section: App.createHomeSection({
                     id: '1',
                     title: 'Currently Trending',
-                    type: 'singleRowNormal',
+                    type: types_1.HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -1733,7 +1734,7 @@ class Madara {
                 section: App.createHomeSection({
                     id: '2',
                     title: 'Most Popular',
-                    type: 'singleRowNormal',
+                    type: types_1.HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -1742,7 +1743,7 @@ class Madara {
                 section: App.createHomeSection({
                     id: '3',
                     title: 'Completed',
-                    type: 'singleRowNormal',
+                    type: types_1.HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             }
@@ -1936,7 +1937,7 @@ class Madara {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":72,"./MadaraParser":73}],72:[function(require,module,exports){
+},{"./MadaraHelper":72,"./MadaraParser":73,"@paperback/types":61}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -2099,6 +2100,9 @@ class Parser {
                 group: ''
             });
             sortingIndex--;
+        }
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`);
         }
         return chapters.map(chapter => {
             chapter.sortingIndex += chapters.length;

@@ -1436,9 +1436,10 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
+const types_1 = require("@paperback/types");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '3.0.4';
+const BASE_VERSION = '3.0.5';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1676,7 +1677,7 @@ class Madara {
                 section: App.createHomeSection({
                     id: '0',
                     title: 'Recently Updated',
-                    type: 'singleRowNormal',
+                    type: types_1.HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -1685,7 +1686,7 @@ class Madara {
                 section: App.createHomeSection({
                     id: '1',
                     title: 'Currently Trending',
-                    type: 'singleRowNormal',
+                    type: types_1.HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -1694,7 +1695,7 @@ class Madara {
                 section: App.createHomeSection({
                     id: '2',
                     title: 'Most Popular',
-                    type: 'singleRowNormal',
+                    type: types_1.HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             },
@@ -1703,7 +1704,7 @@ class Madara {
                 section: App.createHomeSection({
                     id: '3',
                     title: 'Completed',
-                    type: 'singleRowNormal',
+                    type: types_1.HomeSectionType.singleRowNormal,
                     containsMoreItems: true
                 })
             }
@@ -1897,7 +1898,7 @@ class Madara {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":71,"./MadaraParser":72}],71:[function(require,module,exports){
+},{"./MadaraHelper":71,"./MadaraParser":72,"@paperback/types":61}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -2060,6 +2061,9 @@ class Parser {
                 group: ''
             });
             sortingIndex--;
+        }
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`);
         }
         return chapters.map(chapter => {
             chapter.sortingIndex += chapters.length;
@@ -2228,6 +2232,72 @@ class ManhuaPlus extends Madara_1.Madara {
         this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;
         this.chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > p > img';
+    }
+    async getHomePageSections(sectionCallback) {
+        const sections = [
+            {
+                request: App.createRequest({
+                    url: `${this.baseUrl}/manga/?m_orderby=latest`,
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: '0',
+                    title: 'Recently Updated',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: App.createRequest({
+                    url: `${this.baseUrl}/manga/?m_orderby=trending`,
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: '1',
+                    title: 'Currently Trending',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: App.createRequest({
+                    url: `${this.baseUrl}/manga/?m_orderby=views`,
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: '2',
+                    title: 'Most Popular',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: App.createRequest({
+                    url: `${this.baseUrl}/manga/?m_orderby=new-manga`,
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: '3',
+                    title: 'New Manga',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            }
+        ];
+        const promises = [];
+        for (const section of sections) {
+            // Let the app load empty sections
+            sectionCallback(section.section);
+            // Get the section data
+            promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
+                this.checkResponseError(response);
+                const $ = this.cheerio.load(response.data);
+                section.section.items = await this.parser.parseHomeSection($, this);
+                sectionCallback(section.section);
+            }));
+        }
+        // Make sure the function completes
+        await Promise.all(promises);
     }
 }
 exports.ManhuaPlus = ManhuaPlus;
