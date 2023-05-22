@@ -91,7 +91,7 @@ export abstract class BuddyComplex implements SearchResultsProviding, MangaProvi
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
 
-        return this.parser.parseChapterList($)
+        return this.parser.parseChapterList($, mangaId)
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
