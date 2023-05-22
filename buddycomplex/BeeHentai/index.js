@@ -1104,7 +1104,7 @@ const types_1 = require("@paperback/types");
 const BuddyComplexParser_1 = require("./BuddyComplexParser");
 const BuddyComplexHelper_1 = require("./BuddyComplexHelper");
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.0.1';
+const BASE_VERSION = '2.0.2';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1155,7 +1155,7 @@ class BuddyComplex {
         const response = await this.requestManager.schedule(request, 1);
         this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        return this.parser.parseChapterList($);
+        return this.parser.parseChapterList($, mangaId);
     }
     async getChapterDetails(mangaId, chapterId) {
         const request = App.createRequest({
@@ -1440,7 +1440,7 @@ class BuddyComplexParser {
             })
         });
     }
-    parseChapterList($) {
+    parseChapterList($, mangaId) {
         const chapters = [];
         let sortingIndex = 0;
         for (const chapter of $('li', 'ul.chapter-list').toArray()) {
@@ -1466,6 +1466,10 @@ class BuddyComplexParser {
                 group: ''
             });
             sortingIndex--;
+        }
+        // If there are no chapters, throw error to avoid losing progress
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`);
         }
         return chapters.map(chapter => {
             chapter.sortingIndex += chapters.length;
