@@ -25,10 +25,6 @@ export const MangaGenkiInfo: SourceInfo = {
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        },
-        {
             text: '18+',
             type: BadgeColor.YELLOW
         }

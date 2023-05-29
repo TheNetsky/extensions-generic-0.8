@@ -22,16 +22,7 @@ export const AsuraScansInfo: SourceInfo = {
     contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        },
-        {
-            text: 'CloudFlare',
-            type: BadgeColor.RED
-        }
-    ]
+    sourceTags: []
 }
 
 export class AsuraScans extends MangaStream {
