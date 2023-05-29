@@ -21,12 +21,7 @@ export const ManganatoInfo: SourceInfo = {
     description: `Extension that pulls manga from ${SITE_DOMAIN}.`,
     contentRating: ContentRating.MATURE,
     websiteBaseURL: SITE_DOMAIN,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        }
-    ],
+    sourceTags: [],
     intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
 }
 
