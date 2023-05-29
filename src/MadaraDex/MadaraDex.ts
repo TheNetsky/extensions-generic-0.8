@@ -23,10 +23,6 @@ export const MadaraDexInfo: SourceInfo = {
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        },
-        {
             text: '18+',
             type: BadgeColor.YELLOW
         }

@@ -23,10 +23,6 @@ export const NeoxScansInfo: SourceInfo = {
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        },
-        {
             text: 'Portuguese',
             type: BadgeColor.GREY
         }

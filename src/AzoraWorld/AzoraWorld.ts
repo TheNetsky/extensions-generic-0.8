@@ -25,10 +25,6 @@ export const AzoraWorldInfo: SourceInfo = {
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        },
-        {
             text: 'Arabic',
             type: BadgeColor.GREY
         }

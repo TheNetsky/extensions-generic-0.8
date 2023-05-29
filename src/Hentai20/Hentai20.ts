@@ -23,16 +23,8 @@ export const Hentai20Info: SourceInfo = {
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        },
-        {
             text: '18+',
             type: BadgeColor.YELLOW
-        },
-        {
-            text: 'Cloudflare',
-            type: BadgeColor.RED
         }
     ],
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI

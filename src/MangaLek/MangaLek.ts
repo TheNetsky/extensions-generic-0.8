@@ -25,16 +25,8 @@ export const MangaLekInfo: SourceInfo = {
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: BadgeColor.GREEN
-        },
-        {
             text: 'Arabic',
             type: BadgeColor.GREY
-        },
-        {
-            text: 'Cloudflare',
-            type: BadgeColor.RED
         }
     ],
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI
