@@ -2220,16 +2220,8 @@ exports.MangaLekInfo = {
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
-        {
             text: 'Arabic',
             type: types_1.BadgeColor.GREY
-        },
-        {
-            text: 'Cloudflare',
-            type: types_1.BadgeColor.RED
         }
     ],
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI

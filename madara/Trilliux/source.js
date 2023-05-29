@@ -2219,10 +2219,6 @@ exports.TrilliuxInfo = {
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
-        {
             text: '18+',
             type: types_1.BadgeColor.YELLOW
         }

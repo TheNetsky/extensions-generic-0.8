@@ -2219,10 +2219,6 @@ exports.NeoxScansInfo = {
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
-        {
             text: 'Portuguese',
             type: types_1.BadgeColor.GREY
         }

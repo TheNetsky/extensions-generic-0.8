@@ -2220,10 +2220,6 @@ exports.Manga3asqInfo = {
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
-        {
             text: 'Arabic',
             type: types_1.BadgeColor.GREY
         }
