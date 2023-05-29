@@ -2286,10 +2286,6 @@ exports.RawKumaInfo = {
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI,
     sourceTags: [
         {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        },
-        {
             text: 'Japanese',
             type: types_1.BadgeColor.GREY
         }

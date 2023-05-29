@@ -1449,12 +1449,7 @@ exports.FlameScansInfo = {
     contentRating: types_1.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: types_1.BadgeColor.GREEN
-        }
-    ]
+    sourceTags: []
 };
 class FlameScans extends MangaStream_1.MangaStream {
     constructor() {
