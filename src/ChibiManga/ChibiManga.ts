@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://www.cmreader.info'
 
 export const ChibiMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ChibiManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
