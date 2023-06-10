@@ -29,7 +29,7 @@ export class ChibiManga extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = false
+    override alternativeChapterAjaxEndpoint = true
 
     override hasAdvancedSearchPage = true
 }
