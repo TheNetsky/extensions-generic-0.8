@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://www.cmreader.info';
 exports.ChibiMangaInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'ChibiManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -1455,7 +1455,7 @@ class ChibiManga extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.alternativeChapterAjaxEndpoint = false;
+        this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;
     }
 }
