@@ -35,5 +35,5 @@ export class Manhuaus extends Madara {
 
     override chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > figure.wp-block-gallery > figure.wp-block-image > img, div.text-left > p > img'
 
-    override bypassPage = 'https://manhuaus.com/?p'
+    override bypassPage = `${DOMAIN}/?p`
 }

@@ -33,5 +33,5 @@ export class ManhuaFast extends Madara {
 
     override hasAdvancedSearchPage = true
 
-    override bypassPage = 'https://manhuafast.com/?p'
+    override bypassPage = `${DOMAIN}/?p`
 }
