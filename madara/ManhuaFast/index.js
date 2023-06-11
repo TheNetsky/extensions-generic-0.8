@@ -2226,7 +2226,7 @@ class ManhuaFast extends Madara_1.Madara {
         this.baseUrl = DOMAIN;
         this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;
-        this.bypassPage = 'https://manhuafast.com/?p';
+        this.bypassPage = `${DOMAIN}/?p`;
     }
 }
 exports.ManhuaFast = ManhuaFast;

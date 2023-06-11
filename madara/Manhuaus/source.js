@@ -2227,7 +2227,7 @@ class Manhuaus extends Madara_1.Madara {
         this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;
         this.chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > figure.wp-block-gallery > figure.wp-block-image > img, div.text-left > p > img';
-        this.bypassPage = 'https://manhuaus.com/?p';
+        this.bypassPage = `${DOMAIN}/?p`;
     }
 }
 exports.Manhuaus = Manhuaus;

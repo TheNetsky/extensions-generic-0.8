@@ -1435,6 +1435,35 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":62,"./encode.js":64,"./escape.js":65}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.KunManga = exports.KunMangaInfo = void 0;
+const types_1 = require("@paperback/types");
+const Madara_1 = require("../Madara");
+const DOMAIN = 'https://kunmanga.com';
+exports.KunMangaInfo = {
+    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    name: 'KunManga',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: types_1.ContentRating.EVERYONE,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [],
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
+};
+class KunManga extends Madara_1.Madara {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+        this.alternativeChapterAjaxEndpoint = true;
+        this.hasAdvancedSearchPage = true;
+    }
+}
+exports.KunManga = KunManga;
+
+},{"../Madara":71,"@paperback/types":61}],71:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MadaraParser_1 = require("./MadaraParser");
@@ -1898,7 +1927,7 @@ class Madara {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":71,"./MadaraParser":72,"@paperback/types":61}],71:[function(require,module,exports){
+},{"./MadaraHelper":72,"./MadaraParser":73,"@paperback/types":61}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -1941,7 +1970,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -2201,36 +2230,5 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"entities":69}],73:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Manhuaus = exports.ManhuausInfo = void 0;
-const types_1 = require("@paperback/types");
-const Madara_1 = require("../Madara");
-const DOMAIN = 'https://manhuaus.com';
-exports.ManhuausInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
-    name: 'Manhuaus',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: types_1.ContentRating.EVERYONE,
-    websiteBaseURL: DOMAIN,
-    sourceTags: [],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
-};
-class Manhuaus extends Madara_1.Madara {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-        this.alternativeChapterAjaxEndpoint = true;
-        this.hasAdvancedSearchPage = true;
-        this.chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > figure.wp-block-gallery > figure.wp-block-image > img, div.text-left > p > img';
-        this.bypassPage = `${DOMAIN}/?p`;
-    }
-}
-exports.Manhuaus = Manhuaus;
-
-},{"../Madara":70,"@paperback/types":61}]},{},[73])(73)
+},{"entities":69}]},{},[70])(70)
 });

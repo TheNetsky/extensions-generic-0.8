@@ -2232,7 +2232,7 @@ class MangaLek extends Madara_1.Madara {
         this.baseUrl = DOMAIN;
         this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;
-        this.bypassPage = 'https://mangalek.com/?s=&post_type=wp-manga';
+        this.bypassPage = `${DOMAIN}/?s=&post_type=wp-manga`;
         this.parser = new MangaLekParser_1.MangaLekParser();
     }
 }
