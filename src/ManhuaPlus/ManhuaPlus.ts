@@ -4,7 +4,9 @@ import {
     BadgeColor,
     SourceIntents,
     HomeSectionType,
-    HomeSection
+    HomeSection,
+    PagedResults,
+    PartialSourceManga
 } from '@paperback/types'
 
 import {
@@ -15,7 +17,7 @@ import {
 const DOMAIN = 'https://manhuaplus.com'
 
 export const ManhuaPlusInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ManhuaPlus',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -108,6 +110,52 @@ export class ManhuaPlus extends Madara {
 
         // Make sure the function completes
         await Promise.all(promises)
+    }
+
+    override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+        const page = metadata?.page ?? 1
+        let param: string
+
+        switch (homepageSectionId) {
+            case '0': {
+                param = 'm_orderby=latest'
+                break
+            }
+            case '1': {
+                param = 'm_orderby=trending'
+                break
+            }
+            case '2': {
+                param = 'm_orderby=views'
+                break
+            }
+            case '3': {
+                param = 'm_orderby=new-manga'
+                break
+            }
+            default:
+                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
+        }
+
+        const request = App.createRequest({
+            url: `${this.baseUrl}/manga/page/${page}/?${param}`,
+            method: 'GET'
+        })
+
+        const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
+        const $ = this.cheerio.load(response.data as string)
+        const items: PartialSourceManga[] = await this.parser.parseHomeSection($, this)
+
+        let mData: any = { page: (page + 1) }
+        if (!$('a.last')) {
+            mData = undefined
+        }
+
+        return App.createPagedResults({
+            results: items,
+            metadata: mData
+        })
     }
 
 }
