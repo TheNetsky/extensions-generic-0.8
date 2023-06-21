@@ -2209,7 +2209,7 @@ const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://manhuaplus.com';
 exports.ManhuaPlusInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'ManhuaPlus',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -2293,6 +2293,46 @@ class ManhuaPlus extends Madara_1.Madara {
         }
         // Make sure the function completes
         await Promise.all(promises);
+    }
+    async getViewMoreItems(homepageSectionId, metadata) {
+        const page = metadata?.page ?? 1;
+        let param;
+        switch (homepageSectionId) {
+            case '0': {
+                param = 'm_orderby=latest';
+                break;
+            }
+            case '1': {
+                param = 'm_orderby=trending';
+                break;
+            }
+            case '2': {
+                param = 'm_orderby=views';
+                break;
+            }
+            case '3': {
+                param = 'm_orderby=new-manga';
+                break;
+            }
+            default:
+                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
+        }
+        const request = App.createRequest({
+            url: `${this.baseUrl}/manga/page/${page}/?${param}`,
+            method: 'GET'
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
+        const $ = this.cheerio.load(response.data);
+        const items = await this.parser.parseHomeSection($, this);
+        let mData = { page: (page + 1) };
+        if (!$('a.last')) {
+            mData = undefined;
+        }
+        return App.createPagedResults({
+            results: items,
+            metadata: mData
+        });
     }
 }
 exports.ManhuaPlus = ManhuaPlus;
