@@ -2273,9 +2273,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RealmScans = exports.RealmScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://realmscans.com';
+const DOMAIN = 'https://realmscans.xyz';
 exports.RealmScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'RealmScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Seyden',
