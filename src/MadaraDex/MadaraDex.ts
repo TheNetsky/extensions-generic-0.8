@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://madaradex.org'
 
 export const MadaraDexInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'Madaradex',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -34,7 +34,7 @@ export class MadaraDex extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = false
+    override alternativeChapterAjaxEndpoint = true
 
     override hasAdvancedSearchPage = true
 
