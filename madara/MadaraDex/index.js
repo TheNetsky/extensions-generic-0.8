@@ -1906,7 +1906,7 @@ const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://madaradex.org';
 exports.MadaraDexInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'Madaradex',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -1926,7 +1926,7 @@ class MadaraDex extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.alternativeChapterAjaxEndpoint = false;
+        this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;
         this.searchMangaSelector = 'div.c-tabs-item > div.row';
     }
