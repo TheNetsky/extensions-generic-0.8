@@ -118,6 +118,7 @@ coverage
 docs
 
 .idea
+.run
 
 # mac stuff
 .DS_Store
