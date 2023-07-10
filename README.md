@@ -1,2 +1,2 @@
-# MangaStream Extensions
-[Click me](https://thenetsky.github.io/extensions-mangastream/) to go to the index page!
+# NepNep Extensions
+[Click me](https://thenetsky.github.io/extensions-nepnep/) to go to the index page!
