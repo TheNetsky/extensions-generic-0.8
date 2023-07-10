@@ -17,7 +17,10 @@ import {
 
 import { NepNepParser } from './NepNepParser'
 
-const headers = {'content-type': 'application/x-www-form-urlencoded'}
+const BASE_VERSION = '3.0.0'
+export const getExportVersion = (EXTENSION_VERSION: string): string => {
+    return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
+}
 
 export abstract class NepNep implements SearchResultsProviding, MangaProviding, ChapterProviding, HomePageSectionsProviding {
     abstract baseUrl: string;
@@ -64,7 +67,6 @@ export abstract class NepNep implements SearchResultsProviding, MangaProviding, 
         const request = App.createRequest({
             url: `${this.baseUrl}/manga/`,
             method: 'GET',
-            headers,
             param: mangaId
         })
         const response = await this.requestManager.schedule(request, 1)
@@ -75,7 +77,6 @@ export abstract class NepNep implements SearchResultsProviding, MangaProviding, 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = App.createRequest({
             url: `${this.baseUrl}/read-online/`,
-            headers,
             method: 'GET',
             param: chapterId
         })
@@ -87,7 +88,6 @@ export abstract class NepNep implements SearchResultsProviding, MangaProviding, 
         if (!metadata) {
             const request = App.createRequest({
                 url: `${this.baseUrl}/search/`,
-                headers,
                 method: 'GET'
             })
             const searchMetadata = this.parser.searchMetadata(query)
@@ -109,7 +109,6 @@ export abstract class NepNep implements SearchResultsProviding, MangaProviding, 
     async getSearchTags(): Promise<TagSection[]> {
         const request = App.createRequest({
             url: `${this.baseUrl}/search/`,
-            headers,
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
@@ -121,9 +120,7 @@ export abstract class NepNep implements SearchResultsProviding, MangaProviding, 
     }
 
     async getSearchFields(): Promise<SearchField[]> {
-    // Uncomment when this actually works in-app
-    //return this.parser.parseSearchFields()
-        return []
+        return this.parser.parseSearchFields()
     }
 
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
@@ -157,10 +154,14 @@ export abstract class NepNep implements SearchResultsProviding, MangaProviding, 
         })
     }
 
-    getCloudflareBypassRequest(): Request {
+    async getCloudflareBypassRequestAsync() {
         return App.createRequest({
-            url: `${this.baseUrl}`,
-            method: 'GET'
+            url: this.baseUrl,
+            method: 'GET',
+            headers: {
+                'referer': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
         })
     }
 }

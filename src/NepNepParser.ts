@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-inferrable-types */
 import {
     Chapter,
     ChapterDetails,
@@ -12,12 +9,15 @@ import {
     SearchRequest,
     TagSection
 } from '@paperback/types'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+
 const entities = require('entities')
+
 let NEPNEP_IMAGE_DOMAIN = 'https://cover.mangabeast01.com/cover'
+
 export type RegexIdMatch = {
     [id: string]: RegExp;
-};
+}
+
 export const regex: RegexIdMatch = {
     'top_ten': /vm\.TopTenJSON = (.*);/,
     'hot_update': /vm\.HotUpdateJSON = (.*);/,
@@ -32,35 +32,33 @@ export const regex: RegexIdMatch = {
 export class NepNepParser {
     parseMangaDetails($: any, mangaId: string): SourceManga {
         const json = $('[type=application\\/ld\\+json]').html()?.replace(/\n*/g, '') ?? ''
+
         // This is only because they added some really jank alternate titles and didn't properly string escape
         const jsonWithoutAlternateName = json.replace(/"alternateName".*?],/g, '')
-        const alternateNames = /"alternateName": \[(.*?)]/.exec(json)?.[1]
-            ?.replace(/"/g, '')
-            .split(',')
+
         const parsedJson = JSON.parse(jsonWithoutAlternateName)
         const entity = parsedJson.mainEntity
         const info = $('.row')
 
-        const imgSource = $('.ImgHolder').html()?.match(/src="(.*)\//)?.[1] ?? NEPNEP_IMAGE_DOMAIN
-        if (imgSource !== NEPNEP_IMAGE_DOMAIN)
-            NEPNEP_IMAGE_DOMAIN = imgSource
-        const image = `${NEPNEP_IMAGE_DOMAIN}/${mangaId}.jpg`
-
+        const alternateNames = /"alternateName": \[(.*?)]/.exec(json)?.[1]?.replace(/"/g, '').split(',')
         const title = this.decodeHTMLEntity($('h1', info).first().text() ?? '')
         let titles = [title]
-        const author = this.decodeHTMLEntity(entity.author[0])
         titles = titles.concat(alternateNames ?? '')
 
-        const tagSections: TagSection[] = [App.createTagSection({
-            id: '0',
-            label: 'Genres',
-            tags: []
-        }), App.createTagSection({id: '1', label: 'Format', tags: []})]
-        tagSections[0]!.tags = entity.genre.map((elem: string) => App.createTag({id: elem.toLowerCase(), label: elem}))
+        const imgSource = $('.ImgHolder').html()?.match(/src="(.*)\//)?.[1] ?? NEPNEP_IMAGE_DOMAIN
+        if (imgSource !== NEPNEP_IMAGE_DOMAIN) {
+            NEPNEP_IMAGE_DOMAIN = imgSource
+        }
+
+        const image = `${NEPNEP_IMAGE_DOMAIN}/${mangaId}.jpg`
+
+        const author = this.decodeHTMLEntity(entity.author[0])
+
+        const tagSections: TagSection[] = [App.createTagSection({ id: '0', label: 'Genres', tags: [] }), App.createTagSection({ id: '1', label: 'Format', tags: [] })]
+        tagSections[0]!.tags = entity.genre.map((elem: string) => App.createTag({ id: elem.toLowerCase(), label: elem }))
 
         let status = 'ONGOING'
         let desc = ''
-        const hentai = entity.genre.includes('Hentai') || entity.genre.includes('Adult')
 
         const details = $('.list-group', info)
         for (const row of $('li', details).toArray()) {
@@ -68,7 +66,7 @@ export class NepNepParser {
             switch (text) {
                 case 'Type:': {
                     const type = $('a', row).text()
-                    tagSections[1]!.tags.push(App.createTag({id: 'type_' + type.trim().toLowerCase(), label: type.trim()}))
+                    tagSections[1]!.tags.push(App.createTag({ id: 'type_' + type.trim().toLowerCase(), label: type.trim() }))
                     break
                 }
                 case 'Status:': {
@@ -87,12 +85,10 @@ export class NepNepParser {
             mangaInfo: App.createMangaInfo({
                 titles,
                 image,
-                rating: 0,
                 status,
                 author,
                 tags: tagSections,
-                desc,
-                hentai
+                desc
             })
         })
     }
@@ -125,7 +121,15 @@ export class NepNepParser {
                 time
             }))
         }
-        return chapters
+
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`)
+        }
+
+        return chapters.map(chapter => {
+            chapter.sortingIndex += chapters.length
+            return App.createChapter(chapter)
+        })
     }
 
     parseChapterDetails(data: any, mangaId: string, chapterId: string): ChapterDetails {
@@ -154,7 +158,7 @@ export class NepNepParser {
         })
     }
 
-    searchMetadata(query: SearchRequest): {[key: string]: any} {
+    searchMetadata(query: SearchRequest): { [key: string]: any } {
         const author = query.parameters?.['author']?.[0]
         const year = query.parameters?.['year']?.[0]
 
@@ -193,11 +197,6 @@ export class NepNepParser {
             'genre': includedGenres,
             'genreNo': excludedGenres
         }
-    }
-
-    getDirectory(data: any): any {
-        return JSON.parse(data?.replace(/(\r\n|\n|\r)/gm, '')
-            .match(regex['directory'])?.[1].trim().replace(/;$/, '') ?? '')
     }
 
     parseSearch(data: any, metadata: any): PartialSourceManga[] {
@@ -257,7 +256,7 @@ export class NepNepParser {
 
             if (mKeyword && mAuthor && mYear && mType && mScanStatus && mPublishStatus && mTranslation && mGenre && !mGenreNo) {
                 manga.push(App.createPartialSourceManga({
-                    title: elem.s,
+                    title: this.decodeHTMLEntity(elem.s),
                     image: `${NEPNEP_IMAGE_DOMAIN}/${elem.i}.jpg`,
                     mangaId: elem.i,
                     subtitle: undefined
@@ -270,18 +269,18 @@ export class NepNepParser {
 
     parseSearchTags(data: any): TagSection[] {
         const tagSections: TagSection[] = [
-            App.createTagSection({id: 'genres', label: 'Genres', tags: []}),
-            App.createTagSection({id: 'format', label: 'Format', tags: []}),
-            App.createTagSection({id: 'scan_status', label: 'Scan Status', tags: []}),
-            App.createTagSection({id: 'publish_status', label: 'Publish Status', tags: []}),
-            App.createTagSection({id: 'translation', label: 'Translation', tags: []})
+            App.createTagSection({ id: 'genres', label: 'Genres', tags: [] }),
+            App.createTagSection({ id: 'format', label: 'Format', tags: [] }),
+            App.createTagSection({ id: 'scan_status', label: 'Scan Status', tags: [] }),
+            App.createTagSection({ id: 'publish_status', label: 'Publish Status', tags: [] }),
+            App.createTagSection({ id: 'translation', label: 'Translation', tags: [] })
         ]
         const genres = JSON.parse(data.match(/"Genre"\s*: (.*)/)?.[1].replace(/'/g, '"'))
-        tagSections[0]!.tags = genres.map((tag: any) => App.createTag({id: `genre_${tag.toLowerCase()}`, label: tag}))
+        tagSections[0]!.tags = genres.map((tag: any) => App.createTag({ id: `genre_${tag.toLowerCase()}`, label: tag }))
 
         const typesHTML = data.match(/"Type"\s*: (.*),/g)?.[1]
         const types = JSON.parse(typesHTML.match(/(\[.*])/)?.[1].replace(/'/g, '"'))
-        tagSections[1]!.tags = types.map((tag: any) => App.createTag({id: `type_${tag.toLowerCase()}`, label: tag}))
+        tagSections[1]!.tags = types.map((tag: any) => App.createTag({ id: `type_${tag.toLowerCase()}`, label: tag }))
 
         const scanStatusHTML = data.match(/"ScanStatus"\s*: (.*),/g)?.[1]
         const scanStatus = JSON.parse(scanStatusHTML.match(/(\[.*])/)?.[1].replace(/'/g, '"'))
@@ -298,8 +297,8 @@ export class NepNepParser {
         }))
 
         tagSections[4]!.tags = [
-            App.createTag({id: 'translation_yes', label: 'Official'}),
-            App.createTag({id: 'translation_no', label: 'Non-Official'})
+            App.createTag({ id: 'translation_yes', label: 'Official' }),
+            App.createTag({ id: 'translation_no', label: 'Non-Official' })
         ]
 
         return tagSections
@@ -307,8 +306,8 @@ export class NepNepParser {
 
     parseSearchFields(): SearchField[] {
         const searchFields: SearchField[] = [
-            App.createSearchField({id: 'author', name: 'Author', placeholder: 'Miyazaki'}),
-            App.createSearchField({id: 'year', name: 'Year', placeholder: '2000-2010'})
+            App.createSearchField({ id: 'author', name: 'Author', placeholder: 'Miyazaki' }),
+            App.createSearchField({ id: 'year', name: 'Year', placeholder: '2000-2010' })
         ]
         return searchFields
     }
@@ -324,25 +323,25 @@ export class NepNepParser {
             id: 'hot_update',
             title: 'Hot Updates',
             containsMoreItems: true,
-            type: 'singleRowNormal'
+            type: HomeSectionType.singleRowNormal
         })
         const latestSection = App.createHomeSection({
             id: 'latest',
             title: 'Latest Updates',
             containsMoreItems: true,
-            type: 'singleRowNormal'
+            type: HomeSectionType.singleRowNormal
         })
         const newTitlesSection = App.createHomeSection({
             id: 'new_titles',
             title: 'New Titles',
             containsMoreItems: true,
-            type: 'singleRowNormal'
+            type: HomeSectionType.singleRowNormal
         })
         const recommendedSection = App.createHomeSection({
             id: 'recommended',
             title: 'Recommendations',
             containsMoreItems: true,
-            type: 'singleRowNormal'
+            type: HomeSectionType.singleRowNormal
         })
 
         const topTen = JSON.parse((data.match(regex[topTenSection.id])?.[1])).slice(0, 15)
@@ -370,7 +369,7 @@ export class NepNepParser {
                 time = time.slice(4, time.length)
                 manga.push(App.createPartialSourceManga({
                     image,
-                    title: title,
+                    title: this.decodeHTMLEntity(title),
                     mangaId: id,
                     subtitle: undefined
                 }))
@@ -384,8 +383,10 @@ export class NepNepParser {
         const manga: PartialSourceManga[] = []
         const mangaIds: Set<string> = new Set<string>()
 
-        if (!regex[homepageSectionId])
-            App.createPagedResults({results: []})
+        if (!regex[homepageSectionId]) {
+            App.createPagedResults({ results: [] })
+        }
+
         const items = JSON.parse((data.match(regex[homepageSectionId]))?.[1])
         for (const item of items) {
             const id = item.IndexName
@@ -395,9 +396,10 @@ export class NepNepParser {
                 let time = (new Date(item.Date)).toDateString()
                 time = time.slice(0, time.length - 5)
                 time = time.slice(4, time.length)
+
                 manga.push(App.createPartialSourceManga({
                     image,
-                    title: title,
+                    title: this.decodeHTMLEntity(title),
                     mangaId: id,
                     subtitle: undefined
                 }))
@@ -405,6 +407,11 @@ export class NepNepParser {
             }
         }
         return manga
+    }
+
+    getDirectory(data: any): any {
+        return JSON.parse(data?.replace(/(\r\n|\n|\r)/gm, '')
+            .match(regex['directory'])?.[1].trim().replace(/;$/, '') ?? '')
     }
 
     decodeHTMLEntity(str: string): string {
