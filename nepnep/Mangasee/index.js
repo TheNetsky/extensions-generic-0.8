@@ -1435,26 +1435,26 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":62,"./encode.js":64,"./escape.js":65}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Mangasee = exports.MangaseeInfo = exports.MANGASEE_DOMAIN = void 0;
+exports.Mangasee = exports.MangaseeInfo = void 0;
 const types_1 = require("@paperback/types");
 const NepNep_1 = require("../NepNep");
-exports.MANGASEE_DOMAIN = 'https://mangasee123.com';
+const DOMAIN = 'https://mangasee123.com';
 exports.MangaseeInfo = {
-    version: '2.2.0',
+    version: '0.0.0',
     name: 'MangaSee',
     icon: 'icon.png',
-    author: 'Daniel Kovalevich',
-    authorWebsite: 'https://github.com/DanielKovalevich',
-    description: 'Extension that pulls manga from MangaSee, includes Advanced Search and Updated manga fetching',
+    author: 'GameFuzzy',
+    authorWebsite: 'https://github.com/gamefuzzy',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     contentRating: types_1.ContentRating.MATURE,
-    websiteBaseURL: exports.MANGASEE_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 };
 class Mangasee extends NepNep_1.NepNep {
     constructor() {
         super(...arguments);
-        this.baseUrl = 'https://mangasee123.com';
+        this.baseUrl = DOMAIN;
     }
 }
 exports.Mangasee = Mangasee;
@@ -1462,9 +1462,13 @@ exports.Mangasee = Mangasee;
 },{"../NepNep":71,"@paperback/types":61}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NepNep = void 0;
+exports.NepNep = exports.getExportVersion = void 0;
 const NepNepParser_1 = require("./NepNepParser");
-const headers = { 'content-type': 'application/x-www-form-urlencoded' };
+const BASE_VERSION = '3.0.0';
+const getExportVersion = (EXTENSION_VERSION) => {
+    return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
+};
+exports.getExportVersion = getExportVersion;
 class NepNep {
     constructor(cheerio) {
         this.cheerio = cheerio;
@@ -1506,7 +1510,6 @@ class NepNep {
         const request = App.createRequest({
             url: `${this.baseUrl}/manga/`,
             method: 'GET',
-            headers,
             param: mangaId
         });
         const response = await this.requestManager.schedule(request, 1);
@@ -1516,7 +1519,6 @@ class NepNep {
     async getChapterDetails(mangaId, chapterId) {
         const request = App.createRequest({
             url: `${this.baseUrl}/read-online/`,
-            headers,
             method: 'GET',
             param: chapterId
         });
@@ -1527,7 +1529,6 @@ class NepNep {
         if (!metadata) {
             const request = App.createRequest({
                 url: `${this.baseUrl}/search/`,
-                headers,
                 method: 'GET'
             });
             const searchMetadata = this.parser.searchMetadata(query);
@@ -1548,7 +1549,6 @@ class NepNep {
     async getSearchTags() {
         const request = App.createRequest({
             url: `${this.baseUrl}/search/`,
-            headers,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
@@ -1558,9 +1558,7 @@ class NepNep {
         return true;
     }
     async getSearchFields() {
-        // Uncomment when this actually works in-app
-        //return this.parser.parseSearchFields()
-        return [];
+        return this.parser.parseSearchFields();
     }
     async getHomePageSections(sectionCallback) {
         const request = App.createRequest({
@@ -1591,10 +1589,14 @@ class NepNep {
             }
         });
     }
-    getCloudflareBypassRequest() {
+    async getCloudflareBypassRequestAsync() {
         return App.createRequest({
-            url: `${this.baseUrl}`,
-            method: 'GET'
+            url: this.baseUrl,
+            method: 'GET',
+            headers: {
+                'referer': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
         });
     }
 }
@@ -1604,11 +1606,7 @@ exports.NepNep = NepNep;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NepNepParser = exports.regex = void 0;
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-inferrable-types */
 const types_1 = require("@paperback/types");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const entities = require('entities');
 let NEPNEP_IMAGE_DOMAIN = 'https://cover.mangabeast01.com/cover';
 exports.regex = {
@@ -1626,29 +1624,23 @@ class NepNepParser {
         const json = $('[type=application\\/ld\\+json]').html()?.replace(/\n*/g, '') ?? '';
         // This is only because they added some really jank alternate titles and didn't properly string escape
         const jsonWithoutAlternateName = json.replace(/"alternateName".*?],/g, '');
-        const alternateNames = /"alternateName": \[(.*?)]/.exec(json)?.[1]
-            ?.replace(/"/g, '')
-            .split(',');
         const parsedJson = JSON.parse(jsonWithoutAlternateName);
         const entity = parsedJson.mainEntity;
         const info = $('.row');
-        const imgSource = $('.ImgHolder').html()?.match(/src="(.*)\//)?.[1] ?? NEPNEP_IMAGE_DOMAIN;
-        if (imgSource !== NEPNEP_IMAGE_DOMAIN)
-            NEPNEP_IMAGE_DOMAIN = imgSource;
-        const image = `${NEPNEP_IMAGE_DOMAIN}/${mangaId}.jpg`;
+        const alternateNames = /"alternateName": \[(.*?)]/.exec(json)?.[1]?.replace(/"/g, '').split(',');
         const title = this.decodeHTMLEntity($('h1', info).first().text() ?? '');
         let titles = [title];
-        const author = this.decodeHTMLEntity(entity.author[0]);
         titles = titles.concat(alternateNames ?? '');
-        const tagSections = [App.createTagSection({
-                id: '0',
-                label: 'Genres',
-                tags: []
-            }), App.createTagSection({ id: '1', label: 'Format', tags: [] })];
+        const imgSource = $('.ImgHolder').html()?.match(/src="(.*)\//)?.[1] ?? NEPNEP_IMAGE_DOMAIN;
+        if (imgSource !== NEPNEP_IMAGE_DOMAIN) {
+            NEPNEP_IMAGE_DOMAIN = imgSource;
+        }
+        const image = `${NEPNEP_IMAGE_DOMAIN}/${mangaId}.jpg`;
+        const author = this.decodeHTMLEntity(entity.author[0]);
+        const tagSections = [App.createTagSection({ id: '0', label: 'Genres', tags: [] }), App.createTagSection({ id: '1', label: 'Format', tags: [] })];
         tagSections[0].tags = entity.genre.map((elem) => App.createTag({ id: elem.toLowerCase(), label: elem }));
         let status = 'ONGOING';
         let desc = '';
-        const hentai = entity.genre.includes('Hentai') || entity.genre.includes('Adult');
         const details = $('.list-group', info);
         for (const row of $('li', details).toArray()) {
             const text = $('.mlabel', row).text();
@@ -1673,12 +1665,10 @@ class NepNepParser {
             mangaInfo: App.createMangaInfo({
                 titles,
                 image,
-                rating: 0,
                 status,
                 author,
                 tags: tagSections,
-                desc,
-                hentai
+                desc
             })
         });
     }
@@ -1707,7 +1697,13 @@ class NepNepParser {
                 time
             }));
         }
-        return chapters;
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`);
+        }
+        return chapters.map(chapter => {
+            chapter.sortingIndex += chapters.length;
+            return App.createChapter(chapter);
+        });
     }
     parseChapterDetails(data, mangaId, chapterId) {
         const pages = [];
@@ -1762,10 +1758,6 @@ class NepNepParser {
             'genreNo': excludedGenres
         };
     }
-    getDirectory(data) {
-        return JSON.parse(data?.replace(/(\r\n|\n|\r)/gm, '')
-            .match(exports.regex['directory'])?.[1].trim().replace(/;$/, '') ?? '');
-    }
     parseSearch(data, metadata) {
         const manga = [];
         const directory = this.getDirectory(data);
@@ -1817,7 +1809,7 @@ class NepNepParser {
             time = time.slice(4, time.length);
             if (mKeyword && mAuthor && mYear && mType && mScanStatus && mPublishStatus && mTranslation && mGenre && !mGenreNo) {
                 manga.push(App.createPartialSourceManga({
-                    title: elem.s,
+                    title: this.decodeHTMLEntity(elem.s),
                     image: `${NEPNEP_IMAGE_DOMAIN}/${elem.i}.jpg`,
                     mangaId: elem.i,
                     subtitle: undefined
@@ -1875,25 +1867,25 @@ class NepNepParser {
             id: 'hot_update',
             title: 'Hot Updates',
             containsMoreItems: true,
-            type: 'singleRowNormal'
+            type: types_1.HomeSectionType.singleRowNormal
         });
         const latestSection = App.createHomeSection({
             id: 'latest',
             title: 'Latest Updates',
             containsMoreItems: true,
-            type: 'singleRowNormal'
+            type: types_1.HomeSectionType.singleRowNormal
         });
         const newTitlesSection = App.createHomeSection({
             id: 'new_titles',
             title: 'New Titles',
             containsMoreItems: true,
-            type: 'singleRowNormal'
+            type: types_1.HomeSectionType.singleRowNormal
         });
         const recommendedSection = App.createHomeSection({
             id: 'recommended',
             title: 'Recommendations',
             containsMoreItems: true,
-            type: 'singleRowNormal'
+            type: types_1.HomeSectionType.singleRowNormal
         });
         const topTen = JSON.parse((data.match(exports.regex[topTenSection.id])?.[1])).slice(0, 15);
         const hot = JSON.parse((data.match(exports.regex[hotSection.id])?.[1])).slice(0, 15);
@@ -1917,7 +1909,7 @@ class NepNepParser {
                 time = time.slice(4, time.length);
                 manga.push(App.createPartialSourceManga({
                     image,
-                    title: title,
+                    title: this.decodeHTMLEntity(title),
                     mangaId: id,
                     subtitle: undefined
                 }));
@@ -1929,8 +1921,9 @@ class NepNepParser {
     parseViewMore(data, homepageSectionId) {
         const manga = [];
         const mangaIds = new Set();
-        if (!exports.regex[homepageSectionId])
+        if (!exports.regex[homepageSectionId]) {
             App.createPagedResults({ results: [] });
+        }
         const items = JSON.parse((data.match(exports.regex[homepageSectionId]))?.[1]);
         for (const item of items) {
             const id = item.IndexName;
@@ -1942,7 +1935,7 @@ class NepNepParser {
                 time = time.slice(4, time.length);
                 manga.push(App.createPartialSourceManga({
                     image,
-                    title: title,
+                    title: this.decodeHTMLEntity(title),
                     mangaId: id,
                     subtitle: undefined
                 }));
@@ -1950,6 +1943,10 @@ class NepNepParser {
             }
         }
         return manga;
+    }
+    getDirectory(data) {
+        return JSON.parse(data?.replace(/(\r\n|\n|\r)/gm, '')
+            .match(exports.regex['directory'])?.[1].trim().replace(/;$/, '') ?? '');
     }
     decodeHTMLEntity(str) {
         return entities.decodeHTML(str);
