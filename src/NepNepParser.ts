@@ -40,22 +40,28 @@ export class NepNepParser {
         const parsedJson = JSON.parse(jsonWithoutAlternateName)
         const entity = parsedJson.mainEntity
         const info = $('.row')
+
         const imgSource = $('.ImgHolder').html()?.match(/src="(.*)\//)?.[1] ?? NEPNEP_IMAGE_DOMAIN
         if (imgSource !== NEPNEP_IMAGE_DOMAIN)
             NEPNEP_IMAGE_DOMAIN = imgSource
         const image = `${NEPNEP_IMAGE_DOMAIN}/${mangaId}.jpg`
+
         const title = this.decodeHTMLEntity($('h1', info).first().text() ?? '')
         let titles = [title]
         const author = this.decodeHTMLEntity(entity.author[0])
         titles = titles.concat(alternateNames ?? '')
+
         const tagSections: TagSection[] = [App.createTagSection({
             id: '0',
             label: 'Genres',
             tags: []
         }), App.createTagSection({id: '1', label: 'Format', tags: []})]
         tagSections[0]!.tags = entity.genre.map((elem: string) => App.createTag({id: elem.toLowerCase(), label: elem}))
+
+        let status = 'ONGOING'
         let desc = ''
         const hentai = entity.genre.includes('Hentai') || entity.genre.includes('Adult')
+
         const details = $('.list-group', info)
         for (const row of $('li', details).toArray()) {
             const text = $('.mlabel', row).text()
@@ -65,12 +71,17 @@ export class NepNepParser {
                     tagSections[1]!.tags.push(App.createTag({id: 'type_' + type.trim().toLowerCase(), label: type.trim()}))
                     break
                 }
+                case 'Status:': {
+                    status = $(row).text().includes('Ongoing') ? 'ONGOING' : 'COMPLETED'
+                    break
+                }
                 case 'Description:': {
                     desc = this.decodeHTMLEntity($('div', row).text().trim())
                     break
                 }
             }
         }
+
         return App.createSourceManga({
             id: mangaId,
             mangaInfo: App.createMangaInfo({
@@ -89,6 +100,7 @@ export class NepNepParser {
     parseChapters($: any, mangaId: string): Chapter[] {
         const chapterJS: any[] = JSON.parse($.root().html()?.match(regex['chapters'])?.[1] ?? '').reverse()
         const chapters: Chapter[] = []
+
         // Following the url encoding that the website uses, same variables too
         for (const elem of chapterJS) {
             const chapterCode: string = elem.Chapter
@@ -100,8 +112,10 @@ export class NepNepParser {
             const id = mangaId + '-chapter-' + n + m + index + '.html'
             const chapNum = n + a * 0.1
             const name = elem.ChapterName ? elem.ChapterName : '' // can be null
+
             const timeStr = elem.Date.replace(/-/g, '/')
             const time = new Date(timeStr)
+
             chapters.push(App.createChapter({
                 id,
                 name,
@@ -116,18 +130,23 @@ export class NepNepParser {
 
     parseChapterDetails(data: any, mangaId: string, chapterId: string): ChapterDetails {
         const pages: string[] = []
+
         const variableName = data.match(/ng-src="https:\/\/{{([a-zA-Z0-9.]+)}}\/manga\/.+\.png/)?.[1]
         const matchedPath = data.match(new RegExp(`${variableName} = "(.*)";`))?.[1]
+
         const chapterInfo = JSON.parse(data.match(/vm.CurChapter = (.*);/)?.[1])
         const pageNum = Number(chapterInfo.Page)
+
         const chapter = chapterInfo.Chapter.slice(1, -1)
         const odd = chapterInfo.Chapter[chapterInfo.Chapter.length - 1]
         const chapterImage = odd == 0 ? chapter : chapter + '.' + odd
+
         for (let i = 0; i < pageNum; i++) {
             const s = '000' + (i + 1)
             const page = s.substr(s.length - 3)
             pages.push(`https://${matchedPath}/manga/${mangaId}/${chapterInfo.Directory == '' ? '' : chapterInfo.Directory + '/'}${chapterImage}-${page}.png`)
         }
+
         return App.createChapterDetails({
             id: chapterId,
             mangaId: mangaId,
@@ -135,29 +154,34 @@ export class NepNepParser {
         })
     }
 
-    searchMetadata(query: SearchRequest): {
-        [key: string]: any;
-    } {
+    searchMetadata(query: SearchRequest): {[key: string]: any} {
         const author = query.parameters?.['author']?.[0]
         const year = query.parameters?.['year']?.[0]
+
         const type = query.includedTags
             ?.filter(type => type.id.includes('type_'))
             .map(type => type.id.replace('type_', ''))
+
         const scanStatus = query.includedTags
             ?.filter(type => type.id.includes('scan_status_'))
             .map(type => type.id.replace('scan_status_', ''))
+
         const publishStatus = query.includedTags
             ?.filter(type => type.id.includes('publish_status_'))
             .map(type => type.id.replace('publish_status_', ''))
+
         const translation = query.includedTags
             ?.filter(type => type.id.includes('translation_'))
             .map(type => type.id.replace('translation_', ''))
+
         const includedGenres = query.includedTags
             ?.filter(tag => tag.id.includes('genre_'))
             .map(genre => genre.id.replace('genre_', ''))
+
         const excludedGenres = query.excludedTags
             ?.filter(tag => tag.id.includes('genre_'))
             .map(genre => genre.id.replace('genre_', ''))
+
         return {
             'keyword': query.title?.toLowerCase(),
             'author': author?.toLowerCase() ?? '',
@@ -180,8 +204,8 @@ export class NepNepParser {
         const manga: PartialSourceManga[] = []
         const directory: any[] = this.getDirectory(data)
         const imgSource = data.match(regex['directory_image_host'])?.[1] ?? NEPNEP_IMAGE_DOMAIN
-        if (imgSource !== NEPNEP_IMAGE_DOMAIN)
-            NEPNEP_IMAGE_DOMAIN = imgSource
+        if (imgSource !== NEPNEP_IMAGE_DOMAIN) NEPNEP_IMAGE_DOMAIN = imgSource
+
         for (const elem of directory) {
             let mKeyword: boolean = typeof metadata.keyword === 'undefined'
             let mAuthor: boolean = metadata.author === ''
@@ -192,14 +216,17 @@ export class NepNepParser {
             let mType: boolean = !(typeof metadata.type !== 'undefined' && metadata.type.length > 0)
             let mGenre: boolean = !(typeof metadata.genre !== 'undefined' && metadata.genre.length > 0)
             let mGenreNo: boolean = typeof metadata.genreNo !== 'undefined' && metadata.genreNo.length > 0
+
             if (!mKeyword) {
                 const allWords: string = [...(elem.al ?? []), elem.s ?? ''].join('||').toLowerCase()
                 mKeyword = allWords.includes(metadata.keyword)
             }
+
             if (!mAuthor) {
                 const flatA: string = elem.a?.join('||').toLowerCase() ?? ''
                 mAuthor = (flatA.includes(metadata.author))
             }
+
             if (!mYear) {
                 if (metadata.year.includes('-')) {
                     const startYear = parseInt(metadata.year?.split('-')?.[0]) || 0
@@ -209,6 +236,7 @@ export class NepNepParser {
                     mYear = metadata.year == elem.y
                 }
             }
+
             if (!mType)
                 mType = metadata.type.every((i: string) => elem.t?.toLowerCase()?.includes(i))
             if (!mScanStatus)
@@ -217,13 +245,16 @@ export class NepNepParser {
                 mPublishStatus = metadata.publishStatus.every((i: string) => elem.ps?.toLowerCase()?.includes(i))
             if (!mTranslation)
                 mTranslation = metadata.translation.every((i: string) => elem.o?.toLowerCase()?.includes(i))
+
             if (!mGenre)
                 mGenre = metadata.genre.every((i: string) => elem.g?.map((genre: string) => genre.toLowerCase())?.includes(i))
             if (mGenreNo)
                 mGenreNo = metadata.genreNo.every((i: string) => elem.g?.map((genre: string) => genre.toLowerCase())?.includes(i))
+
             let time = (new Date(elem.ls)).toDateString()
             time = time.slice(0, time.length - 5)
             time = time.slice(4, time.length)
+
             if (mKeyword && mAuthor && mYear && mType && mScanStatus && mPublishStatus && mTranslation && mGenre && !mGenreNo) {
                 manga.push(App.createPartialSourceManga({
                     title: elem.s,
@@ -233,6 +264,7 @@ export class NepNepParser {
                 }))
             }
         }
+
         return manga
     }
 
@@ -246,25 +278,30 @@ export class NepNepParser {
         ]
         const genres = JSON.parse(data.match(/"Genre"\s*: (.*)/)?.[1].replace(/'/g, '"'))
         tagSections[0]!.tags = genres.map((tag: any) => App.createTag({id: `genre_${tag.toLowerCase()}`, label: tag}))
+
         const typesHTML = data.match(/"Type"\s*: (.*),/g)?.[1]
         const types = JSON.parse(typesHTML.match(/(\[.*])/)?.[1].replace(/'/g, '"'))
         tagSections[1]!.tags = types.map((tag: any) => App.createTag({id: `type_${tag.toLowerCase()}`, label: tag}))
+
         const scanStatusHTML = data.match(/"ScanStatus"\s*: (.*),/g)?.[1]
         const scanStatus = JSON.parse(scanStatusHTML.match(/(\[.*])/)?.[1].replace(/'/g, '"'))
         tagSections[2]!.tags = scanStatus.map((tag: any) => App.createTag({
             id: `scan_status_${tag.toLowerCase()}`,
             label: tag
         }))
+
         const publishStatusHTML = data.match(/"PublishStatus"\s*: (.*),/g)?.[1]
         const publishStatus = JSON.parse(publishStatusHTML.match(/(\[.*])/)?.[1].replace(/'/g, '"'))
         tagSections[3]!.tags = publishStatus.map((tag: any) => App.createTag({
             id: `publish_status_${tag.toLowerCase()}`,
             label: tag
         }))
+
         tagSections[4]!.tags = [
             App.createTag({id: 'translation_yes', label: 'Official'}),
             App.createTag({id: 'translation_no', label: 'Non-Official'})
         ]
+
         return tagSections
     }
 
@@ -307,16 +344,20 @@ export class NepNepParser {
             containsMoreItems: true,
             type: 'singleRowNormal'
         })
+
         const topTen = JSON.parse((data.match(regex[topTenSection.id])?.[1])).slice(0, 15)
         const hot = JSON.parse((data.match(regex[hotSection.id])?.[1])).slice(0, 15)
         const latest = JSON.parse((data.match(regex[latestSection.id])?.[1])).slice(0, 15)
         const newTitles = JSON.parse((data.match(regex[newTitlesSection.id]))?.[1]).slice(0, 15)
         const recommended = JSON.parse((data.match(regex[recommendedSection.id])?.[1])).slice(0, 15)
+
         const sections = [topTenSection, hotSection, latestSection, newTitlesSection, recommendedSection]
         const sectionData = [topTen, hot, latest, newTitles, recommended]
+
         const imgSource = $('.ImageHolder').html()?.match(/ng-src="(.*)\//)?.[1] ?? NEPNEP_IMAGE_DOMAIN
         if (imgSource !== NEPNEP_IMAGE_DOMAIN)
             NEPNEP_IMAGE_DOMAIN = imgSource
+
         for (const [i, section] of sections.entries()) {
             sectionCallback(section)
             const manga: PartialSourceManga[] = []
@@ -342,6 +383,7 @@ export class NepNepParser {
     parseViewMore(data: any, homepageSectionId: string): PartialSourceManga[] {
         const manga: PartialSourceManga[] = []
         const mangaIds: Set<string> = new Set<string>()
+
         if (!regex[homepageSectionId])
             App.createPagedResults({results: []})
         const items = JSON.parse((data.match(regex[homepageSectionId]))?.[1])
