@@ -4,12 +4,12 @@ import {
     SourceIntents
 } from '@paperback/types'
 
-import { NepNep } from '../NepNep'
+import { NepNep, getExportVersion } from '../NepNep'
 
 const DOMAIN = 'https://manga4life.com'
 
 export const MangaLifeInfo: SourceInfo = {
-    version: '0.0.0',
+    version: getExportVersion('0.0.0'),
     name: 'Manga4Life',
     icon: 'icon.png',
     author: 'GameFuzzy',

@@ -4,12 +4,12 @@ import {
     SourceIntents
 } from '@paperback/types'
 
-import { NepNep } from '../NepNep'
+import { NepNep, getExportVersion } from '../NepNep'
 
 const DOMAIN = 'https://mangasee123.com'
 
 export const MangaseeInfo: SourceInfo = {
-    version: '0.0.0',
+    version: getExportVersion('0.0.0'),
     name: 'MangaSee',
     icon: 'icon.png',
     author: 'GameFuzzy',
