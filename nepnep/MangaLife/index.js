@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const NepNep_1 = require("../NepNep");
 const DOMAIN = 'https://manga4life.com';
 exports.MangaLifeInfo = {
-    version: '0.0.0',
+    version: (0, NepNep_1.getExportVersion)('0.0.0'),
     name: 'Manga4Life',
     icon: 'icon.png',
     author: 'GameFuzzy',

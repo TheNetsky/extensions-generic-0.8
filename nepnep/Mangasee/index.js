@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const NepNep_1 = require("../NepNep");
 const DOMAIN = 'https://mangasee123.com';
 exports.MangaseeInfo = {
-    version: '0.0.0',
+    version: (0, NepNep_1.getExportVersion)('0.0.0'),
     name: 'MangaSee',
     icon: 'icon.png',
     author: 'GameFuzzy',
