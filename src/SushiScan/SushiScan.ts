@@ -14,7 +14,7 @@ import {
 const DOMAIN = 'https://sushiscan.net'
 
 export const SushiScanInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'Sushi Scan',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'btylerh7',
@@ -33,6 +33,9 @@ export const SushiScanInfo: SourceInfo = {
 
 export class SushiScan extends MangaStream {
     baseUrl: string = DOMAIN
+
+    override directoryPath = 'catalogue'
+
     override language = '🇫🇷'
 
     override manga_tag_selector_box = 'div.seriestugenre'
@@ -45,8 +48,6 @@ export class SushiScan extends MangaStream {
         ONGOING: 'En Cours',
         COMPLETED: 'Terminé'
     }
-
-    override directoryPath = 'manga'
 
     // ----DATE SELECTORS----
     /**

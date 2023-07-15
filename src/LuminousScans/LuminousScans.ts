@@ -31,6 +31,7 @@ export class LuminousScans extends MangaStream {
     baseUrl: string = DOMAIN
 
     override directoryPath = 'series'
+
     override usePostIds = false
 
     override configureSections() {
