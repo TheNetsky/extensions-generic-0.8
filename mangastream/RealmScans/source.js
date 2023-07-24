@@ -2275,7 +2275,7 @@ const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
 const DOMAIN = 'https://realmscans.xyz';
 exports.RealmScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.2'),
     name: 'RealmScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Seyden',
@@ -2290,7 +2290,7 @@ class RealmScans extends MangaStream_1.MangaStream {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.directoryPath = 'series';
+        this.directoryPath = 'm050523/series';
         this.usePostIds = false;
     }
     configureSections() {
