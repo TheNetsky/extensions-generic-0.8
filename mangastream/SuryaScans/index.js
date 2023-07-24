@@ -2270,34 +2270,32 @@ exports.MangaStreamParser = MangaStreamParser;
 },{"./LanguageUtils":70,"entities":69}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RealmScans = exports.RealmScansInfo = void 0;
+exports.SuryaScans = exports.SuryaScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://realmscans.xyz';
-exports.RealmScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
-    name: 'RealmScans',
+const DOMAIN = 'https://suryascans.com';
+exports.SuryaScansInfo = {
+    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    name: 'SuryaScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Seyden',
-    authorWebsite: 'http://github.com/Seyden',
-    icon: 'icon.webp',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
     contentRating: types_1.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI,
     sourceTags: []
 };
-class RealmScans extends MangaStream_1.MangaStream {
+class SuryaScans extends MangaStream_1.MangaStream {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.directoryPath = 'series';
-        this.usePostIds = false;
     }
     configureSections() {
         this.homescreen_sections['new_titles'].enabled = false;
     }
 }
-exports.RealmScans = RealmScans;
+exports.SuryaScans = SuryaScans;
 
 },{"../MangaStream":71,"@paperback/types":61}],75:[function(require,module,exports){
 "use strict";

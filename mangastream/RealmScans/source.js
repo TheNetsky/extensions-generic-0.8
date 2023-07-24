@@ -2291,6 +2291,7 @@ class RealmScans extends MangaStream_1.MangaStream {
         super(...arguments);
         this.baseUrl = DOMAIN;
         this.directoryPath = 'series';
+        this.usePostIds = false;
     }
     configureSections() {
         this.homescreen_sections['new_titles'].enabled = false;
