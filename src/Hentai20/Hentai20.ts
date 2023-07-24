@@ -11,30 +11,33 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://realmscans.xyz'
+const DOMAIN = 'https://hentai20.io'
 
-export const RealmScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
-    name: 'RealmScans',
+export const Hentai20Info: SourceInfo = {
+    version: getExportVersion('0.0.0'),
+    name: 'Hentai20',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Seyden',
-    authorWebsite: 'http://github.com/Seyden',
-    icon: 'icon.webp',
-    contentRating: ContentRating.MATURE,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: ContentRating.ADULT,
     websiteBaseURL: DOMAIN,
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI,
-    sourceTags: []
+    sourceTags: [
+        {
+            text: '18+',
+            type: BadgeColor.YELLOW
+        }
+    ]
 }
 
-export class RealmScans extends MangaStream {
+export class Hentai20 extends MangaStream {
 
     baseUrl: string = DOMAIN
 
-    override directoryPath = 'series'
-
     override usePostIds = false
 
-    override configureSections(): void {
+    override configureSections() {
         this.homescreen_sections['new_titles'].enabled = false
     }
 }
