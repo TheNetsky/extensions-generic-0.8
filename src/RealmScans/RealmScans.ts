@@ -14,7 +14,7 @@ import {
 const DOMAIN = 'https://realmscans.xyz'
 
 export const RealmScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'RealmScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Seyden',
@@ -30,7 +30,7 @@ export class RealmScans extends MangaStream {
 
     baseUrl: string = DOMAIN
 
-    override directoryPath = 'series'
+    override directoryPath = 'm050523/series'
 
     override usePostIds = false
 
