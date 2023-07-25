@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
 const DOMAIN = 'https://asura.gg';
 exports.AsuraScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.2'),
     name: 'AsuraScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -1449,7 +1449,12 @@ exports.AsuraScansInfo = {
     contentRating: types_1.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI,
-    sourceTags: []
+    sourceTags: [
+        {
+            text: 'Dev Build',
+            type: types_1.BadgeColor.BLUE
+        }
+    ]
 };
 class AsuraScans extends MangaStream_1.MangaStream {
     constructor() {
@@ -1458,6 +1463,19 @@ class AsuraScans extends MangaStream_1.MangaStream {
     }
     configureSections() {
         this.homescreen_sections['new_titles'].enabled = false;
+    }
+    async getCloudflareBypassRequestAsync() {
+        // Delete cookies
+        this.requestManager?.cookieStore?.getAllCookies().forEach(x => { this.requestManager?.cookieStore?.removeCookie(x); });
+        return App.createRequest({
+            url: `${this.bypassPage || this.baseUrl}/`,
+            method: 'GET',
+            headers: {
+                'referer': `${this.baseUrl}/`,
+                'origin': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
+        });
     }
 }
 exports.AsuraScans = AsuraScans;
