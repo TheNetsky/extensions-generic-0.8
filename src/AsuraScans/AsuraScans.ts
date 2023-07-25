@@ -2,7 +2,8 @@ import {
     BadgeColor,
     ContentRating,
     SourceInfo,
-    SourceIntents
+    SourceIntents,
+    Request
 } from '@paperback/types'
 
 import {
@@ -13,7 +14,7 @@ import {
 const DOMAIN = 'https://asura.gg'
 
 export const AsuraScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'AsuraScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -31,5 +32,21 @@ export class AsuraScans extends MangaStream {
 
     override configureSections(): void {
         this.homescreen_sections['new_titles'].enabled = false
+    }
+
+    override async getCloudflareBypassRequestAsync(): Promise<Request> {
+
+        // Delete cookies
+        this.requestManager?.cookieStore?.getAllCookies().forEach(x => { this.requestManager?.cookieStore?.removeCookie(x) })
+
+        return App.createRequest({
+            url: `${this.bypassPage || this.baseUrl}/`,
+            method: 'GET',
+            headers: {
+                'referer': `${this.baseUrl}/`,
+                'origin': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
+        })
     }
 }
