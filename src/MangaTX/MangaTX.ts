@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://mangatx.com'
 
 export const MangaTXInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'MangaTX',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -29,7 +29,7 @@ export class MangaTX extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = false
+    override alternativeChapterAjaxEndpoint = true
 
     override hasAdvancedSearchPage = true
 }
