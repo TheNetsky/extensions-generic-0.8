@@ -10,11 +10,11 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://xcalibrscans.com'
+const DOMAIN = 'https://freakscans.com'
 
-export const xCalibrScansInfo: SourceInfo = {
+export const FreakScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'xCalibrScans',
+    name: 'FreakScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -25,7 +25,7 @@ export const xCalibrScansInfo: SourceInfo = {
     sourceTags: []
 }
 
-export class xCalibrScans extends MangaStream {
+export class FreakScans extends MangaStream {
 
     baseUrl: string = DOMAIN
 
