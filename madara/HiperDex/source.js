@@ -1438,9 +1438,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HiperDex = exports.HiperDexInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://hiperdex.com';
+const DOMAIN = 'https://hiperdex.xyz';
 exports.HiperDexInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.2'),
+    version: (0, Madara_1.getExportVersion)('0.0.3'),
     name: 'HiperDex',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
