@@ -2,7 +2,9 @@ import {
     ContentRating,
     SourceInfo,
     BadgeColor,
-    SourceIntents
+    SourceIntents,
+    HomeSection,
+    HomeSectionType
 } from '@paperback/types'
 
 import {
@@ -39,5 +41,56 @@ export class SamuraiScan extends Madara {
     override alternativeChapterAjaxEndpoint = true
 
     override hasAdvancedSearchPage = true
+
+    override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
+        const sections = [
+            {
+                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_week_views_value'),
+                section: App.createHomeSection({
+                    id: '0',
+                    title: 'Currently Trending',
+                    type: HomeSectionType.featured,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: this.constructAjaxHomepageRequest(0, 10, '_latest_update'),
+                section: App.createHomeSection({
+                    id: '1',
+                    title: 'Recently Updated',
+                    type: HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_views'),
+                section: App.createHomeSection({
+                    id: '2',
+                    title: 'Most Popular',
+                    type: HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            }
+        ]
+
+        const promises: Promise<void>[] = []
+        for (const section of sections) {
+            // Let the app load empty sections
+            sectionCallback(section.section)
+
+            // Get the section data
+            promises.push(
+                this.requestManager.schedule(section.request, 1).then(async response => {
+                    this.checkResponseError(response)
+                    const $ = this.cheerio.load(response.data as string)
+                    section.section.items = await this.parser.parseHomeSection($, this)
+                    sectionCallback(section.section)
+                })
+            )
+
+        }
+        // Make sure the function completes
+        await Promise.all(promises)
+    }
 
 }
