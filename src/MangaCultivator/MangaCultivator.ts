@@ -14,7 +14,7 @@ import { MangaCultivatorParser } from './MangaCultivatorParser'
 const DOMAIN = 'https://mangacultivator.com'
 
 export const MangaCultivatorInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'MangaCultivator',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Community',
