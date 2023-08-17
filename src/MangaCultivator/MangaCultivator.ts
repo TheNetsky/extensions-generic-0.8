@@ -9,8 +9,6 @@ import {
     Madara
 } from '../Madara'
 
-import { MangaCultivatorParser } from './MangaCultivatorParser'
-
 const DOMAIN = 'https://mangacultivator.com'
 
 export const MangaCultivatorInfo: SourceInfo = {
@@ -34,9 +32,7 @@ export class MangaCultivator extends Madara {
 
     override hasAdvancedSearchPage = true
 
+    override hasProtectedChapters = true
+
     override usePostIds = false
-
-    override chapterDetailsSelector = '#chapter-protector-data'
-
-    override parser: MangaCultivatorParser = new MangaCultivatorParser()
 }
