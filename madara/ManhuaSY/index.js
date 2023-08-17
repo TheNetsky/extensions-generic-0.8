@@ -9117,31 +9117,34 @@ exports.Parser = Parser;
 },{"crypto-js":72,"entities":105}],109:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NovelMic = exports.NovelMicInfo = void 0;
+exports.ManhuaSY = exports.ManhuaSYInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://novelmic.com';
-exports.NovelMicInfo = {
+const DOMAIN = 'https://manhuasy.com';
+exports.ManhuaSYInfo = {
     version: (0, Madara_1.getExportVersion)('0.0.0'),
-    name: 'NovelMic',
+    name: 'ManhuaSY',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
+    author: 'Community',
+    authorWebsite: '-',
     icon: 'icon.png',
-    contentRating: types_1.ContentRating.MATURE,
+    contentRating: types_1.ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
     sourceTags: [],
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
 };
-class NovelMic extends Madara_1.Madara {
+class ManhuaSY extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.alternativeChapterAjaxEndpoint = false;
+        this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;
+        this.hasProtectedChapters = true;
+        this.usePostIds = false;
+        this.directoryPath = 'manhua';
     }
 }
-exports.NovelMic = NovelMic;
+exports.ManhuaSY = ManhuaSY;
 
 },{"../Madara":106,"@paperback/types":61}]},{},[109])(109)
 });
