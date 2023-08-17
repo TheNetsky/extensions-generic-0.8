@@ -137,6 +137,18 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
     searchPagePathName = 'page'
 
     /**
+     * Set to true if the source makes use of the manga chapter protector plugin.
+     * (https://mangabooth.com/product/wp-manga-chapter-protector/)
+     */
+    hasProtectedChapters = false
+
+    /**
+     * Some sources may in the future change how to get the chapter protector data,
+     * making it configurable, will make it way more flexible and open to customized installations of the protector plugin.
+     */
+    protectedChapterDataSelector = '#chapter-protector-data'
+
+    /**
      * Some sites use the alternate URL for getting chapters through ajax
      */
     alternativeChapterAjaxEndpoint = false
@@ -234,8 +246,11 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
-        return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector, this)
+        if (this.hasProtectedChapters) {
+            return this.parser.parseProtectedChapterDetails($, mangaId, chapterId, this.protectedChapterDataSelector, this)
+        }
 
+        return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector, this)
     }
 
     async getSearchTags(): Promise<TagSection[]> {
