@@ -1,7 +1,6 @@
 import {
     ContentRating,
     SourceInfo,
-    BadgeColor,
     SourceIntents
 } from '@paperback/types'
 
@@ -10,14 +9,16 @@ import {
     Madara
 } from '../Madara'
 
+import { MangaCultivatorParser } from './MangaCultivatorParser'
+
 const DOMAIN = 'https://mangacultivator.com'
 
 export const MangaCultivatorInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'MangaCultivator',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
+    author: 'Community',
+    authorWebsite: '-',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
@@ -34,4 +35,8 @@ export class MangaCultivator extends Madara {
     override hasAdvancedSearchPage = true
 
     override usePostIds = false
+
+    override chapterDetailsSelector = '#chapter-protector-data'
+
+    override parser: MangaCultivatorParser = new MangaCultivatorParser()
 }
