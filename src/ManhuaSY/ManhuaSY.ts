@@ -9,11 +9,11 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://mangacultivator.com'
+const DOMAIN = 'https://manhuasy.com'
 
-export const MangaCultivatorInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
-    name: 'MangaCultivator',
+export const ManhuaSYInfo: SourceInfo = {
+    version: getExportVersion('0.0.0'),
+    name: 'ManhuaSY',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Community',
     authorWebsite: '-',
@@ -24,7 +24,7 @@ export const MangaCultivatorInfo: SourceInfo = {
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI
 }
 
-export class MangaCultivator extends Madara {
+export class ManhuaSY extends Madara {
 
     baseUrl: string = DOMAIN
 
@@ -35,4 +35,6 @@ export class MangaCultivator extends Madara {
     override hasProtectedChapters = true
 
     override usePostIds = false
+
+    override directoryPath = 'manhua'
 }
