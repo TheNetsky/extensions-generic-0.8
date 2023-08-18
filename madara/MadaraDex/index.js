@@ -8277,7 +8277,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '3.0.5';
+const BASE_VERSION = '3.1.0';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -8354,8 +8354,9 @@ class Madara {
         /**
          * Set to true if your source has advanced search functionality built in.
          * If this is not true, no genre tags will be shown on the homepage!
+         * See https://www.webtoon.xyz/?s=&post_type=wp-manga if they have a "advanced" option, if NOT, set this to false.
          */
-        this.hasAdvancedSearchPage = false;
+        this.hasAdvancedSearchPage = true;
         /**
          * The path used for search pagination. Used in search function.
          * Eg. for https://mangabob.com/page/2/?s&post_type=wp-manga it would be 'page'
@@ -8472,8 +8473,9 @@ class Madara {
     async getSearchTags() {
         let request;
         if (this.hasAdvancedSearchPage) {
+            // Adding the fake query "the" since some source revert to homepage when none is given!
             request = App.createRequest({
-                url: `${this.baseUrl}/?s=&post_type=wp-manga`,
+                url: `${this.baseUrl}/?s=the&post_type=wp-manga`,
                 method: 'GET'
             });
         }
@@ -8749,7 +8751,58 @@ class Madara {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":108,"./MadaraParser":109,"@paperback/types":61}],107:[function(require,module,exports){
+},{"./MadaraHelper":109,"./MadaraParser":110,"@paperback/types":61}],107:[function(require,module,exports){
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.extractVariableValues = exports.decryptData = void 0;
+const crypto_js_1 = __importDefault(require("crypto-js"));
+const CryptoJSFormatter = {
+    stringify: function (cipherParams) {
+        const jsonObj = {
+            ct: cipherParams.ciphertext.toString(crypto_js_1.default.enc.Base64), iv: '',
+            s: ''
+        };
+        if (cipherParams.iv) {
+            jsonObj.iv = cipherParams.iv.toString();
+        }
+        if (cipherParams.salt) {
+            jsonObj.s = cipherParams.salt.toString();
+        }
+        return JSON.stringify(jsonObj);
+    },
+    parse: function (jsonStr) {
+        const jsonObj = JSON.parse(jsonStr);
+        const cipherParams = crypto_js_1.default.lib.CipherParams.create({ ciphertext: crypto_js_1.default.enc.Base64.parse(jsonObj.ct) });
+        if (jsonObj.iv) {
+            cipherParams.iv = crypto_js_1.default.enc.Hex.parse(jsonObj.iv);
+        }
+        if (jsonObj.s) {
+            cipherParams.salt = crypto_js_1.default.enc.Hex.parse(jsonObj.s);
+        }
+        return cipherParams;
+    }
+};
+function decryptData(cipherText, key) {
+    return JSON.parse(JSON.parse(crypto_js_1.default.AES.decrypt(cipherText, key, { format: CryptoJSFormatter }).toString(crypto_js_1.default.enc.Utf8)));
+}
+exports.decryptData = decryptData;
+function extractVariableValues(chapterData) {
+    const variableRegex = /var\s+(\w+)\s*=\s*'([^']*)';/g;
+    const variables = {};
+    let match;
+    // Under no circumstances directly eval (or Function), as they might go hardy harr-harr sneaky and pull an RCE
+    while ((match = variableRegex.exec(chapterData)) !== null) {
+        const [, variableName, variableValue] = match;
+        variables[variableName] = variableValue;
+    }
+    return variables;
+}
+exports.extractVariableValues = extractVariableValues;
+
+},{"crypto-js":72}],108:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MadaraDex = exports.MadaraDexInfo = void 0;
@@ -8778,13 +8831,12 @@ class MadaraDex extends Madara_1.Madara {
         super(...arguments);
         this.baseUrl = DOMAIN;
         this.alternativeChapterAjaxEndpoint = true;
-        this.hasAdvancedSearchPage = true;
         this.searchMangaSelector = 'div.c-tabs-item > div.row';
     }
 }
 exports.MadaraDex = MadaraDex;
 
-},{"../Madara":106,"@paperback/types":61}],108:[function(require,module,exports){
+},{"../Madara":106,"@paperback/types":61}],109:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -8827,40 +8879,12 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],109:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 const entities = require("entities");
-const crypto_js_1 = __importDefault(require("crypto-js"));
-const CryptoJSFormatter = {
-    stringify: function (cipherParams) {
-        const jsonObj = { ct: cipherParams.ciphertext.toString(crypto_js_1.default.enc.Base64), iv: '',
-            s: ''
-        };
-        if (cipherParams.iv) {
-            jsonObj.iv = cipherParams.iv.toString();
-        }
-        if (cipherParams.salt) {
-            jsonObj.s = cipherParams.salt.toString();
-        }
-        return JSON.stringify(jsonObj);
-    },
-    parse: function (jsonStr) {
-        const jsonObj = JSON.parse(jsonStr);
-        const cipherParams = crypto_js_1.default.lib.CipherParams.create({ ciphertext: crypto_js_1.default.enc.Base64.parse(jsonObj.ct) });
-        if (jsonObj.iv) {
-            cipherParams.iv = crypto_js_1.default.enc.Hex.parse(jsonObj.iv);
-        }
-        if (jsonObj.s) {
-            cipherParams.salt = crypto_js_1.default.enc.Hex.parse(jsonObj.s);
-        }
-        return cipherParams;
-    }
-};
+const MadaraDecrypter_1 = require("./MadaraDecrypter");
 class Parser {
     constructor() {
         this.parseDate = (date) => {
@@ -9000,29 +9024,15 @@ class Parser {
             pages: pages
         });
     }
-    decryptData(cipherText, key) {
-        return JSON.parse(JSON.parse(crypto_js_1.default.AES.decrypt(cipherText, key, { format: CryptoJSFormatter }).toString(crypto_js_1.default.enc.Utf8)));
-    }
-    extractVariableValues(chapterData) {
-        const variableRegex = /var\s+(\w+)\s*=\s*'([^']*)';/g;
-        const variables = {};
-        let match;
-        while ((match = variableRegex.exec(chapterData)) !== null) {
-            const [, variableName, variableValue] = match;
-            variables[variableName] = variableValue;
-        }
-        return variables;
-    }
     async parseProtectedChapterDetails($, mangaId, chapterId, selector, source) {
         if (!$(selector).length) {
             return this.parseChapterDetails($, mangaId, chapterId, selector, source);
         }
-        // under no circumstances directly eval (or Function), as they might go hardy harr-harr sneaky and pull an RCE
-        const variables = this.extractVariableValues($(selector).get()[0].children[0].data);
+        const variables = (0, MadaraDecrypter_1.extractVariableValues)($(selector).get()[0].children[0].data);
         if (!('chapter_data' in variables) || !('wpmangaprotectornonce' in variables)) {
             throw new Error(`Could not parse page for postId:${mangaId} chapterId:${chapterId}. Reason: Lacks sufficient data`);
         }
-        const chapterList = this.decryptData(variables['chapter_data'], variables['wpmangaprotectornonce']);
+        const chapterList = (0, MadaraDecrypter_1.decryptData)(variables['chapter_data'], variables['wpmangaprotectornonce']);
         const pages = [];
         chapterList.forEach((page) => {
             pages.push(encodeURI(page));
@@ -9149,5 +9159,5 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"crypto-js":72,"entities":105}]},{},[107])(107)
+},{"./MadaraDecrypter":107,"entities":105}]},{},[108])(108)
 });
