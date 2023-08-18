@@ -23,7 +23,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '3.1.0'
+const BASE_VERSION = '3.1.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -238,9 +238,9 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         let url: string
         if (this.usePostIds) {
             const slugData: any = await this.convertPostIdToSlug(Number(mangaId))
-            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}${this.useListParameter ? '/?style=list' : ''}`
+            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/${this.useListParameter ? '?style=list' : ''}`
         } else {
-            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}${this.useListParameter ? '/?style=list' : ''}`
+            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/${this.useListParameter ? '?style=list' : ''}`
         }
 
         const request = App.createRequest({
