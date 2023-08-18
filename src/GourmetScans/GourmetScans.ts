@@ -1,7 +1,6 @@
 import {
     ContentRating,
     SourceInfo,
-    BadgeColor,
     SourceIntents
 } from '@paperback/types'
 
@@ -31,10 +30,6 @@ export class GourmetScans extends Madara {
     override alternativeChapterAjaxEndpoint = true
 
     override hasProtectedChapters = true
-
-    override usePostIds = false
-
-    override directoryPath = 'project'
 
     override useListParameter = false
 }
