@@ -31,7 +31,5 @@ export class KissManga extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = false
-
     override usePostIds = false
 }

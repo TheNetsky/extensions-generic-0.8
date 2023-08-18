@@ -15,8 +15,8 @@ export const ManhuaSYInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'ManhuaSY',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Community',
-    authorWebsite: '-',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
@@ -29,8 +29,6 @@ export class ManhuaSY extends Madara {
     baseUrl: string = DOMAIN
 
     override alternativeChapterAjaxEndpoint = true
-
-    override hasAdvancedSearchPage = true
 
     override hasProtectedChapters = true
 

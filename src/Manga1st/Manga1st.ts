@@ -30,6 +30,4 @@ export class Manga1st extends Madara {
     baseUrl: string = DOMAIN
 
     override alternativeChapterAjaxEndpoint = true
-
-    override hasAdvancedSearchPage = true
 }

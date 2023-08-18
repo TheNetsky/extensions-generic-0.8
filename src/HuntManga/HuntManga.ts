@@ -29,6 +29,4 @@ export class HuntManga extends Madara {
     baseUrl: string = DOMAIN
 
     override alternativeChapterAjaxEndpoint = true
-
-    override hasAdvancedSearchPage = true
 }

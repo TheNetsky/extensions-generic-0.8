@@ -39,8 +39,6 @@ export class AzoraWorld extends Madara {
     override language = '🇦🇪'
 
     override alternativeChapterAjaxEndpoint = true
-
-    override hasAdvancedSearchPage = true
-
+    
     override parser: AzoraWorldParser = new AzoraWorldParser()
 }

@@ -31,8 +31,6 @@ export class AquaManga extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
 
         let url: string

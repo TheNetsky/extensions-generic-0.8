@@ -31,7 +31,5 @@ export class ManhuaFast extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override bypassPage = `${DOMAIN}/?p`
 }

@@ -30,8 +30,6 @@ export class MangaCultivator extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override hasProtectedChapters = true
 
     override usePostIds = false

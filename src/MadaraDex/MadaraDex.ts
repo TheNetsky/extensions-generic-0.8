@@ -36,7 +36,5 @@ export class MadaraDex extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override searchMangaSelector = 'div.c-tabs-item > div.row'
 }

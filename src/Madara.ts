@@ -23,7 +23,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '3.0.5'
+const BASE_VERSION = '3.1.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -127,8 +127,9 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
     /**
      * Set to true if your source has advanced search functionality built in.
      * If this is not true, no genre tags will be shown on the homepage!
+     * See https://www.webtoon.xyz/?s=&post_type=wp-manga if they have a "advanced" option, if NOT, set this to false.
      */
-    hasAdvancedSearchPage = false
+    hasAdvancedSearchPage = true
 
     /**
      * The path used for search pagination. Used in search function.
@@ -256,8 +257,9 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
     async getSearchTags(): Promise<TagSection[]> {
         let request
         if (this.hasAdvancedSearchPage) {
+            // Adding the fake query "the" since some source revert to homepage when none is given!
             request = App.createRequest({
-                url: `${this.baseUrl}/?s=&post_type=wp-manga`,
+                url: `${this.baseUrl}/?s=the&post_type=wp-manga`,
                 method: 'GET'
             })
         } else {

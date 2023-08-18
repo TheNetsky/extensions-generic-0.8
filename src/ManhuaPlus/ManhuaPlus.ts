@@ -35,8 +35,6 @@ export class ManhuaPlus extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > p > img'
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {

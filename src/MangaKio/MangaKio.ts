@@ -31,7 +31,5 @@ export class MangaKio extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override usePostIds = false
 }

@@ -38,7 +38,5 @@ export class Manga3asq extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override parser: Manga3asqParser = new Manga3asqParser()
 }

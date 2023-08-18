@@ -35,6 +35,4 @@ export class WebtoonXYZ extends Madara {
     baseUrl: string = DOMAIN
 
     override alternativeChapterAjaxEndpoint = true
-
-    override hasAdvancedSearchPage = false
 }
