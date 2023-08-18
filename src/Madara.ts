@@ -176,6 +176,11 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
      */
     directoryPath = 'manga'
 
+    /**
+     * Some sources may redirect to the manga page instead of the chapter page if adding the parameter '?style=list'
+     */
+    useListParameter = true
+
     parser = new Parser()
 
     getMangaShareUrl(mangaId: string): string {
@@ -233,9 +238,9 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         let url: string
         if (this.usePostIds) {
             const slugData: any = await this.convertPostIdToSlug(Number(mangaId))
-            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`
+            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}${this.useListParameter ? '/?style=list' : ''}`
         } else {
-            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/?style=list`
+            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}${this.useListParameter ? '/?style=list' : ''}`
         }
 
         const request = App.createRequest({
