@@ -1,4 +1,3 @@
-
 import { MangaStreamParser } from '../MangaStreamParser'
 import { ChapterDetails } from '@paperback/types'
 
