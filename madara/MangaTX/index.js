@@ -8277,7 +8277,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '3.1.0';
+const BASE_VERSION = '3.1.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -8394,6 +8394,10 @@ class Madara {
          * When not using postIds, you need to set the directory path
          */
         this.directoryPath = 'manga';
+        /**
+         * Some sources may redirect to the manga page instead of the chapter page if adding the parameter '?style=list'
+         */
+        this.useListParameter = true;
         this.parser = new MadaraParser_1.Parser();
     }
     async getSourceMenu() {
@@ -8453,10 +8457,10 @@ class Madara {
         let url;
         if (this.usePostIds) {
             const slugData = await this.convertPostIdToSlug(Number(mangaId));
-            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`;
+            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/${this.useListParameter ? '?style=list' : ''}`;
         }
         else {
-            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/?style=list`;
+            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/${this.useListParameter ? '?style=list' : ''}`;
         }
         const request = App.createRequest({
             url: url,
