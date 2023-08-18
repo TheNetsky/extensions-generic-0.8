@@ -1,6 +1,5 @@
 
 import {
-    BadgeColor,
     ContentRating,
     SourceInfo,
     SourceIntents
@@ -10,15 +9,17 @@ import {
     getExportVersion,
     MangaStream
 } from '../MangaStream'
+import { RealmScansParser } from './RealmScansParser'
+import { Months } from '../MangaStreamInterfaces'
 
-const DOMAIN = 'https://realmscans.xyz'
+const DOMAIN = 'https://realmscans.to'
 
 export const RealmScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('1.0.2'),
     name: 'RealmScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Seyden',
-    authorWebsite: 'http://github.com/Seyden',
+    author: 'IvanMatthew',
+    authorWebsite: 'http://github.com/Ivanmatthew',
     icon: 'icon.webp',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
@@ -32,9 +33,28 @@ export class RealmScans extends MangaStream {
 
     override directoryPath = 'm050523/series'
 
+    override filterPath = 'series'
+
     override usePostIds = false
+
+    override parser: RealmScansParser = new RealmScansParser()
 
     override configureSections(): void {
         this.homescreen_sections['new_titles'].enabled = false
+    }
+
+    override dateMonths: Months = {
+        january: 'Jan',
+        february: 'Feb',
+        march: 'Mar',
+        april: 'Apr',
+        may: 'May',
+        june: 'Jun',
+        july: 'Jul',
+        august: 'Aug',
+        september: 'Sep',
+        october: 'Oct',
+        november: 'Nov',
+        december: 'Dec'
     }
 }

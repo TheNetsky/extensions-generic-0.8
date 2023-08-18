@@ -15,7 +15,6 @@ import { HomeSectionData } from './MangaStreamHelper'
 import entities = require('entities')
 
 export class MangaStreamParser {
-
     parseMangaDetails($: CheerioStatic, mangaId: string, source: any): SourceManga {
         const titles: string[] = []
         titles.push(this.decodeHTMLEntity($('h1.entry-title').text().trim()))
@@ -28,8 +27,8 @@ export class MangaStreamParser {
             titles.push(this.decodeHTMLEntity(title.trim()))
         }
 
-        const author = $(`span:contains(${source.manga_selector_author}), .fmed b:contains(${source.manga_selector_author})+span, .imptdt:contains(${source.manga_selector_author}) i`).contents().remove().last().text().trim() // Language dependant
-        const artist = $(`span:contains(${source.manga_selector_artist}), .fmed b:contains(${source.manga_selector_artist})+span, .imptdt:contains(${source.manga_selector_artist}) i`).contents().remove().last().text().trim() // Language dependant
+        const author = $(`span:contains(${source.manga_selector_author}), .fmed b:contains(${source.manga_selector_author})+span, .imptdt:contains(${source.manga_selector_author}) i, .tsinfo > div:nth-child(4) > i`).contents().remove().last().text().trim() // Language dependant
+        const artist = $(`span:contains(${source.manga_selector_artist}), .fmed b:contains(${source.manga_selector_artist})+span, .imptdt:contains(${source.manga_selector_artist}) i, .tsinfo > div:nth-child(5) > i`).contents().remove().last().text().trim() // Language dependant
         const image = this.getImageSrc($('img', 'div[itemprop="image"]'))
         const description = this.decodeHTMLEntity($('div[itemprop="description"]  p').text().trim())
 
