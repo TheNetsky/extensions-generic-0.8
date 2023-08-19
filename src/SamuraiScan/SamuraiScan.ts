@@ -12,6 +12,10 @@ import {
     Madara
 } from '../Madara'
 
+import {
+    SamuraiScanParser
+} from './SamuraiScanParser'
+
 const DOMAIN = 'https://samuraiscan.com'
 
 export const SamuraiScanInfo: SourceInfo = {
@@ -41,6 +45,8 @@ export class SamuraiScan extends Madara {
     override alternativeChapterAjaxEndpoint = true
 
     override hasAdvancedSearchPage = true
+
+    override parser: SamuraiScanParser = new SamuraiScanParser()
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
