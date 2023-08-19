@@ -142,11 +142,6 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
     directoryPath = 'manga'
 
     /**
-     * The pathname between the domain and the filter page (this is usually the same as the directory path).
-     */
-    filterPath = this.directoryPath
-
-    /**
      * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
      */
     bypassPage = ''
@@ -350,7 +345,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
     async getSearchTags(): Promise<TagSection[]> {
         const request = App.createRequest({
-            url: `${this.baseUrl}/${this.filterPath}/`,
+            url: `${this.baseUrl}/${this.directoryPath}/`,
             method: 'GET'
         })
 
