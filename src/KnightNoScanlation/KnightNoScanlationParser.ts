@@ -21,13 +21,13 @@ export class KnightNoScanlationParser extends Parser {
         for (const obj of $('div.post-content_item').toArray()) {
             switch (this.decodeHTMLEntity($('h5', obj).first().text()).trim().toUpperCase()) {
                 case 'ALTERNATIVE':
-                    titles.push($('div.summary-content', obj).text().trim())
+                    titles.push(this.decodeHTMLEntity($('div.summary-content', obj).text().trim()))
                     break
                 case 'STATUS':
                     parsedStatus = $('div.summary-content', obj).text().trim()
                     break
                 case 'SUMMARY':
-                    description = $('p', obj).first().text().trim()
+                    description = this.decodeHTMLEntity(($('p', obj).first().text().trim()))
                     break
             }
         }
