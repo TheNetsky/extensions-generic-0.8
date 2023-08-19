@@ -123,7 +123,6 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
      * which is looped over. This may be overridden if required.
      */
     searchMangaSelector = 'div.c-tabs-item__content'
-    descriptionSelector = 'div.description-summary'
 
     /**
      * Set to true if your source has advanced search functionality built in.

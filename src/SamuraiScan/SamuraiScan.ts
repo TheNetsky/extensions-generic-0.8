@@ -42,8 +42,6 @@ export class SamuraiScan extends Madara {
 
     override hasAdvancedSearchPage = true
 
-    override descriptionSelector = 'div.manga-excerpt'
-
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
             {
