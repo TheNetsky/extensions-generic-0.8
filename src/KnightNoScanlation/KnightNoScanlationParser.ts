@@ -11,21 +11,23 @@ import {
 export class KnightNoScanlationParser extends Parser {
 
     override async parseMangaDetails($: CheerioStatic, mangaId: string, source: any): Promise<SourceManga> {
+        const image: string = encodeURI(await this.getImageSrc($('div.summary_image img').first(), source))
         const titles: string[] = []
         titles.push(this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim()))
-        const description: string = this.decodeHTMLEntity($('div.post-content_item > div > p').first().text()).replace('Show more', '').trim()
-
-        const image: string = encodeURI(await this.getImageSrc($('div.summary_image img').first(), source))
 
         let parsedStatus = ''
+        let description = ''
 
         for (const obj of $('div.post-content_item').toArray()) {
-            switch (this.decodeHTMLEntity($('h5', obj).first().text()).trim()) {
-                case 'Alternative':
+            switch (this.decodeHTMLEntity($('h5', obj).first().text()).trim().toUpperCase()) {
+                case 'ALTERNATIVE':
                     titles.push($('div.summary-content', obj).text().trim())
                     break
-                case 'Status':
+                case 'STATUS':
                     parsedStatus = $('div.summary-content', obj).text().trim()
+                    break
+                case 'SUMMARY':
+                    description = $('p', obj).first().text().trim()
                     break
             }
         }
