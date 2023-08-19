@@ -9,7 +9,7 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://nightscans.org/'
+const DOMAIN = 'https://nightscans.org'
 
 export const NightScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
