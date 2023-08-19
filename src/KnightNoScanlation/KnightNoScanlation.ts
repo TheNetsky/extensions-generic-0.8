@@ -14,7 +14,7 @@ import {
     KnightNoScanlationParser
 } from './KnightNoScanlationParser'
 
-const DOMAIN = 'https://knightnoscanlation.com/'
+const DOMAIN = 'https://knightnoscanlation.com'
 
 export const KnightNoScanlationInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
