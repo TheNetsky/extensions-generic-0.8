@@ -1,4 +1,5 @@
 import {
+    SourceManga,
     Tag,
     TagSection
 } from '@paperback/types'

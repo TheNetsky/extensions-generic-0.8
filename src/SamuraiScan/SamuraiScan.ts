@@ -44,8 +44,6 @@ export class SamuraiScan extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override parser: SamuraiScanParser = new SamuraiScanParser()
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
