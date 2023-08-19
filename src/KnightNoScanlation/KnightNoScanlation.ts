@@ -23,7 +23,7 @@ export const KnightNoScanlationInfo: SourceInfo = {
     author: 'Netsky & Seitenca',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: ContentRating.EVERYONE,
+    contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
