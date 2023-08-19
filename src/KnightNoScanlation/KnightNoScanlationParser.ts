@@ -27,7 +27,7 @@ export class KnightNoScanlationParser extends Parser {
                     parsedStatus = $('div.summary-content', obj).text().trim()
                     break
                 case 'SUMMARY':
-                    description = this.decodeHTMLEntity(($('p', obj).first().text().trim()))
+                    description = this.decodeHTMLEntity($('p', obj).text().trim())
                     break
             }
         }
