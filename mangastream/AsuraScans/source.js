@@ -1438,9 +1438,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AsuraScans = exports.AsuraScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://asura.nacm.xyz';
+const DOMAIN = 'https://asuracomics.com';
 exports.AsuraScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.3'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.4'),
     name: 'AsuraScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
