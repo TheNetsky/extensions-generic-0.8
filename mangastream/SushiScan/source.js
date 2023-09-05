@@ -2275,7 +2275,7 @@ const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
 const DOMAIN = 'https://sushiscan.net';
 exports.SushiScanInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.2'),
     name: 'Sushi Scan',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'btylerh7',
@@ -2295,6 +2295,7 @@ class SushiScan extends MangaStream_1.MangaStream {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
+        this.usePostIds = false;
         this.directoryPath = 'catalogue';
         this.language = '🇫🇷';
         this.manga_tag_selector_box = 'div.seriestugenre';
