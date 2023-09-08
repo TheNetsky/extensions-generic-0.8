@@ -28,8 +28,8 @@ export class MangaStreamParser {
             titles.push(this.decodeHTMLEntity(title.trim()))
         }
 
-        const author = $(`span:contains(${source.manga_selector_author}), .fmed b:contains(${source.manga_selector_author})+span, .imptdt:contains(${source.manga_selector_author}) i`).contents().remove().last().text().trim() // Language dependant
-        const artist = $(`span:contains(${source.manga_selector_artist}), .fmed b:contains(${source.manga_selector_artist})+span, .imptdt:contains(${source.manga_selector_artist}) i`).contents().remove().last().text().trim() // Language dependant
+        const author = $(`span:contains(${source.manga_selector_author}), .fmed b:contains(${source.manga_selector_author})+span, .imptdt:contains(${source.manga_selector_author}) i, tr td:contains(${source.manga_selector_author}) + td`).contents().remove().last().text().trim() // Language dependant
+        const artist = $(`span:contains(${source.manga_selector_artist}), .fmed b:contains(${source.manga_selector_artist})+span, .imptdt:contains(${source.manga_selector_artist}) i, tr td:contains(${source.manga_selector_artist}) + td`).contents().remove().last().text().trim() // Language dependant
         const image = this.getImageSrc($('img', 'div[itemprop="image"]'))
         const description = this.decodeHTMLEntity($('div[itemprop="description"]  p').text().trim())
 
