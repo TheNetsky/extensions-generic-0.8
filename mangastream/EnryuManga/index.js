@@ -1435,47 +1435,58 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":62,"./encode.js":64,"./escape.js":65}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AsuraScans = exports.AsuraScansInfo = void 0;
+exports.EnryuManga = exports.EnryuMangaInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://asuracomics.com';
-exports.AsuraScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.4'),
-    name: 'AsuraScans',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
+const MangaStreamHelper_1 = require("../MangaStreamHelper");
+const DOMAIN = 'https://enryumanga.com';
+exports.EnryuMangaInfo = {
+    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    name: 'EnryuManga',
+    description: `Extension that pulls manga from ${DOMAIN} - A website that primarily hosts webtoons fastpass chapters`,
+    author: 'MuhamedZ1',
+    authorWebsite: 'http://github.com/MuhamedZ1',
     icon: 'icon.png',
     contentRating: types_1.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI,
     sourceTags: []
 };
-class AsuraScans extends MangaStream_1.MangaStream {
+class EnryuManga extends MangaStream_1.MangaStream {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
+        this.usePostIds = false;
     }
     configureSections() {
+        this.homescreen_sections['popular_today'].selectorFunc = ($) => $('div.bsx', $('h2:contains(Popular Today)')?.parent()?.next());
         this.homescreen_sections['new_titles'].enabled = false;
-    }
-    async getCloudflareBypassRequestAsync() {
-        // Delete cookies
-        this.requestManager?.cookieStore?.getAllCookies().forEach(x => { this.requestManager?.cookieStore?.removeCookie(x); });
-        return App.createRequest({
-            url: `${this.bypassPage || this.baseUrl}/`,
-            method: 'GET',
-            headers: {
-                'referer': `${this.baseUrl}/`,
-                'origin': `${this.baseUrl}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent()
-            }
-        });
+        this.homescreen_sections['top_alltime'].enabled = false;
+        this.homescreen_sections['top_monthly'].enabled = false;
+        this.homescreen_sections['top_weekly'].enabled = false;
+        //@ts-ignore
+        this.homescreen_sections['project_updates'] = {
+            ...MangaStreamHelper_1.DefaultHomeSectionData,
+            section: (0, MangaStreamHelper_1.createHomeSection)('project_updates', 'Project Updates', false),
+            selectorFunc: ($) => $('div.bsx', $('h2:contains(Project Update)')?.parent()?.next()),
+            titleSelectorFunc: ($, element) => $('a', element).attr('title'),
+            subtitleSelectorFunc: ($, element) => $('span.fivchap', element).first().text().trim(),
+            sortIndex: 2
+        };
+        this.homescreen_sections['latest_update'] = {
+            ...MangaStreamHelper_1.DefaultHomeSectionData,
+            section: (0, MangaStreamHelper_1.createHomeSection)('latest_update', 'Latest Update', true),
+            selectorFunc: ($) => $('div.bs.styletere.stylefiv', $('h2:contains(Latest Update)')?.parent()?.next()),
+            titleSelectorFunc: ($, element) => $('a', element).attr('title'),
+            subtitleSelectorFunc: ($, element) => $('span.fivchap', element).first().text().trim(),
+            getViewMoreItemsFunc: (page) => `${this.directoryPath}/?page=${page}&order=update`,
+            sortIndex: 3
+        };
     }
 }
-exports.AsuraScans = AsuraScans;
+exports.EnryuManga = EnryuManga;
 
-},{"../MangaStream":72,"@paperback/types":61}],71:[function(require,module,exports){
+},{"../MangaStream":72,"../MangaStreamHelper":73,"@paperback/types":61}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertDate = void 0;
