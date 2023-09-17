@@ -4,19 +4,35 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Test Current Source",
-            "request": "launch",
-            "runtimeArgs": [
-                "paperback",
-                "test",
-                "${fileBasenameNoExtension}"
-            ],
-            "runtimeExecutable": "npx",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "type": "node"
-        }
+      {
+        "name": "Test Sources",
+        "request": "launch",
+        "runtimeArgs": [
+          "run-script",
+          "test",
+          "${input:sourceId}"
+        ],
+        "runtimeExecutable": "npm",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "type": "node",
+        "presentation": {
+          "hidden": false,
+          "group": "Paperback",
+          "order": 1
+        },
+        "console": "integratedTerminal",
+        "autoAttachChildProcesses": true,
+        "internalConsoleOptions": "openOnSessionStart",
+        "trace": true,
+      }
+    ],
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "sourceId",
+        "description": "Source ID"
+      }
     ]
-}
+  }

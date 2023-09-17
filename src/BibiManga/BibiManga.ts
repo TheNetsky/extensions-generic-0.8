@@ -35,8 +35,6 @@ export class BibiManga extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override usePostIds = false
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {

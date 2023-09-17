@@ -1,7 +1,6 @@
 import {
     ContentRating,
     SourceInfo,
-    BadgeColor,
     SourceIntents
 } from '@paperback/types'
 
@@ -13,11 +12,11 @@ import {
 const DOMAIN = 'https://mangacultivator.com'
 
 export const MangaCultivatorInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'MangaCultivator',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
+    author: 'Community',
+    authorWebsite: '-',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
@@ -31,7 +30,7 @@ export class MangaCultivator extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
+    override hasProtectedChapters = true
 
     override usePostIds = false
 }

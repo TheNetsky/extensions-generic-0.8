@@ -23,7 +23,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '3.0.5'
+const BASE_VERSION = '3.1.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -127,14 +127,27 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
     /**
      * Set to true if your source has advanced search functionality built in.
      * If this is not true, no genre tags will be shown on the homepage!
+     * See https://www.webtoon.xyz/?s=&post_type=wp-manga if they have a "advanced" option, if NOT, set this to false.
      */
-    hasAdvancedSearchPage = false
+    hasAdvancedSearchPage = true
 
     /**
      * The path used for search pagination. Used in search function.
      * Eg. for https://mangabob.com/page/2/?s&post_type=wp-manga it would be 'page'
      */
     searchPagePathName = 'page'
+
+    /**
+     * Set to true if the source makes use of the manga chapter protector plugin.
+     * (https://mangabooth.com/product/wp-manga-chapter-protector/)
+     */
+    hasProtectedChapters = false
+
+    /**
+     * Some sources may in the future change how to get the chapter protector data,
+     * making it configurable, will make it way more flexible and open to customized installations of the protector plugin.
+     */
+    protectedChapterDataSelector = '#chapter-protector-data'
 
     /**
      * Some sites use the alternate URL for getting chapters through ajax
@@ -162,6 +175,11 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
      * When not using postIds, you need to set the directory path
      */
     directoryPath = 'manga'
+
+    /**
+     * Some sources may redirect to the manga page instead of the chapter page if adding the parameter '?style=list'
+     */
+    useListParameter = true
 
     parser = new Parser()
 
@@ -220,9 +238,9 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         let url: string
         if (this.usePostIds) {
             const slugData: any = await this.convertPostIdToSlug(Number(mangaId))
-            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`
+            url = `${this.baseUrl}/${slugData.path}/${slugData.slug}/${chapterId}/${this.useListParameter ? '?style=list' : ''}`
         } else {
-            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/?style=list`
+            url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/${this.useListParameter ? '?style=list' : ''}`
         }
 
         const request = App.createRequest({
@@ -234,15 +252,19 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
-        return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector, this)
+        if (this.hasProtectedChapters) {
+            return this.parser.parseProtectedChapterDetails($, mangaId, chapterId, this.protectedChapterDataSelector, this)
+        }
 
+        return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector, this)
     }
 
     async getSearchTags(): Promise<TagSection[]> {
         let request
         if (this.hasAdvancedSearchPage) {
+            // Adding the fake query "the" since some source revert to homepage when none is given!
             request = App.createRequest({
-                url: `${this.baseUrl}/?s=&post_type=wp-manga`,
+                url: `${this.baseUrl}/?s=the&post_type=wp-manga`,
                 method: 'GET'
             })
         } else {

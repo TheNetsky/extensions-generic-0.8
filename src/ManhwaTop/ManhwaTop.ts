@@ -30,6 +30,4 @@ export class ManhwaTop extends Madara {
     baseUrl: string = DOMAIN
 
     override alternativeChapterAjaxEndpoint = false
-
-    override hasAdvancedSearchPage = true
 }

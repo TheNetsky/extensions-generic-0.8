@@ -31,7 +31,5 @@ export class ZinManga extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override usePostIds = false
 }

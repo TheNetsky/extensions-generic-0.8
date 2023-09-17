@@ -40,8 +40,6 @@ export class ToonGod extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
             {
@@ -160,5 +158,5 @@ export class ToonGod extends Madara {
             metadata: mData
         })
     }
-
+    
 }

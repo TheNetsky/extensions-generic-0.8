@@ -36,7 +36,5 @@ export class Toonily extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override searchMangaSelector = 'div.page-item-detail.manga'
 }

@@ -37,6 +37,4 @@ export class NeoxScans extends Madara {
     override language = '🇵🇹'
 
     override alternativeChapterAjaxEndpoint = true
-
-    override hasAdvancedSearchPage = true
 }

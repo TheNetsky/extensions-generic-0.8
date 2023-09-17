@@ -38,8 +38,6 @@ export class MangaLek extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override bypassPage = `${DOMAIN}/?s=&post_type=wp-manga`
 
     override parser: MangaLekParser = new MangaLekParser()

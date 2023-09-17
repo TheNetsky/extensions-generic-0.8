@@ -38,7 +38,5 @@ export class ReaperScansFR extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override hasAdvancedSearchPage = true
-
     override parser: ReaperScansFRParser = new ReaperScansFRParser()
 }

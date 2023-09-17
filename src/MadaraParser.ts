@@ -9,6 +9,12 @@ import {
 
 import entities = require('entities')
 
+import {
+    extractVariableValues,
+    decryptData
+} from './MadaraDecrypter'
+
+
 export class Parser {
     async parseMangaDetails($: CheerioStatic, mangaId: string, source: any): Promise<SourceManga> {
         const title: string = this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim())
@@ -119,6 +125,30 @@ export class Parser {
             }
             pages.push(encodeURI(page))
         }
+
+        return App.createChapterDetails({
+            id: chapterId,
+            mangaId: mangaId,
+            pages: pages
+        })
+    }
+
+    async parseProtectedChapterDetails($: CheerioSelector, mangaId: string, chapterId: string, selector: string, source: any): Promise<ChapterDetails> {
+        if (!$(selector).length) {
+            return this.parseChapterDetails($, mangaId, chapterId, selector, source)
+        }
+
+        const variables = extractVariableValues($(selector).get()[0].children[0].data)
+        if (!('chapter_data' in variables) || !('wpmangaprotectornonce' in variables)) {
+            throw new Error(`Could not parse page for postId:${mangaId} chapterId:${chapterId}. Reason: Lacks sufficient data`)
+        }
+
+        const chapterList = decryptData(<string>variables['chapter_data'], <string>variables['wpmangaprotectornonce'])
+        const pages: string[] = []
+
+        chapterList.forEach((page: string) => {
+            pages.push(encodeURI(page))
+        })
 
         return App.createChapterDetails({
             id: chapterId,
