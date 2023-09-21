@@ -1474,7 +1474,7 @@ class NepNep {
         this.cheerio = cheerio;
         this.parser = new NepNepParser_1.NepNepParser();
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 0.5,
+            requestsPerSecond: 3,
             requestTimeout: 15000,
             interceptor: {
                 interceptRequest: async (request) => {
