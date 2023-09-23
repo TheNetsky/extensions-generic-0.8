@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://anigliscans.com'
+const DOMAIN = 'https://anigliscans.xyz'
 
 export const AnigliScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'AnigliScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
