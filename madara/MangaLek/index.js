@@ -9136,9 +9136,9 @@ exports.MangaLek = exports.MangaLekInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
 const MangaLekParser_1 = require("./MangaLekParser");
-const DOMAIN = 'https://mangalek.com';
+const DOMAIN = 'https://mangaleku.com';
 exports.MangaLekInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'MangaLek',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
