@@ -11,10 +11,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://asuracomics.com'
+const DOMAIN = 'https://asuracomics.gg'
 
 export const AsuraScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.4'),
+    version: getExportVersion('0.0.5'),
     name: 'AsuraScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
