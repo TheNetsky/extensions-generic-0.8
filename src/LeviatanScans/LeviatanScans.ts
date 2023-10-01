@@ -10,10 +10,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://en.leviatanscans.com'
+const DOMAIN = 'https://lscomic.com'
 
 export const LeviatanScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'LeviatanScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
