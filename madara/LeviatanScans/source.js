@@ -8276,9 +8276,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LeviatanScans = exports.LeviatanScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://en.leviatanscans.com';
+const DOMAIN = 'https://lscomic.com';
 exports.LeviatanScansInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'LeviatanScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
