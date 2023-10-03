@@ -11,17 +11,11 @@ import {
     MangaProviding,
     SearchResultsProviding,
     HomePageSectionsProviding,
-    PartialSourceManga,
     HomeSectionType
 } from '@paperback/types'
 
-import { 
-    parseChapterDetails, 
-    parseChapters, 
-    parseMangaDetails 
-} from './MangaCatalogParser';
-
-import { decodeHTMLEntity } from './MangaCatalogUtil';
+import { Parser } from './MangaCatalogParser'
+import { SourceBase, SourceBaseData } from './MangaCatalogInterface'
 
 const BASE_VERSION = '0.0.0'
 
@@ -31,27 +25,30 @@ export const getExportVersion = (EXTENSION_VERSION: string): string => {
 }
 
 export abstract class MangaCatalog implements SearchResultsProviding, MangaProviding, ChapterProviding, HomePageSectionsProviding {
-    
-    constructor(private cheerio: CheerioAPI) {}
-    
+
+    constructor(private cheerio: CheerioAPI) { }
+
     abstract baseUrl: string
-    
-    abstract sourceUrlList: string[]
-    private mangas: PartialSourceManga[] = []
 
-    mangaTitleSelector: string = "div.container > h1"
-    mangaImageSelector: string = "div.flex > img"
-    mangaDescriptionSelector: string = "div.text-text-muted"
+    abstract baseSourceList: SourceBase[]
 
-    chaptersArraySelector: string = '.bg-bg-secondary.p-3.rounded.mb-3.shadow'
-    chapterTitleSelector: string = 'a.text'
-    chapterIdSelector: string = 'a.text'
+    private sourceData: SourceBaseData[] = [] // Store the manga 
 
-    chapterImagesArraySelector: string = 'div.text-center'
-    chapterImageSelector: string = 'img'
-    chapterDateSelector: string = ''
+    mangaTitleSelector = 'div.container > h1'
+    mangaImageSelector = 'div.flex > img'
+    mangaDescriptionSelector = 'div.text-text-muted'
+
+    chaptersArraySelector = '.bg-bg-secondary.p-3.rounded.mb-3.shadow'
+    chapterTitleSelector = 'a.text'
+    chapterIdSelector = 'a.text'
+
+    chapterImagesArraySelector = 'div.text-center'
+    chapterImageSelector = 'img'
+    chapterDateSelector = ''
 
     language = '🇬🇧'
+
+    parser = new Parser()
 
     requestManager = App.createRequestManager({
         requestsPerSecond: 4,
@@ -61,7 +58,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
-                        'referer': `${this.baseUrl}/`,
+                        'referer': `${this.baseUrl}/`
                     }
                 }
                 return request
@@ -70,7 +67,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
                 return response
             }
         }
-    });
+    })
 
     getMangaShareUrl(mangaId: string): string { return `${this.baseUrl}/manga/${mangaId}` }
 
@@ -82,7 +79,8 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        return parseMangaDetails($, mangaId, this.mangaImageSelector, this.mangaTitleSelector, this.mangaDescriptionSelector)
+
+        return this.parser.parseMangaDetails($, mangaId, this)
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
@@ -93,10 +91,10 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
 
-        return parseChapters($, mangaId, this.chaptersArraySelector, this.chapterTitleSelector, this.chapterIdSelector, this.chapterDateSelector)
+        return this.parser.parseChapters($, mangaId, this)
     }
 
-   async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
+    async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = App.createRequest({
             url: `${this.baseUrl}/chapter/${chapterId}`,
             method: 'GET'
@@ -104,71 +102,87 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data as string)
-        return parseChapterDetails($, mangaId, chapterId, this.chapterImagesArraySelector, this.chapterImageSelector)
+
+        return this.parser.parseChapterDetails($, mangaId, chapterId, this)
     }
 
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-        const mainSection = App.createHomeSection({
-            id: 'main',
-            title: 'Manga',
-            containsMoreItems: false,
-            type: HomeSectionType.featured
-        })
+        await this.populateMangaList()
 
-        await this.populateMangas()
-    
+        for (const source of this.sourceData) {
+            const secion = App.createHomeSection({
+                id: source.data.title,
+                title: source.data.title,
+                containsMoreItems: true,
+                type: HomeSectionType.singleRowNormal
+            })
 
-        mainSection.items = this.mangas
-        sectionCallback(mainSection)
-    }
-    
-    async getSearchResults(query: SearchRequest, metadata: unknown): Promise<PagedResults> {
-        
-        await this.populateMangas()
-        const searchedMangas: PartialSourceManga[] = []
-
-        for(const manga of this.mangas){
-            if(manga.title.toLowerCase().includes(query?.title?.toLowerCase() ?? "")){
-                searchedMangas.push(
-                    manga
-                )
-            }
+            secion.items = [source.items]
+            sectionCallback(secion)
         }
-        return App.createPagedResults({
-            results: searchedMangas,
-            metadata
-        })
-    }
-    
-    getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
-        throw new Error('Method not implemented.');
     }
 
-    private async populateMangas(){
-        
-        if(this.mangas.length == this.sourceUrlList.length) return
-        this.mangas = []
-        for(const sourceUrl of this.sourceUrlList){
+    async getSearchResults(query: SearchRequest, metadata: unknown): Promise<PagedResults> {
+        await this.populateMangaList()
+
+        const results = this.sourceData.map(x => x.items).filter(x => {
+            const title = x.title.toLowerCase()
+            const queryTitle = (query?.title || '').toLowerCase()
+
+            return title.includes(queryTitle)
+        })
+
+        return App.createPagedResults({
+            results: results,
+            metadata: undefined
+        })
+    }
+
+    async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+        await this.populateMangaList()
+
+        return App.createPagedResults({
+            results: this.sourceData.map(x => x.items),
+            metadata: undefined
+        })
+    }
+
+    // Populat the "SourceBaseData" array
+    async populateMangaList(): Promise<SourceBaseData[]> {
+        // If the list is already populated, return list
+        if (this.sourceData.length == this.baseSourceList.length) {
+            return this.sourceData
+        }
+
+        this.sourceData = []
+
+        for (const source of this.baseSourceList) {
             const request = App.createRequest({
-                url: `${sourceUrl}`,
+                url: source.url,
                 method: 'GET'
             })
-            
+
             const response = await this.requestManager.schedule(request, 1)
             const $ = this.cheerio.load(response.data as string)
-            
-            const title: string = decodeHTMLEntity($(this.mangaTitleSelector).text().trim());
-            const image: string = $(this.mangaImageSelector).attr('src') ?? ""
-            const id: string = sourceUrl.split('/')[4] ?? ""
 
-            if(!(!title || !image || !id)){
-                this.mangas.push(App.createPartialSourceManga({
+            const title: string = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim())
+            const image: string = $(this.mangaImageSelector).attr('src') ?? ''
+            const id: string = source.url.split('/')[4] ?? ''
+
+            if (!id || !title) {
+                continue
+            }
+
+            this.sourceData.push({
+                data: source,
+                items: App.createPartialSourceManga({
                     image: image,
                     title: title,
-                    mangaId: id,
-                }))
-            }
+                    mangaId: id
+                })
+            })
         }
-        
+
+        return this.sourceData
     }
 }

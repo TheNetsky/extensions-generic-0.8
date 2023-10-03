@@ -1,72 +1,96 @@
 import {
     Chapter,
     ChapterDetails,
-    SourceManga} from '@paperback/types'
+    SourceManga
+} from '@paperback/types'
 
-import { decodeHTMLEntity } from './MangaCatalogUtil';
+import entities = require('entities')
 
+export class Parser {
 
-export const parseMangaDetails = ($: CheerioStatic, mangaId: string, mangaImageSelector: string, mangaTitleSelector: string, mangaDescriptionSelector: string): SourceManga => {
-    const image = $(mangaImageSelector).attr('src') ?? ""
-    const title = decodeHTMLEntity($(mangaTitleSelector).text().trim());
-    const description = decodeHTMLEntity($(mangaDescriptionSelector).text().trim());
-    return App.createSourceManga({
-        id: mangaId,
-        mangaInfo: App.createMangaInfo({
-            titles: [title],
-            image: image,
-            status: "",
-            desc: description
+    parseMangaDetails = ($: CheerioStatic, mangaId: string, source: any): SourceManga => {
+        const image = $(source.mangaImageSelector).attr('src') ?? ''
+        const title = this.decodeHTMLEntity($(source.mangaTitleSelector).text().trim())
+        const description = this.decodeHTMLEntity($(source.mangaDescriptionSelector).text().trim())
+
+        return App.createSourceManga({
+            id: mangaId,
+            mangaInfo: App.createMangaInfo({
+                titles: [title],
+                image: image,
+                status: 'Ongoing',
+                desc: description
+            })
         })
-    })
-}
+    }
 
-export const parseChapters = ($: CheerioStatic, mangaId: string, chaptersArraySelector: string, chapterTitleSelector: string, chapterIdSelector: string, chapterDateSelector: string): Chapter[] => {
+    parseChapters = ($: CheerioStatic, mangaId: string, source: any): Chapter[] => {
+        const chapters: Chapter[] = []
+        let sortingIndex = 0
 
-    const chapters: Chapter[] = []
-    for(const chapter of $(chaptersArraySelector).toArray()){
-        const title: string = $(chapterTitleSelector, chapter).text()
-        const chapterId: string = $(chapterIdSelector, chapter).attr('href').split('/')[4]
-        const chapNumRegex = chapterId.match(/(\d+\.?\d?)+/)
-        const dateTimeStamps = Date.parse($(chapterDateSelector, chapter).text().trim())
-        let date = new Date()
-        if(!isNaN(dateTimeStamps)){
-            date = new Date(dateTimeStamps)
+        for (const chapter of $(source.chaptersArraySelector).toArray()) {
+            const title: string = $(source.chapterTitleSelector, chapter).text()
+            const id: string = $(source.chapterIdSelector, chapter).attr('href')?.split('/')[4] ?? ''
+
+            const chapNumRegex = id.match(/(\d+\.?\d?)+/)
+
+            let chapNum = 0
+            if (chapNumRegex && chapNumRegex[1]) chapNum = Number(chapNumRegex[1])
+
+            let date = new Date()
+            const dateTimeStamps = Date.parse($(source.chapterDateSelector, chapter).text().trim())
+
+            if (!isNaN(dateTimeStamps)) {
+                date = new Date(dateTimeStamps)
+            }
+
+            if (!id || typeof id === 'undefined') {
+                throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`)
+            }
+
+            chapters.push({
+                id: id,
+                langCode: source.language,
+                chapNum: chapNum,
+                name: title,
+                time: date,
+                sortingIndex,
+                volume: 0,
+                group: ''
+            })
+            sortingIndex--
         }
-        let chapNum = 0
-        if (chapNumRegex && chapNumRegex[1]) chapNum = Number(chapNumRegex[1])
 
-        chapters.push(
-            App.createChapter({
-            id: chapterId,
-            name: title,
-            time: date,
-            langCode: '🇬🇧',
-            chapNum: chapNum,
-        }))
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`)
+        }
+
+        return chapters.map(chapter => {
+            chapter.sortingIndex += chapters.length
+            return App.createChapter(chapter)
+        })
     }
 
-    if (chapters.length == 0) {
-        throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`)
-    }
-
-    return chapters
-}
-
-export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string, chapterImagesArraySelector: string, chapterImageSelector: string): ChapterDetails => {
+    parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string, source: any): ChapterDetails => {
         const pages: string[] = []
-    
-        for (const img of $(chapterImageSelector, chapterImagesArraySelector).toArray()) {
+
+        for (const img of $(source.chapterImageSelector, source.chapterImagesArraySelector).toArray()) {
             const image = img.attribs['src']
             if (!image) continue
             pages.push(image)
         }
-    
+
         const chapterDetails = App.createChapterDetails({
             id: chapterId,
             mangaId: mangaId,
             pages: pages
         })
-    
+
         return chapterDetails
+    }
+
+    // UTILITY METHODS
+    decodeHTMLEntity(str: string): string {
+        return entities.decodeHTML(str)
+    }
 }
