@@ -1,5 +1,5 @@
-import * as he from 'he';
+import * as entities from 'entities';
 
 export const decodeHTMLEntity = (str: string): string => {
-    return he.decode(str);
+    return entities.decode(str);
 };
