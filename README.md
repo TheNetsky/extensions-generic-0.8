@@ -12,4 +12,4 @@ Join the [Discord](https://discord.gg/rmf6jQpMU9) for support and more sources!
 | BuddyComplex      | BuddyComplex Generic      | [Click me!](https://thenetsky.github.io/extensions-generic-0.8/buddycomplex/)    |
 | MangaBox      | MangaBox Generic      | [Click me!](https://thenetsky.github.io/extensions-generic-0.8/mangabox/)    |
 | NepNep      | NepNep Generic      | [Click me!](https://thenetsky.github.io/extensions-generic-0.8/nepnep/)    |
-
+| MangaCatalog      | MangaCatalog Generic      | [Click me!](https://thenetsky.github.io/extensions-generic-0.8/mangacatalog/)    |
