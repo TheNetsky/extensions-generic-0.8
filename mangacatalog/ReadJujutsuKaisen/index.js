@@ -1438,7 +1438,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaCatalog = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MangaCatalogParser_1 = require("./MangaCatalogParser");
-const BASE_VERSION = '0.0.0';
+const BASE_VERSION = '1.0.0';
 const getExportVersion = (EXTENSION_VERSION) => {
     // Thanks to https://github.com/TheNetsky/
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
@@ -1460,7 +1460,7 @@ class MangaCatalog {
         this.language = '🇬🇧';
         this.parser = new MangaCatalogParser_1.Parser();
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 4,
+            requestsPerSecond: 5,
             requestTimeout: 20000,
             interceptor: {
                 interceptRequest: async (request) => {
@@ -1538,35 +1538,40 @@ class MangaCatalog {
             metadata: undefined
         });
     }
-    // Populat the "SourceBaseData" array
+    // Populate the "SourceBaseData" array
     async populateMangaList() {
         // If the list is already populated, return list
         if (this.sourceData.length == this.baseSourceList.length) {
             return this.sourceData;
         }
-        this.sourceData = [];
+        const fetchPromises = [];
         for (const source of this.baseSourceList) {
             const request = App.createRequest({
                 url: source.url,
                 method: 'GET'
             });
-            const response = await this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            const title = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim());
-            const image = $(this.mangaImageSelector).attr('src') ?? '';
-            const id = source.url.split('/')[4] ?? '';
-            if (!id || !title) {
-                continue;
-            }
-            this.sourceData.push({
-                data: source,
-                items: App.createPartialSourceManga({
-                    image: image,
-                    title: title,
-                    mangaId: id
-                })
+            const fetchPromise = this.requestManager.schedule(request, 1)
+                .then(response => {
+                const $ = this.cheerio.load(response.data);
+                const title = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim());
+                const image = $(this.mangaImageSelector).attr('src') || '';
+                const id = source.url.split('/')[4] || '';
+                if (id && title) {
+                    this.sourceData.push({
+                        data: source,
+                        items: App.createPartialSourceManga({
+                            image: image,
+                            title: title,
+                            mangaId: id
+                        })
+                    });
+                }
+            }).catch(error => {
+                throw new Error(error);
             });
+            fetchPromises.push(fetchPromise);
         }
+        await Promise.all(fetchPromises);
         return this.sourceData;
     }
 }
