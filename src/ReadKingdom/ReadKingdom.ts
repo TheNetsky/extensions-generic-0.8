@@ -17,7 +17,7 @@ export const ReadKingdomInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'ReadKingdom',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'EmZedace',
+    author: 'EmZedH',
     authorWebsite: 'http://github.com/EmZedH',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
