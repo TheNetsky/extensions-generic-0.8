@@ -17,7 +17,7 @@ import {
 import { Parser } from './MangaCatalogParser'
 import { SourceBase, SourceBaseData } from './MangaCatalogInterface'
 
-const BASE_VERSION = '0.0.0'
+const BASE_VERSION = '1.0.0'
 
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     // Thanks to https://github.com/TheNetsky/
@@ -51,7 +51,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
     parser = new Parser()
 
     requestManager = App.createRequestManager({
-        requestsPerSecond: 4,
+        requestsPerSecond: 5,
         requestTimeout: 20000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
@@ -147,14 +147,14 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
         })
     }
 
-    // Populat the "SourceBaseData" array
+    // Populate the "SourceBaseData" array
     async populateMangaList(): Promise<SourceBaseData[]> {
         // If the list is already populated, return list
         if (this.sourceData.length == this.baseSourceList.length) {
             return this.sourceData
         }
 
-        this.sourceData = []
+        const fetchPromises: Promise<void>[] = []
 
         for (const source of this.baseSourceList) {
             const request = App.createRequest({
@@ -162,26 +162,31 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
                 method: 'GET'
             })
 
-            const response = await this.requestManager.schedule(request, 1)
-            const $ = this.cheerio.load(response.data as string)
+            const fetchPromise = this.requestManager.schedule(request, 1)
+                .then(response => {
+                    const $ = this.cheerio.load(response.data as string)
+                    const title: string = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim())
+                    const image: string = $(this.mangaImageSelector).attr('src') || ''
+                    const id: string = source.url.split('/')[4] || ''
 
-            const title: string = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim())
-            const image: string = $(this.mangaImageSelector).attr('src') ?? ''
-            const id: string = source.url.split('/')[4] ?? ''
-
-            if (!id || !title) {
-                continue
-            }
-
-            this.sourceData.push({
-                data: source,
-                items: App.createPartialSourceManga({
-                    image: image,
-                    title: title,
-                    mangaId: id
+                    if (id && title) {
+                        this.sourceData.push({
+                            data: source,
+                            items: App.createPartialSourceManga({
+                                image: image,
+                                title: title,
+                                mangaId: id
+                            })
+                        })
+                    }
+                }).catch(error => {
+                    throw new Error(error)
                 })
-            })
+
+            fetchPromises.push(fetchPromise)
         }
+
+        await Promise.all(fetchPromises)
 
         return this.sourceData
     }
