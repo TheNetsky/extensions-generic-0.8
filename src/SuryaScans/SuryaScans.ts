@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://suryascans.com'
+const DOMAIN = 'https://suryareader.com'
 
 export const SuryaScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'SuryaScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
