@@ -9,7 +9,7 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://mangacultivator.com'
+const DOMAIN = 'https://mangacult.org'
 
 export const MangaCultivatorInfo: SourceInfo = {
     version: getExportVersion('0.0.1'),
