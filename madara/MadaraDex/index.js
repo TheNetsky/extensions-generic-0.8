@@ -8277,7 +8277,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '3.1.1';
+const BASE_VERSION = '3.1.2';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -9015,7 +9015,7 @@ class Parser {
     }
     async parseChapterDetails($, mangaId, chapterId, selector, source) {
         const pages = [];
-        for (const obj of $(selector).toArray()) {
+        for (const obj of $(selector).get()) {
             const page = await this.getImageSrc($(obj), source);
             if (!page) {
                 throw new Error(`Could not parse page for postId:${mangaId} chapterId:${chapterId}`);
@@ -9113,19 +9113,19 @@ class Parser {
     }
     async getImageSrc(imageObj, source) {
         let image;
-        if ((typeof imageObj?.attr('data-src')) != 'undefined') {
+        if ((typeof imageObj?.attr('data-src')) != 'undefined' && imageObj?.attr('data-src') != '') {
             image = imageObj?.attr('data-src');
         }
-        else if ((typeof imageObj?.attr('data-lazy-src')) != 'undefined') {
+        else if ((typeof imageObj?.attr('data-lazy-src')) != 'undefined' && imageObj?.attr('data-lazy-src') != '') {
             image = imageObj?.attr('data-lazy-src');
         }
-        else if ((typeof imageObj?.attr('srcset')) != 'undefined') {
+        else if ((typeof imageObj?.attr('srcset')) != 'undefined' && imageObj?.attr('srcset') != '') {
             image = imageObj?.attr('srcset')?.split(' ')[0] ?? '';
         }
-        else if ((typeof imageObj?.attr('src')) != 'undefined') {
+        else if ((typeof imageObj?.attr('src')) != 'undefined' && imageObj?.attr('src') != '') {
             image = imageObj?.attr('src');
         }
-        else if ((typeof imageObj?.attr('data-cfsrc')) != 'undefined') {
+        else if ((typeof imageObj?.attr('data-cfsrc')) != 'undefined' && imageObj?.attr('data-cfsrc') != '') {
             image = imageObj?.attr('data-cfsrc');
         }
         else {
