@@ -12,7 +12,7 @@ import {
 const DOMAIN = 'https://mangacult.org'
 
 export const MangaCultivatorInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'MangaCultivator',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Community',
@@ -32,5 +32,5 @@ export class MangaCultivator extends Madara {
 
     override hasProtectedChapters = true
 
-    override usePostIds = false
+    override usePostIds = true
 }

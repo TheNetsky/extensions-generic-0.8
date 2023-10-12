@@ -17,7 +17,7 @@ import {
 const DOMAIN = 'https://bibimanga.com'
 
 export const BibiMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'BibiManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -41,7 +41,7 @@ export class BibiManga extends Madara {
         const sections = [
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/manga/?m_orderby=latest`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=latest`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -53,7 +53,7 @@ export class BibiManga extends Madara {
             },
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/manga/?m_orderby=views`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=views`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -65,7 +65,7 @@ export class BibiManga extends Madara {
             },
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/manga/?m_orderby=new-manga`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=new-manga`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -124,7 +124,7 @@ export class BibiManga extends Madara {
         }
 
         const request = App.createRequest({
-            url: `${this.baseUrl}/manga/page/${page}/?${param}`,
+            url: `${this.baseUrl}/${this.directoryPath}/page/${page}/?${param}`,
             method: 'GET'
         })
 

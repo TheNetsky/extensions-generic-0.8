@@ -65,7 +65,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
                 return response
             }
         }
-    });
+    })
 
 
     stateManager = App.createSourceStateManager()

@@ -17,7 +17,7 @@ import {
 const DOMAIN = 'https://manhuaplus.com'
 
 export const ManhuaPlusInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'ManhuaPlus',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -41,7 +41,7 @@ export class ManhuaPlus extends Madara {
         const sections = [
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/manga/?m_orderby=latest`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=latest`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -53,7 +53,7 @@ export class ManhuaPlus extends Madara {
             },
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/manga/?m_orderby=trending`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=trending`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -65,7 +65,7 @@ export class ManhuaPlus extends Madara {
             },
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/manga/?m_orderby=views`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=views`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -77,7 +77,7 @@ export class ManhuaPlus extends Madara {
             },
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/manga/?m_orderby=new-manga`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=new-manga`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -136,7 +136,7 @@ export class ManhuaPlus extends Madara {
         }
 
         const request = App.createRequest({
-            url: `${this.baseUrl}/manga/page/${page}/?${param}`,
+            url: `${this.baseUrl}/${this.directoryPath}/page/${page}/?${param}`,
             method: 'GET'
         })
 
