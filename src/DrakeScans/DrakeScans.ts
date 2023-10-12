@@ -10,11 +10,11 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://lscomic.com'
+const DOMAIN = 'https://drakescans.com'
 
-export const LSComicInfo: SourceInfo = {
+export const DrakeScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'LSComic',
+    name: 'DrakeScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -25,7 +25,7 @@ export const LSComicInfo: SourceInfo = {
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI
 }
 
-export class LSComic extends Madara {
+export class DrakeScans extends Madara {
 
     baseUrl: string = DOMAIN
 
