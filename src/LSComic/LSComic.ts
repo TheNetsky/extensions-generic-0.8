@@ -12,9 +12,9 @@ import {
 
 const DOMAIN = 'https://lscomic.com'
 
-export const LeviatanScansInfo: SourceInfo = {
+export const LSComicInfo: SourceInfo = {
     version: getExportVersion('0.0.1'),
-    name: 'LeviatanScans',
+    name: 'LSComic',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -25,7 +25,7 @@ export const LeviatanScansInfo: SourceInfo = {
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI
 }
 
-export class LeviatanScans extends Madara {
+export class LLSComic extends Madara {
 
     baseUrl: string = DOMAIN
 
