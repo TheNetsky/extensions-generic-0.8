@@ -118,7 +118,7 @@ export class Parser {
     async parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string, selector: string, source: any): Promise<ChapterDetails> {
         const pages: string[] = []
 
-        for (const obj of $(selector).toArray()) {
+        for (const obj of $(selector).get()) {
             const page = await this.getImageSrc($(obj), source)
             if (!page) {
                 throw new Error(`Could not parse page for postId:${mangaId} chapterId:${chapterId}`)
@@ -234,19 +234,19 @@ export class Parser {
 
     async getImageSrc(imageObj: Cheerio | undefined, source: any): Promise<string> {
         let image: string | undefined
-        if ((typeof imageObj?.attr('data-src')) != 'undefined') {
+        if ((typeof imageObj?.attr('data-src')) != 'undefined' && imageObj?.attr('data-src') != '') {
             image = imageObj?.attr('data-src')
         }
-        else if ((typeof imageObj?.attr('data-lazy-src')) != 'undefined') {
+        else if ((typeof imageObj?.attr('data-lazy-src')) != 'undefined' && imageObj?.attr('data-lazy-src') != '') {
             image = imageObj?.attr('data-lazy-src')
         }
-        else if ((typeof imageObj?.attr('srcset')) != 'undefined') {
+        else if ((typeof imageObj?.attr('srcset')) != 'undefined' && imageObj?.attr('srcset') != '') {
             image = imageObj?.attr('srcset')?.split(' ')[0] ?? ''
         }
-        else if ((typeof imageObj?.attr('src')) != 'undefined') {
+        else if ((typeof imageObj?.attr('src')) != 'undefined' && imageObj?.attr('src') != '') {
             image = imageObj?.attr('src')
         }
-        else if ((typeof imageObj?.attr('data-cfsrc')) != 'undefined') {
+        else if ((typeof imageObj?.attr('data-cfsrc')) != 'undefined' && imageObj?.attr('data-cfsrc') != '') {
             image = imageObj?.attr('data-cfsrc')
         } else {
             image = ''
