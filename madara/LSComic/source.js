@@ -8273,6 +8273,34 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":98,"./encode.js":100,"./escape.js":101}],106:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.LSComic = exports.LSComicInfo = void 0;
+const types_1 = require("@paperback/types");
+const Madara_1 = require("../Madara");
+const DOMAIN = 'https://lscomic.com';
+exports.LSComicInfo = {
+    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    name: 'LSComic',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: types_1.ContentRating.EVERYONE,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [],
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
+};
+class LSComic extends Madara_1.Madara {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+        this.alternativeChapterAjaxEndpoint = true;
+    }
+}
+exports.LSComic = LSComic;
+
+},{"../Madara":107,"@paperback/types":61}],107:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MadaraParser_1 = require("./MadaraParser");
@@ -8755,7 +8783,7 @@ class Madara {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":108,"./MadaraParser":109,"@paperback/types":61}],107:[function(require,module,exports){
+},{"./MadaraHelper":109,"./MadaraParser":110,"@paperback/types":61}],108:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -8806,7 +8834,7 @@ function extractVariableValues(chapterData) {
 }
 exports.extractVariableValues = extractVariableValues;
 
-},{"crypto-js":72}],108:[function(require,module,exports){
+},{"crypto-js":72}],109:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -8849,7 +8877,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],109:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -9129,33 +9157,5 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"./MadaraDecrypter":107,"entities":105}],110:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Manga1st = exports.Manga1stInfo = void 0;
-const types_1 = require("@paperback/types");
-const Madara_1 = require("../Madara");
-const DOMAIN = 'https://manga1st.online';
-exports.Manga1stInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
-    name: 'Manga1st',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: types_1.ContentRating.ADULT,
-    websiteBaseURL: DOMAIN,
-    sourceTags: [],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
-};
-class Manga1st extends Madara_1.Madara {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-        this.alternativeChapterAjaxEndpoint = true;
-    }
-}
-exports.Manga1st = Manga1st;
-
-},{"../Madara":106,"@paperback/types":61}]},{},[110])(110)
+},{"./MadaraDecrypter":108,"entities":105}]},{},[106])(106)
 });

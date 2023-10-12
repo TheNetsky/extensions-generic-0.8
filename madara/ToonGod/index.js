@@ -9137,7 +9137,7 @@ const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://www.toongod.org';
 exports.ToonGodInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.1'),
+    version: (0, Madara_1.getExportVersion)('0.0.2'),
     name: 'ToonGod',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -9157,13 +9157,14 @@ class ToonGod extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
+        this.directoryPath = 'webtoons';
         this.alternativeChapterAjaxEndpoint = true;
     }
     async getHomePageSections(sectionCallback) {
         const sections = [
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/webtoons?m_orderby=latest`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=latest`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -9175,7 +9176,7 @@ class ToonGod extends Madara_1.Madara {
             },
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/webtoons?m_orderby=trending`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=trending`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -9187,7 +9188,7 @@ class ToonGod extends Madara_1.Madara {
             },
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/webtoons?m_orderby=views`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=views`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -9199,7 +9200,7 @@ class ToonGod extends Madara_1.Madara {
             },
             {
                 request: App.createRequest({
-                    url: `${this.baseUrl}/webtoons?m_orderby=new-manga`,
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=new-manga`,
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
@@ -9249,7 +9250,7 @@ class ToonGod extends Madara_1.Madara {
                 throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
         }
         const request = App.createRequest({
-            url: `${this.baseUrl}/webtoons/page/${page}/?${param}`,
+            url: `${this.baseUrl}/${this.directoryPath}/page/${page}/?${param}`,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);

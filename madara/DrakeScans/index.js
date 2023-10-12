@@ -8273,13 +8273,13 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":98,"./encode.js":100,"./escape.js":101}],106:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LeviatanScans = exports.LeviatanScansInfo = void 0;
+exports.DrakeScans = exports.DrakeScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://lscomic.com';
-exports.LeviatanScansInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.1'),
-    name: 'LeviatanScans',
+const DOMAIN = 'https://drakescans.com';
+exports.DrakeScansInfo = {
+    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    name: 'DrakeScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -8289,14 +8289,14 @@ exports.LeviatanScansInfo = {
     sourceTags: [],
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
 };
-class LeviatanScans extends Madara_1.Madara {
+class DrakeScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
         this.alternativeChapterAjaxEndpoint = true;
     }
 }
-exports.LeviatanScans = LeviatanScans;
+exports.DrakeScans = DrakeScans;
 
 },{"../Madara":107,"@paperback/types":61}],107:[function(require,module,exports){
 "use strict";

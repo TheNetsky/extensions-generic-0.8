@@ -8279,7 +8279,7 @@ const Madara_1 = require("../Madara");
 const AzoraWorldParser_1 = require("./AzoraWorldParser");
 const DOMAIN = 'https://azoranov.com';
 exports.AzoraWorldInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'AzoraWorld',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -8300,8 +8300,116 @@ class AzoraWorld extends Madara_1.Madara {
         super(...arguments);
         this.baseUrl = DOMAIN;
         this.language = '🇦🇪';
+        this.directoryPath = 'series';
+        this.hasProtectedChapters = true;
         this.alternativeChapterAjaxEndpoint = true;
         this.parser = new AzoraWorldParser_1.AzoraWorldParser();
+    }
+    async getHomePageSections(sectionCallback) {
+        const sections = [
+            {
+                request: App.createRequest({
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=latest`,
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: '0',
+                    title: 'Recently Updated',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: App.createRequest({
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=trending`,
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: '1',
+                    title: 'Currently Trending',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: App.createRequest({
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=views`,
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: '2',
+                    title: 'Most Popular',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: App.createRequest({
+                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=new-manga`,
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: '3',
+                    title: 'New Manga',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            }
+        ];
+        const promises = [];
+        for (const section of sections) {
+            // Let the app load empty sections
+            sectionCallback(section.section);
+            // Get the section data
+            promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
+                this.checkResponseError(response);
+                const $ = this.cheerio.load(response.data);
+                section.section.items = await this.parser.parseHomeSection($, this);
+                sectionCallback(section.section);
+            }));
+        }
+        // Make sure the function completes
+        await Promise.all(promises);
+    }
+    async getViewMoreItems(homepageSectionId, metadata) {
+        const page = metadata?.page ?? 1;
+        let param;
+        switch (homepageSectionId) {
+            case '0': {
+                param = 'm_orderby=latest';
+                break;
+            }
+            case '1': {
+                param = 'm_orderby=trending';
+                break;
+            }
+            case '2': {
+                param = 'm_orderby=views';
+                break;
+            }
+            case '3': {
+                param = 'm_orderby=new-manga';
+                break;
+            }
+            default:
+                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
+        }
+        const request = App.createRequest({
+            url: `${this.baseUrl}/${this.directoryPath}/page/${page}/?${param}`,
+            method: 'GET'
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
+        const $ = this.cheerio.load(response.data);
+        const items = await this.parser.parseHomeSection($, this);
+        let mData = { page: (page + 1) };
+        if (!$('a.last')) {
+            mData = undefined;
+        }
+        return App.createPagedResults({
+            results: items,
+            metadata: mData
+        });
     }
 }
 exports.AzoraWorld = AzoraWorld;
