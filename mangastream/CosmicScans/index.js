@@ -1438,9 +1438,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CosmicScans = exports.CosmicScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://cosmicscans.com';
+const DOMAIN = 'https://cosmic-scans.com';
 exports.CosmicScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'CosmicScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
