@@ -1438,9 +1438,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FlameScans = exports.FlameScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://flamescans.org';
+const DOMAIN = 'https://flamecomics.com';
 exports.FlameScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'FlameScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
