@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://flamescans.org'
+const DOMAIN = 'https://flamecomics.com'
 
 export const FlameScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'FlameScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
