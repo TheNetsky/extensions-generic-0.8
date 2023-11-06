@@ -1435,13 +1435,13 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":62,"./encode.js":64,"./escape.js":65}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FlameScans = exports.FlameScansInfo = void 0;
+exports.FlameComics = exports.FlameComicsInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
 const DOMAIN = 'https://flamecomics.com';
-exports.FlameScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
-    name: 'FlameScans',
+exports.FlameComicsInfo = {
+    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    name: 'FlameComics',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -1451,7 +1451,7 @@ exports.FlameScansInfo = {
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI,
     sourceTags: []
 };
-class FlameScans extends MangaStream_1.MangaStream {
+class FlameComics extends MangaStream_1.MangaStream {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
@@ -1466,7 +1466,7 @@ class FlameScans extends MangaStream_1.MangaStream {
         this.homescreen_sections['latest_update'].subtitleSelectorFunc = ($, element) => $('div.epxs', element).text().trim();
     }
 }
-exports.FlameScans = FlameScans;
+exports.FlameComics = FlameComics;
 
 },{"../MangaStream":72,"@paperback/types":61}],71:[function(require,module,exports){
 "use strict";
