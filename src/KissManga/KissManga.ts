@@ -10,10 +10,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://1stkissmanga.me'
+const DOMAIN = 'https://1st-kissmanga.net'
 
 export const KissMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'KissManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -31,5 +31,5 @@ export class KissManga extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override usePostIds = false
+    override usePostIds = true
 }
