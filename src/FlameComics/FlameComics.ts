@@ -12,9 +12,9 @@ import {
 
 const DOMAIN = 'https://flamecomics.com'
 
-export const FlameScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
-    name: 'FlameScans',
+export const FlameComicsInfo: SourceInfo = {
+    version: getExportVersion('0.0.0'),
+    name: 'FlameComics',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -25,7 +25,7 @@ export const FlameScansInfo: SourceInfo = {
     sourceTags: []
 }
 
-export class FlameScans extends MangaStream {
+export class FlameComics extends MangaStream {
 
     baseUrl: string = DOMAIN
 
