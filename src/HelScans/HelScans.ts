@@ -5,7 +5,7 @@ import { getExportVersion, MangaStream } from "../MangaStream";
 const DOMAIN = "https://helscans.com";
 
 export const HelScansInfo: SourceInfo = {
-	version: getExportVersion("0.0.6"),
+	version: getExportVersion("0.0.0"),
 	name: "HelScans",
 	description: `Extension that pulls manga from ${DOMAIN}`,
 	author: "Netsky",
@@ -18,26 +18,9 @@ export const HelScansInfo: SourceInfo = {
 };
 
 export class HelScans extends MangaStream {
-	baseUrl: string = DOMAIN;
+	baseUrl: string = DOMAIN
 
 	override configureSections(): void {
 		this.homescreen_sections["new_titles"].enabled = false;
-	}
-
-	override async getCloudflareBypassRequestAsync(): Promise<Request> {
-		// Delete cookies
-		this.requestManager?.cookieStore?.getAllCookies().forEach((x) => {
-			this.requestManager?.cookieStore?.removeCookie(x);
-		});
-
-		return App.createRequest({
-			url: `${this.bypassPage || this.baseUrl}/`,
-			method: "GET",
-			headers: {
-				referer: `${this.baseUrl}/`,
-				origin: `${this.baseUrl}/`,
-				"user-agent": await this.requestManager.getDefaultUserAgent(),
-			},
-		});
 	}
 }
