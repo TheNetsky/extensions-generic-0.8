@@ -4,7 +4,7 @@ import {
 
 export class MangaReadOrgParser extends Parser {
 
-    parseDate = (date: string): Date => {
+    override parseDate = (date: string): Date => {
         date = date.toUpperCase()
         let time: Date
         const number = Number((/\d*/.exec(date) ?? [])[0])
@@ -26,11 +26,13 @@ export class MangaReadOrgParser extends Parser {
             time = new Date(Date.now() - (number * 60000))
         } else if (date.includes('SECOND') || date.includes('SECONDS')) {
             time = new Date(Date.now() - (number * 1000))
-        } else if (date.includes('.')){
+        } else if (date.includes('.')) {
             const dateParts = date.split('.')
-            const year = parseInt(dateParts[2])
-            const month = parseInt(dateParts[1]) - 1
-            const day = parseInt(dateParts[0])
+
+            const year = parseInt(dateParts[2] as string)
+            const month = parseInt(dateParts[1] as string) - 1
+            const day = parseInt(dateParts[0] as string)
+            
             time = new Date(year, month, day)
         } else {
             time = new Date(date)

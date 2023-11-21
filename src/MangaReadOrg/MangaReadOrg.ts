@@ -9,13 +9,13 @@ import {
     Madara
 } from '../Madara'
 
-import { 
+import {
     MangaReadOrgParser
- } from './MangaReadOrgParser'
+} from './MangaReadOrgParser'
 
 const DOMAIN = 'https://www.mangaread.org'
 
-export const MangaReadOrgInfo : SourceInfo = {
+export const MangaReadOrgInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'MangaReadOrg',
     description: `Extension that pulls manga from ${DOMAIN}`,
@@ -34,5 +34,5 @@ export class MangaReadOrg extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override parser: MangaLekParser = new MangaReadOrgParser()
+    override parser: MangaReadOrgParser = new MangaReadOrgParser()
 }
