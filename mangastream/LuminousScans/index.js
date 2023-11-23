@@ -1461,9 +1461,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LuminousScans = exports.LuminousScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://luminousscans.com';
+const DOMAIN = 'https://luminousscans.net';
 exports.LuminousScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'LuminousScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'yehru',
@@ -2122,7 +2122,7 @@ class MangaStreamParser {
                 throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`);
             }
             chapters.push({
-                id: id,
+                id: id, // Store chapterNumber as id
                 langCode: language,
                 chapNum: chapterNumber,
                 name: title,
