@@ -1665,9 +1665,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadJujutsuKaisen = exports.ReadJujutsuKaisenInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaCatalog_1 = require("../MangaCatalog");
-const DOMAIN = 'https://ww2.readjujutsukaisen.com';
+const DOMAIN = 'https://ww3.readjujutsukaisen.com/';
 exports.ReadJujutsuKaisenInfo = {
-    version: (0, MangaCatalog_1.getExportVersion)('0.0.0'),
+    version: (0, MangaCatalog_1.getExportVersion)('0.0.1'),
     name: 'ReadJujutsuKaisen',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'EmZedH',
