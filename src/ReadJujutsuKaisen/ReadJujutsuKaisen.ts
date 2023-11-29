@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww3.readjujutsukaisen.com/'
+const DOMAIN = 'https://ww3.readjujutsukaisen.com'
 
 export const ReadJujutsuKaisenInfo: SourceInfo = {
     version: getExportVersion('0.0.1'),
