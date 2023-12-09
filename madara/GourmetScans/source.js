@@ -8761,9 +8761,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GourmetScans = exports.GourmetScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://gourmetscans.net';
+const DOMAIN = 'https://gourmetsupremacy.com';
 exports.GourmetScansInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'GourmetScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
