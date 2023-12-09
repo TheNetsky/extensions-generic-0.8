@@ -12,10 +12,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://aresmanga.org'
+const DOMAIN = 'https://en-aresmanga.com'
 
 export const AresMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'AresManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Ali Mohamed',
