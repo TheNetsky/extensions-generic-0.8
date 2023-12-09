@@ -1438,9 +1438,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AresManga = exports.AresMangaInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://aresmanga.org';
+const DOMAIN = 'https://en-aresmanga.com';
 exports.AresMangaInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'AresManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Ali Mohamed',
