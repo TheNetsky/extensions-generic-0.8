@@ -12,10 +12,10 @@ import {
 
 import { MangaLekParser } from './MangaLekParser'
 
-const DOMAIN = 'https://manga-lek.net'
+const DOMAIN = 'https://mangaleku.com'
 
 export const MangaLekInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'MangaLek',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
