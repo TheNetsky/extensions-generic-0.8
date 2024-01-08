@@ -1440,7 +1440,7 @@ const types_1 = require("@paperback/types");
 const MangaBoxParser_1 = require("./MangaBoxParser");
 const MangaBoxHelpers_1 = require("./MangaBoxHelpers");
 const MangaBoxSettings_1 = require("./MangaBoxSettings");
-const BASE_VERSION = '4.0.0';
+const BASE_VERSION = '4.0.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1586,7 +1586,7 @@ class MangaBox {
         });
         const response = await this.requestManager.schedule(request, 1);
         const $ = this.cheerio.load(response.data);
-        return this.parser.parseChapters($, this);
+        return this.parser.parseChapters($, mangaId, this);
     }
     async getChapterDetails(mangaId, chapterId) {
         const cookieDomainRegex = chapterId.match(/(.*.com\/).*$/g);
@@ -1792,7 +1792,7 @@ class MangaBoxParser {
                 })
             });
         };
-        this.parseChapters = ($, source) => {
+        this.parseChapters = ($, mangaId, source) => {
             const chapters = [];
             let sortingIndex = 0;
             for (const chapter of $(source.chapterListSelector).toArray()) {
@@ -1817,7 +1817,11 @@ class MangaBoxParser {
                 });
                 sortingIndex--;
             }
-            return chapters.map(chapter => {
+            // If there are no chapters, throw error to avoid losing progress
+            if (chapters.length == 0) {
+                throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`);
+            }
+            return chapters.map((chapter) => {
                 chapter.sortingIndex += chapters.length;
                 return App.createChapter(chapter);
             });
