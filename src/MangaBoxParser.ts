@@ -101,7 +101,7 @@ export class MangaBoxParser {
         })
     }
 
-    parseChapters = ($: CheerioStatic, source: MangaBox): Chapter[] => {
+    parseChapters = ($: CheerioStatic, mangaId: string, source: MangaBox): Chapter[] => {
         const chapters: Chapter[] = []
         let sortingIndex = 0
 
@@ -129,7 +129,12 @@ export class MangaBoxParser {
             sortingIndex--
         }
 
-        return chapters.map(chapter => {
+        // If there are no chapters, throw error to avoid losing progress
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`)
+        }
+
+        return chapters.map((chapter) => {
             chapter.sortingIndex += chapters.length
             return App.createChapter(chapter)
         })
