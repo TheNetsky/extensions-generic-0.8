@@ -28,7 +28,7 @@ export class MangaCultivator extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 
     override hasProtectedChapters = true
 

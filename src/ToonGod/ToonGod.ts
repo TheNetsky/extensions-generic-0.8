@@ -40,7 +40,7 @@ export class ToonGod extends Madara {
 
     override directoryPath = 'webtoons'
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 2
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [

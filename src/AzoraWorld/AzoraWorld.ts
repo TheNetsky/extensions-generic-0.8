@@ -46,7 +46,7 @@ export class AzoraWorld extends Madara {
 
     override hasProtectedChapters = true
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 
     override parser: AzoraWorldParser = new AzoraWorldParser()
 

@@ -1,7 +1,7 @@
 import {
     ContentRating,
-    SourceInfo,
     BadgeColor,
+    SourceInfo,
     SourceIntents
 } from '@paperback/types'
 
@@ -10,31 +10,24 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://neoxscans.net'
+const DOMAIN = 'https://mangaclash.com'
 
-export const NeoxScansInfo: SourceInfo = {
+export const MangaClashInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'NeoxScans',
+    name: 'MangaClash',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
-    sourceTags: [
-        {
-            text: 'Portuguese',
-            type: BadgeColor.GREY
-        }
-    ],
+    sourceTags: [],
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI
 }
 
-export class NeoxScans extends Madara {
+export class MangaClash extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override language = '🇵🇹'
-
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 }

@@ -28,6 +28,4 @@ export const NovelMicInfo: SourceInfo = {
 export class NovelMic extends Madara {
 
     baseUrl: string = DOMAIN
-
-    override alternativeChapterAjaxEndpoint = false
 }

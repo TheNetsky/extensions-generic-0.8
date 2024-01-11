@@ -1,7 +1,7 @@
 import {
     ContentRating,
-    SourceInfo,
     BadgeColor,
+    SourceInfo,
     SourceIntents
 } from '@paperback/types'
 
@@ -10,24 +10,31 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://toonily.net'
+const DOMAIN = 'https://manga-scantrad.io'
 
-export const ToonilyNetInfo: SourceInfo = {
+export const MangaScantradInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'ToonilyNet',
+    name: 'MangaScantrad',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
-    sourceTags: [],
+    sourceTags: [
+        {
+            text: 'French',
+            type: BadgeColor.GREY
+        }
+    ],
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI
 }
 
-export class ToonilyNet extends Madara {
+export class MangaScantrad extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = true
+    override language = '🇫🇷'
+
+    override chapterEndpoint = 1
 }

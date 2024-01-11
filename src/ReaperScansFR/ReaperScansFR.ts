@@ -36,7 +36,9 @@ export class ReaperScansFR extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = true
+    override language = '🇫🇷'
+
+    override chapterEndpoint = 1
 
     override parser: ReaperScansFRParser = new ReaperScansFRParser()
 }

@@ -36,7 +36,9 @@ export class Manga3asq extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = true
+    override language = '🇦🇪'
+
+    override chapterEndpoint = 1
 
     override parser: Manga3asqParser = new Manga3asqParser()
 }

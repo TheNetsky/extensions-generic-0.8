@@ -32,7 +32,7 @@ export class MangaReadOrg extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 
     override parser: MangaReadOrgParser = new MangaReadOrgParser()
 }

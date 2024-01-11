@@ -28,6 +28,4 @@ export const MangaBobInfo: SourceInfo = {
 export class MangaBob extends Madara {
 
     baseUrl: string = DOMAIN
-
-    override alternativeChapterAjaxEndpoint = false
 }

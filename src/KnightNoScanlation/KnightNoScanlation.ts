@@ -40,7 +40,7 @@ export class KnightNoScanlation extends Madara {
 
     override language = '🇪🇸'
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 
     override parser: KnightNoScanlationParser = new KnightNoScanlationParser()
 }

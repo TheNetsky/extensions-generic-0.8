@@ -42,7 +42,7 @@ export class SamuraiScan extends Madara {
 
     override language = '🇪🇸'
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 
     override parser: SamuraiScanParser = new SamuraiScanParser()
 

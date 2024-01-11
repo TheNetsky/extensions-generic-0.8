@@ -36,5 +36,5 @@ export class ArthurScan extends Madara {
 
     override language = '🇵🇹'
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 }

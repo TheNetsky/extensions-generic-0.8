@@ -36,7 +36,9 @@ export class MangaLek extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = true
+    override language = '🇦🇪'
+
+    override chapterEndpoint = 1
 
     override bypassPage = `${DOMAIN}/?s=&post_type=wp-manga`
 

@@ -36,7 +36,7 @@ export class Sinensis extends Madara {
 
     override language = '🇵🇹'
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 
     override hasProtectedChapters = true
 }

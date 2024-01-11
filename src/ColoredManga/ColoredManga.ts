@@ -29,5 +29,5 @@ export class ColoredManga extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 }

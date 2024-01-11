@@ -29,5 +29,5 @@ export class ManhwaFull extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 }

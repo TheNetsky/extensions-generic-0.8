@@ -33,7 +33,7 @@ export class BibiManga extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = true
+    override chapterEndpoint = 1
 
     override usePostIds = false
 

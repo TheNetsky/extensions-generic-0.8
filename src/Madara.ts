@@ -23,7 +23,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '3.1.2'
+const BASE_VERSION = '3.1.3'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -151,8 +151,11 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
 
     /**
      * Some sites use the alternate URL for getting chapters through ajax
+     * 0: (POST) Form data https://domain.com/wp-admin/admin-ajax.php
+     * 1: (POST) Alternative Ajax page (https://domain.com/manga/manga-slug/ajax/chapters)
+     * 2: (POST) Manga page (https://domain.com/manga/manga-slug)
      */
-    alternativeChapterAjaxEndpoint = false
+    chapterEndpoint = 0
 
     /**
      * Different Madara sources might have a slightly different selector which is required to parse out
@@ -201,30 +204,56 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
-        let endpoint: string
+        let requestConfig
+        let path = this.directoryPath
+        let slug = mangaId
 
-        if (this.alternativeChapterAjaxEndpoint) {
-            if (this.usePostIds) {
-                const slugData: any = await this.convertPostIdToSlug(Number(mangaId))
-                endpoint = `${this.baseUrl}/${slugData.path}/${slugData.slug}/ajax/chapters`
-            } else {
-                endpoint = `${this.baseUrl}/${this.directoryPath}/${mangaId}/ajax/chapters`
-            }
-        } else {
-            endpoint = `${this.baseUrl}/wp-admin/admin-ajax.php`
+        if (this.usePostIds) {
+            const postData = await this.convertPostIdToSlug(Number(mangaId))
+            path = postData.path
+            slug = postData.slug
         }
 
-        const request = App.createRequest({
-            url: endpoint,
-            method: 'POST',
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded'
-            },
-            data: {
-                'action': 'manga_get_chapters',
-                'manga': this.usePostIds ? mangaId : await this.convertSlugToPostId(mangaId, this.directoryPath)
-            }
-        })
+        switch (this.chapterEndpoint) {
+            case 0:
+                requestConfig = {
+                    url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/x-www-form-urlencoded'
+                    },
+                    data: {
+                        'action': 'manga_get_chapters',
+                        'manga': this.usePostIds ? mangaId : await this.convertSlugToPostId(mangaId, this.directoryPath)
+                    }
+                }
+                break
+                
+            case 1:
+                requestConfig = {
+                    url: `${this.baseUrl}/${path}/${slug}/ajax/chapters`,
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/x-www-form-urlencoded'
+                    }
+                }
+                break
+
+            case 2:
+                requestConfig = {
+                    url: `${this.baseUrl}/${path}/${slug}`,
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/x-www-form-urlencoded'
+                    }
+                }
+                break
+
+            default:
+                throw new Error('Invalid chapter endpoint!')
+        }
+
+        const request = App.createRequest(requestConfig)
 
         const response = await this.requestManager.schedule(request, 1)
         this.checkResponseError(response)
@@ -475,7 +504,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         return postId
     }
 
-    async convertPostIdToSlug(postId: number): Promise<any> {
+    async convertPostIdToSlug(postId: number) {
         const request = App.createRequest({
             url: `${this.baseUrl}/?p=${postId}`,
             method: 'GET'

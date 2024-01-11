@@ -29,7 +29,5 @@ export class PlatinumScans extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override alternativeChapterAjaxEndpoint = false
-
     override hasAdvancedSearchPage = false
 }
