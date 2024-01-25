@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://elarcpage.com'
+const DOMAIN = 'https://elarctoon.com'
 
 export const ElarcPageInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ElarcPage',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',

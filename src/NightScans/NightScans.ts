@@ -9,10 +9,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://nightscans.net'
+const DOMAIN = 'https://night-scans.com'
 
 export const NightScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'NightScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
