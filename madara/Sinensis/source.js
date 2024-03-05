@@ -9643,9 +9643,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Sinensis = exports.SinensisInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://sinensisscans.com';
+const DOMAIN = 'https://sinensisscan.net';
 exports.SinensisInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'Sinensis',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
