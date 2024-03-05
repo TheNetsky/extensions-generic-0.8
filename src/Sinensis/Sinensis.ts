@@ -10,10 +10,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://sinensisscans.com'
+const DOMAIN = 'https://sinensisscan.net'
 
 export const SinensisInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'Sinensis',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
