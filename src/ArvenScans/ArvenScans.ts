@@ -10,7 +10,7 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://arvenscans.org/'
+const DOMAIN = 'https://arvenscans.org'
 
 export const ArvenScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
