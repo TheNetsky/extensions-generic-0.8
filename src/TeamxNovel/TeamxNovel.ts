@@ -10,11 +10,11 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://arenascans.net'
+const DOMAIN = 'https://teamxnovel.com'
 
-export const ArenaScansInfo: SourceInfo = {
+export const TeamxNovelInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'ArenaScans',
+    name: 'TeamxNovel',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
@@ -25,7 +25,7 @@ export const ArenaScansInfo: SourceInfo = {
     sourceTags: []
 }
 
-export class ArenaScans extends MangaStream {
+export class TeamxNovel extends MangaStream {
 
     baseUrl: string = DOMAIN
 

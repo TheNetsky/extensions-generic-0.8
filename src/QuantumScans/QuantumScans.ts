@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://readers-point.space'
 
 export const QuantumScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'QuantumScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',

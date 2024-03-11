@@ -32,14 +32,14 @@ export const AresMangaInfo: SourceInfo = {
 }
 export class AresManga extends MangaStream {
     override baseUrl = DOMAIN
-    override language ='AR'
+    override language = 'AR'
     override directoryPath = 'series'
     override manga_selector_author = 'المؤلف'
     override manga_selector_artist = 'الرسام'
     override manga_selector_status = 'الحالة'
 
-     //----DATE SETTINGS
-     override dateMonths = {
+    //----DATE SETTINGS
+    override dateMonths = {
         january: 'يناير',
         february: 'فبراير',
         march: 'مارس',
@@ -54,9 +54,9 @@ export class AresManga extends MangaStream {
         december: 'ديسمبر'
     }
 
- override configureSections() {
-    this.homescreen_sections['new_titles'].enabled = false
-    this.homescreen_sections['popular_today'].enabled = false
-    this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(جديد إصداراتنا)')?.parent()?.next())
+    override configureSections() {
+        this.homescreen_sections['new_titles'].enabled = false
+        this.homescreen_sections['popular_today'].enabled = false
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(جديد إصداراتنا)')?.parent()?.next())
     }
 }
