@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://edoujin.net'
+const DOMAIN = 'https://ehentaimanga.com'
 
 export const eDoujinInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'eDoujin',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
