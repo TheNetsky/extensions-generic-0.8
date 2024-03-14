@@ -1438,7 +1438,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaCatalog = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MangaCatalogParser_1 = require("./MangaCatalogParser");
-const BASE_VERSION = '1.0.0';
+const BASE_VERSION = '1.1.0';
 const getExportVersion = (EXTENSION_VERSION) => {
     // Thanks to https://github.com/TheNetsky/
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
@@ -1449,12 +1449,11 @@ class MangaCatalog {
         this.cheerio = cheerio;
         this.sourceData = []; // Store the manga 
         this.mangaTitleSelector = 'div.container > h1';
-        this.mangaImageSelector = 'div.flex > img';
         this.mangaDescriptionSelector = 'div.text-text-muted';
-        this.chaptersArraySelector = '.bg-bg-secondary.p-3.rounded.mb-3.shadow';
+        this.chaptersArraySelector = 'div.col-span-4';
         this.chapterTitleSelector = 'a.text';
         this.chapterIdSelector = 'a.text';
-        this.chapterImagesArraySelector = 'div.text-center';
+        this.chapterImagesArraySelector = 'div.my-3';
         this.chapterImageSelector = 'img';
         this.chapterDateSelector = '';
         this.language = '🇬🇧';
@@ -1554,13 +1553,12 @@ class MangaCatalog {
                 .then(response => {
                 const $ = this.cheerio.load(response.data);
                 const title = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim());
-                const image = $(this.mangaImageSelector).attr('src') || '';
                 const id = source.url.split('/')[4] || '';
                 if (id && title) {
                     this.sourceData.push({
                         data: source,
                         items: App.createPartialSourceManga({
-                            image: image,
+                            image: this.iconUrl,
                             title: title,
                             mangaId: id
                         })
@@ -1585,7 +1583,7 @@ const entities = require("entities");
 class Parser {
     constructor() {
         this.parseMangaDetails = ($, mangaId, source) => {
-            const image = $(source.mangaImageSelector).attr('src') ?? '';
+            const image = source.iconUrl;
             const title = this.decodeHTMLEntity($(source.mangaTitleSelector).text().trim());
             const description = this.decodeHTMLEntity($(source.mangaDescriptionSelector).text().trim());
             return App.createSourceManga({
@@ -1602,8 +1600,7 @@ class Parser {
             const chapters = [];
             let sortingIndex = 0;
             for (const chapter of $(source.chaptersArraySelector).toArray()) {
-                const title = $(source.chapterTitleSelector, chapter).text();
-                const id = $(source.chapterIdSelector, chapter).attr('href')?.split('/')[4] ?? '';
+                const id = this.idCleaner($('a', chapter).attr('href') ?? '');
                 const chapNumRegex = id.match(/(\d+\.?\d?)+/);
                 let chapNum = 0;
                 if (chapNumRegex && chapNumRegex[1])
@@ -1614,13 +1611,13 @@ class Parser {
                     date = new Date(dateTimeStamps);
                 }
                 if (!id || typeof id === 'undefined') {
-                    throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`);
+                    continue;
                 }
                 chapters.push({
                     id: id,
                     langCode: source.language,
                     chapNum: chapNum,
-                    name: title,
+                    name: 'Chapter ' + chapNum,
                     time: date,
                     sortingIndex,
                     volume: 0,
@@ -1642,7 +1639,7 @@ class Parser {
                 const image = img.attribs['src'];
                 if (!image)
                     continue;
-                pages.push(image);
+                pages.push(image.trim());
             }
             const chapterDetails = App.createChapterDetails({
                 id: chapterId,
@@ -1656,6 +1653,14 @@ class Parser {
     decodeHTMLEntity(str) {
         return entities.decodeHTML(str);
     }
+    idCleaner(str) {
+        let cleanId = str;
+        cleanId = cleanId.replace(/\/$/, '');
+        cleanId = cleanId.split('/').pop() ?? null;
+        if (!cleanId)
+            throw new Error(`Unable to parse id for ${str}`); // Log to logger
+        return cleanId;
+    }
 }
 exports.Parser = Parser;
 
@@ -1665,7 +1670,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadFairyTail = exports.ReadFairyTailInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaCatalog_1 = require("../MangaCatalog");
-const DOMAIN = 'https://ww5.readfairytail.com';
+const DOMAIN = 'https://readfairytail.com';
 exports.ReadFairyTailInfo = {
     version: (0, MangaCatalog_1.getExportVersion)('0.0.0'),
     name: 'ReadFairyTail',
@@ -1682,69 +1687,70 @@ class ReadFairyTail extends MangaCatalog_1.MangaCatalog {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
+        this.iconUrl = 'https://i.imgur.com/XUDUoez.png';
         this.baseSourceList = [
             {
-                title: 'ReadEdensZero (Edens Zero)',
+                title: 'ReadFairyTail (Edens Zero)',
                 url: DOMAIN + '/manga/edens-zero'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail)',
+                title: 'ReadFairyTail (Fairy Tail)',
                 url: DOMAIN + '/manga/fairy-tail'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail: Zero)',
+                title: 'ReadFairyTail (Fairy Tail: Zero)',
                 url: DOMAIN + '/manga/fairy-tail-zero'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail: City Hero)',
+                title: 'ReadFairyTail (Fairy Tail: City Hero)',
                 url: DOMAIN + '/manga/fairy-tail-city-hero'
             },
             {
-                title: 'ReadEdensZero (Heros)',
+                title: 'ReadFairyTail (Heros)',
                 url: DOMAIN + '/manga/heros'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail: Happy\'s Grand Adventure)',
+                title: 'ReadFairyTail (Fairy Tail: Happy\'s Grand Adventure)',
                 url: DOMAIN + '/manga/fairy-tail-happys-grand-adventure'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail: 100 Years Quest)',
+                title: 'ReadFairyTail (Fairy Tail: 100 Years Quest)',
                 url: DOMAIN + '/manga/fairy-tail-100-years-quest'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail: Ice Trail)',
+                title: 'ReadFairyTail (Fairy Tail: Ice Trail)',
                 url: DOMAIN + '/manga/fairy-tail-ice-trail'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail x Nanatsu no Taizai Christmas Special)',
+                title: 'ReadFairyTail (Fairy Tail x Nanatsu no Taizai Christmas Special)',
                 url: DOMAIN + '/manga/fairy-tail-x-nanatsu-no-taizai-christmas-special'
             },
             {
-                title: 'ReadEdensZero (Parasyte x Fairy Tail)',
+                title: 'ReadFairyTail (Parasyte x Fairy Tail)',
                 url: DOMAIN + '/manga/parasyte-x-fairy-tail'
             },
             {
-                title: 'ReadEdensZero (Monster Hunter: Orage)',
+                title: 'ReadFairyTail (Monster Hunter: Orage)',
                 url: DOMAIN + '/manga/monster-hunter-orage'
             },
             {
-                title: 'ReadEdensZero (Rave Master)',
+                title: 'ReadFairyTail (Rave Master)',
                 url: DOMAIN + '/manga/rave-master'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail x Rave)',
+                title: 'ReadFairyTail (Fairy Tail x Rave)',
                 url: DOMAIN + '/manga/fairy-tail-x-rave'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail Gaiden: Raigo Issen)',
+                title: 'ReadFairyTail (Fairy Tail Gaiden: Raigo Issen)',
                 url: DOMAIN + '/manga/fairy-tail-gaiden-raigo-issen'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail Gaiden: Kengami no Souryuu)',
+                title: 'ReadFairyTail (Fairy Tail Gaiden: Kengami no Souryuu)',
                 url: DOMAIN + '/manga/fairy-tail-gaiden-kengami-no-souryuu'
             },
             {
-                title: 'ReadEdensZero (Fairy Tail Gaiden: Road Knight)',
+                title: 'ReadFairyTail (Fairy Tail Gaiden: Road Knight)',
                 url: DOMAIN + '/manga/fairy-tail-gaiden-road-knight'
             }
         ];

@@ -1438,7 +1438,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaCatalog = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MangaCatalogParser_1 = require("./MangaCatalogParser");
-const BASE_VERSION = '1.0.0';
+const BASE_VERSION = '1.1.0';
 const getExportVersion = (EXTENSION_VERSION) => {
     // Thanks to https://github.com/TheNetsky/
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
@@ -1449,12 +1449,11 @@ class MangaCatalog {
         this.cheerio = cheerio;
         this.sourceData = []; // Store the manga 
         this.mangaTitleSelector = 'div.container > h1';
-        this.mangaImageSelector = 'div.flex > img';
         this.mangaDescriptionSelector = 'div.text-text-muted';
-        this.chaptersArraySelector = '.bg-bg-secondary.p-3.rounded.mb-3.shadow';
+        this.chaptersArraySelector = 'div.col-span-4';
         this.chapterTitleSelector = 'a.text';
         this.chapterIdSelector = 'a.text';
-        this.chapterImagesArraySelector = 'div.text-center';
+        this.chapterImagesArraySelector = 'div.my-3';
         this.chapterImageSelector = 'img';
         this.chapterDateSelector = '';
         this.language = '🇬🇧';
@@ -1554,13 +1553,12 @@ class MangaCatalog {
                 .then(response => {
                 const $ = this.cheerio.load(response.data);
                 const title = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim());
-                const image = $(this.mangaImageSelector).attr('src') || '';
                 const id = source.url.split('/')[4] || '';
                 if (id && title) {
                     this.sourceData.push({
                         data: source,
                         items: App.createPartialSourceManga({
-                            image: image,
+                            image: this.iconUrl,
                             title: title,
                             mangaId: id
                         })
@@ -1585,7 +1583,7 @@ const entities = require("entities");
 class Parser {
     constructor() {
         this.parseMangaDetails = ($, mangaId, source) => {
-            const image = $(source.mangaImageSelector).attr('src') ?? '';
+            const image = source.iconUrl;
             const title = this.decodeHTMLEntity($(source.mangaTitleSelector).text().trim());
             const description = this.decodeHTMLEntity($(source.mangaDescriptionSelector).text().trim());
             return App.createSourceManga({
@@ -1602,8 +1600,7 @@ class Parser {
             const chapters = [];
             let sortingIndex = 0;
             for (const chapter of $(source.chaptersArraySelector).toArray()) {
-                const title = $(source.chapterTitleSelector, chapter).text();
-                const id = $(source.chapterIdSelector, chapter).attr('href')?.split('/')[4] ?? '';
+                const id = this.idCleaner($('a', chapter).attr('href') ?? '');
                 const chapNumRegex = id.match(/(\d+\.?\d?)+/);
                 let chapNum = 0;
                 if (chapNumRegex && chapNumRegex[1])
@@ -1614,13 +1611,13 @@ class Parser {
                     date = new Date(dateTimeStamps);
                 }
                 if (!id || typeof id === 'undefined') {
-                    throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`);
+                    continue;
                 }
                 chapters.push({
                     id: id,
                     langCode: source.language,
                     chapNum: chapNum,
-                    name: title,
+                    name: 'Chapter ' + chapNum,
                     time: date,
                     sortingIndex,
                     volume: 0,
@@ -1642,7 +1639,7 @@ class Parser {
                 const image = img.attribs['src'];
                 if (!image)
                     continue;
-                pages.push(image);
+                pages.push(image.trim());
             }
             const chapterDetails = App.createChapterDetails({
                 id: chapterId,
@@ -1655,6 +1652,14 @@ class Parser {
     // UTILITY METHODS
     decodeHTMLEntity(str) {
         return entities.decodeHTML(str);
+    }
+    idCleaner(str) {
+        let cleanId = str;
+        cleanId = cleanId.replace(/\/$/, '');
+        cleanId = cleanId.split('/').pop() ?? null;
+        if (!cleanId)
+            throw new Error(`Unable to parse id for ${str}`); // Log to logger
+        return cleanId;
     }
 }
 exports.Parser = Parser;
@@ -1682,8 +1687,8 @@ class ReadBerserk extends MangaCatalog_1.MangaCatalog {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
+        this.iconUrl = 'https://i0.wp.com/readberserk.com/wp-content/uploads/2017/06/berserk-1.jpg';
         this.mangaTitleSelector = 'h2 > span';
-        this.mangaImageSelector = '.card-img-right';
         this.mangaDescriptionSelector = 'div.card.flex-md-row.mb-4.box-shadow.h-md-250 > div > p:nth-child(3)';
         this.chaptersArraySelector = 'tbody.no-border-x > tr';
         this.chapterIdSelector = 'div.d-flex > a';
