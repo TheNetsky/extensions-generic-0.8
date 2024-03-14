@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww4.readneverland.com'
+const DOMAIN = 'https://i.imgur.com/jJeS2uO.jpg'
 
 export const ReadThePromisedNeverlandInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadThePromisedNeverlandInfo: SourceInfo = {
 export class ReadThePromisedNeverland extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/yv8QOj4.png'
 
     baseSourceList: SourceBase[] = [
         {

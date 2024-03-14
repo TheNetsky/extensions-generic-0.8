@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww4.readnoblesse.com'
+const DOMAIN = 'https://readnoblesse.com'
 
 export const ReadNoblesseInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadNoblesseInfo: SourceInfo = {
 export class ReadNoblesse extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = ''
 
     baseSourceList: SourceBase[] = [
         {

@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww3.readhxh.com'
+const DOMAIN = 'https://readhxh.com'
 
 export const ReadHunterxHunterInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadHunterxHunterInfo: SourceInfo = {
 export class ReadHunterxHunter extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/IJGrbuU.jpg'
 
     baseSourceList: SourceBase[] = [
         {

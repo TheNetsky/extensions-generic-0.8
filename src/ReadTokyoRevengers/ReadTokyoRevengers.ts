@@ -11,14 +11,14 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://readsololeveling.org'
+const DOMAIN = 'https://readtokyorevengers.net'
 
-export const ReadSoloLevelingInfo: SourceInfo = {
+export const ReadTokyoRevengersInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'ReadSoloLeveling',
+    name: 'ReadTokyoRevengers',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'EmZedH',
-    authorWebsite: 'http://github.com/EmZedH',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
@@ -26,20 +26,20 @@ export const ReadSoloLevelingInfo: SourceInfo = {
     sourceTags: []
 }
 
-export class ReadSoloLeveling extends MangaCatalog {
+export class ReadTokyoRevengers extends MangaCatalog {
 
     baseUrl: string = DOMAIN
 
-    iconUrl = 'https://i.imgur.com/leTtc1A.jpg'
+    iconUrl = 'https://i.imgur.com/Gwpyjgi.jpeg'
 
     baseSourceList: SourceBase[] = [
         {
-            title: 'ReadSoloLeveling (Solo Leveling)',
-            url: DOMAIN + '/manga/solo-leveling'
+            title: 'ReadTokyoRevengers (Tokyo Revengers)',
+            url: DOMAIN + '/manga/tokyo-revengers'
         },
         {
-            title: 'ReadSoloLeveling (Solo Leveling Novel)',
-            url: DOMAIN + '/manga/solo-leveling-novel'
+            title: 'ReadTokyoRevengers (Tokyo Revengers: Letter from Keisuke Baji)',
+            url: DOMAIN + '/manga/tokyo-revengers-letter-from-keisuke-baji'
         }
     ]
 }

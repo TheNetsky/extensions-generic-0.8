@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww2.readtowerofgod.com'
+const DOMAIN = 'https://readtowerofgod.com'
 
 export const ReadTowerOfGodInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadTowerOfGodInfo: SourceInfo = {
 export class ReadTowerOfGod extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = ''
 
     baseSourceList: SourceBase[] = [
         {

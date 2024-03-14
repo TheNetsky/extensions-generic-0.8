@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww8.readsnk.com'
+const DOMAIN = 'https://readsnk.com'
 
 export const ReadAttackOnTitanInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadAttackOnTitanInfo: SourceInfo = {
 export class ReadAttackOnTitan extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/XDcjemc.png'
 
     baseSourceList: SourceBase[] = [
         {

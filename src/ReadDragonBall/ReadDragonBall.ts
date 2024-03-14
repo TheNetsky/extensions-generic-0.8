@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww7.dbsmanga.com'
+const DOMAIN = 'https://dbsmanga.com'
 
 export const ReadDragonBallInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadDragonBallInfo: SourceInfo = {
 export class ReadDragonBall extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/xKpUtga.png'
 
     baseSourceList: SourceBase[] = [
         {

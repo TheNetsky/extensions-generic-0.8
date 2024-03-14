@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww6.readmha.com'
+const DOMAIN = 'https://readmha.com'
 
 export const ReadMyHeroAcademiaInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadMyHeroAcademiaInfo: SourceInfo = {
 export class ReadMyHeroAcademia extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/c1rNiei.png'
 
     baseSourceList: SourceBase[] = [
         {

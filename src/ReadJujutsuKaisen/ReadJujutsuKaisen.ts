@@ -11,10 +11,10 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww3.readjujutsukaisen.com'
+const DOMAIN = 'https://readjujutsukaisen.com'
 
 export const ReadJujutsuKaisenInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.0'),
     name: 'ReadJujutsuKaisen',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'EmZedH',
@@ -29,6 +29,8 @@ export const ReadJujutsuKaisenInfo: SourceInfo = {
 export class ReadJujutsuKaisen extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/AHz5hzf.png'
 
     baseSourceList: SourceBase[] = [
         {

@@ -11,14 +11,14 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://i.imgur.com/2jfUeeU.png'
+const DOMAIN = 'https://readbleachmanga.com/'
 
-export const ReadVinlandSagaInfo: SourceInfo = {
+export const ReadBleachInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'ReadVinlandSaga',
+    name: 'ReadBleach',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'EmZedH',
-    authorWebsite: 'http://github.com/EmZedH',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
@@ -26,24 +26,24 @@ export const ReadVinlandSagaInfo: SourceInfo = {
     sourceTags: []
 }
 
-export class ReadVinlandSaga extends MangaCatalog {
+export class ReadBleach extends MangaCatalog {
 
     baseUrl: string = DOMAIN
 
-    iconUrl = 'https://i.imgur.com/yv8QOj4.png'
+    iconUrl = 'https://i.imgur.com/Vf65wQL.png'
 
     baseSourceList: SourceBase[] = [
         {
-            title: 'ReadVinlandSaga (Vinland Saga)',
-            url: DOMAIN + '/manga/vinland-saga'
+            title: 'ReadBleach (Bleach)',
+            url: DOMAIN + '/manga/bleach'
         },
         {
-            title: 'ReadVinlandSaga (Vinland Saga: Colored)',
-            url: DOMAIN + '/manga/vinland-saga-colored'
+            title: 'ReadBleach (Bleach Digital Colored Comics)',
+            url: DOMAIN + '/manga/bleach-digital-colored-comics'
         },
         {
-            title: 'ReadVinlandSaga (Planetes)',
-            url: DOMAIN + '/manga/planetes'
+            title: 'ReadBleach (Bleach One Shot: Burn the Witch)',
+            url: DOMAIN + '/manga/bleach-one-shot-burn-the-witch'
         }
     ]
 }

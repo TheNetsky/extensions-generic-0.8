@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww4.readdrstone.com'
+const DOMAIN = 'https://readdrstone.com'
 
 export const ReadDrStoneInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadDrStoneInfo: SourceInfo = {
 export class ReadDrStone extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/gHXraOY.jpg'
 
     baseSourceList: SourceBase[] = [
         {

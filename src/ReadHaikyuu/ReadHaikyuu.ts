@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww7.readhaikyuu.com'
+const DOMAIN = 'https://readhaikyuu.com'
 
 export const ReadHaikyuuInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadHaikyuuInfo: SourceInfo = {
 export class ReadHaikyuu extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/w2ubpnd.png'
 
     baseSourceList: SourceBase[] = [
         {

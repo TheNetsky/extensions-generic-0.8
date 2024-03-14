@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww7.readblackclover.com'
+const DOMAIN = 'https://readblackclover.com'
 
 export const ReadBlackCloverInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadBlackCloverInfo: SourceInfo = {
 export class ReadBlackClover extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/pKG50Z8.png'
 
     baseSourceList: SourceBase[] = [
         {

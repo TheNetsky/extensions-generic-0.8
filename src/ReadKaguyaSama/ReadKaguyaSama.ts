@@ -11,7 +11,7 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww2.readkaguyasama.com'
+const DOMAIN = 'https://readkaguyasama.com'
 
 export const ReadKaguyaSamaInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -29,6 +29,8 @@ export const ReadKaguyaSamaInfo: SourceInfo = {
 export class ReadKaguyaSama extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/0CY4QGe.png'
 
     baseSourceList: SourceBase[] = [
         {

@@ -15,9 +15,12 @@ import {
 } from '@paperback/types'
 
 import { Parser } from './MangaCatalogParser'
-import { SourceBase, SourceBaseData } from './MangaCatalogInterface'
+import {
+    SourceBase,
+    SourceBaseData
+} from './MangaCatalogInterface'
 
-const BASE_VERSION = '1.0.0'
+const BASE_VERSION = '1.1.0'
 
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     // Thanks to https://github.com/TheNetsky/
@@ -30,19 +33,20 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
 
     abstract baseUrl: string
 
+    abstract iconUrl: string
+
     abstract baseSourceList: SourceBase[]
 
     private sourceData: SourceBaseData[] = [] // Store the manga 
 
     mangaTitleSelector = 'div.container > h1'
-    mangaImageSelector = 'div.flex > img'
     mangaDescriptionSelector = 'div.text-text-muted'
 
-    chaptersArraySelector = '.bg-bg-secondary.p-3.rounded.mb-3.shadow'
+    chaptersArraySelector = 'div.col-span-4'
     chapterTitleSelector = 'a.text'
     chapterIdSelector = 'a.text'
 
-    chapterImagesArraySelector = 'div.text-center'
+    chapterImagesArraySelector = 'div.my-3'
     chapterImageSelector = 'img'
     chapterDateSelector = ''
 
@@ -166,14 +170,13 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
                 .then(response => {
                     const $ = this.cheerio.load(response.data as string)
                     const title: string = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim())
-                    const image: string = $(this.mangaImageSelector).attr('src') || ''
                     const id: string = source.url.split('/')[4] || ''
 
                     if (id && title) {
                         this.sourceData.push({
                             data: source,
                             items: App.createPartialSourceManga({
-                                image: image,
+                                image: this.iconUrl,
                                 title: title,
                                 mangaId: id
                             })
