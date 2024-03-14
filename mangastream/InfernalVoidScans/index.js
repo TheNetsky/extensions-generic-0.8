@@ -1438,9 +1438,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InfernalVoidScans = exports.InfernalVoidScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://void-scans.com';
+const DOMAIN = 'https://hivescans.com';
 exports.InfernalVoidScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'InfernalVoidScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'nicknitewolf',

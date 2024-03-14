@@ -2334,9 +2334,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.eDoujin = exports.eDoujinInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://edoujin.net';
+const DOMAIN = 'https://ehentaimanga.com';
 exports.eDoujinInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'eDoujin',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
