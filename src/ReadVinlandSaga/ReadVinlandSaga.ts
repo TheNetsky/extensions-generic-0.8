@@ -11,10 +11,10 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://i.imgur.com/2jfUeeU.png'
+const DOMAIN = 'https://readvinlandsaga.com'
 
 export const ReadVinlandSagaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ReadVinlandSaga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'EmZedH',
