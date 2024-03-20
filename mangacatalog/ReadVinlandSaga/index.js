@@ -1670,9 +1670,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadVinlandSaga = exports.ReadVinlandSagaInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaCatalog_1 = require("../MangaCatalog");
-const DOMAIN = 'https://i.imgur.com/2jfUeeU.png';
+const DOMAIN = 'https://readvinlandsaga.com';
 exports.ReadVinlandSagaInfo = {
-    version: (0, MangaCatalog_1.getExportVersion)('0.0.0'),
+    version: (0, MangaCatalog_1.getExportVersion)('0.0.1'),
     name: 'ReadVinlandSaga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'EmZedH',
