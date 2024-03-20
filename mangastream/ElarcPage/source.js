@@ -1438,9 +1438,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ElarcPage = exports.ElarcPageInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://elarctoon.com';
+const DOMAIN = 'https://elarctoons.com';
 exports.ElarcPageInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.2'),
     name: 'ElarcPage',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
