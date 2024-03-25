@@ -10,10 +10,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://zinmanga.com'
+const DOMAIN = 'https://mangazin.org'
 
 export const ZinMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'ZinManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
