@@ -9643,9 +9643,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ZinManga = exports.ZinMangaInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://zinmanga.com';
+const DOMAIN = 'https://mangazin.org';
 exports.ZinMangaInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.1'),
+    version: (0, Madara_1.getExportVersion)('0.0.2'),
     name: 'ZinManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
