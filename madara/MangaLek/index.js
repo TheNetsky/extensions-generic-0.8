@@ -9644,9 +9644,9 @@ exports.MangaLek = exports.MangaLekInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
 const MangaLekParser_1 = require("./MangaLekParser");
-const DOMAIN = 'https://manga-leko.com';
+const DOMAIN = 'https://lekmanga.net';
 exports.MangaLekInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.4'),
+    version: (0, Madara_1.getExportVersion)('0.0.5'),
     name: 'MangaLek',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
