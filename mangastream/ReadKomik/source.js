@@ -2273,9 +2273,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadKomik = exports.ReadKomikInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://readkomik.com';
+const DOMAIN = 'https://rkreader.org';
 exports.ReadKomikInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'ReadKomik',
     description: 'Extension that pulls manga from ReadKomik',
     author: 'Netsky',
