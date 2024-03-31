@@ -1505,7 +1505,7 @@ const MangaStreamParser_1 = require("./MangaStreamParser");
 const UrlBuilder_1 = require("./UrlBuilder");
 const MangaStreamHelper_1 = require("./MangaStreamHelper");
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '3.0.1';
+const BASE_VERSION = '3.0.2';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -2160,13 +2160,16 @@ class MangaStreamParser {
         if (!readerScript) {
             throw new Error(`Failed to find page details script for manga ${mangaId}`); // If null, throw error, else parse data to json.
         }
-        const scriptMatch = readerScript.html()?.match(/ts_reader\.run\((.*?"})/);
+        const scriptMatch = readerScript.html()?.match(/ts_reader\.run\((.*?(?=\);|},))/);
         let scriptObj = '';
         if (scriptMatch && scriptMatch[1]) {
             scriptObj = scriptMatch[1];
         }
         if (!scriptObj) {
             throw new Error(`Failed to parse script for manga ${mangaId}`); // If null, throw error, else parse data to json.
+        }
+        if (!scriptObj.endsWith('}')) {
+            scriptObj = scriptObj + '}';
         }
         scriptObj = JSON.parse(scriptObj);
         if (!scriptObj?.sources) {
