@@ -137,7 +137,7 @@ export class MangaStreamParser {
             throw new Error(`Failed to find page details script for manga ${mangaId}`) // If null, throw error, else parse data to json.
         }
 
-        const scriptMatch = readerScript.html()?.match(/ts_reader\.run\((.*?"})/)
+        const scriptMatch = readerScript.html()?.match(/ts_reader\.run\((.*?(?=\);|},))/)
 
         let scriptObj: any = ''
 
@@ -147,6 +147,10 @@ export class MangaStreamParser {
 
         if (!scriptObj) {
             throw new Error(`Failed to parse script for manga ${mangaId}`) // If null, throw error, else parse data to json.
+        }
+
+        if (!scriptObj.endsWith('}')) {
+            scriptObj = scriptObj + '}'
         }
 
         scriptObj = JSON.parse(scriptObj)
