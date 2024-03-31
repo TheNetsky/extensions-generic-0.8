@@ -1464,7 +1464,7 @@ const MangaStreamParser_1 = require("./MangaStreamParser");
 const UrlBuilder_1 = require("./UrlBuilder");
 const MangaStreamHelper_1 = require("./MangaStreamHelper");
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '3.0.0';
+const BASE_VERSION = '3.0.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -2111,18 +2111,27 @@ class MangaStreamParser {
         });
     }
     parseChapterDetails($, mangaId, chapterId) {
-        const data = $.html();
         const pages = [];
-        // To avoid our regex capturing more scrips, we stop at the first match of ";", also known as the first ending the matching script.
-        let obj = /ts_reader.run\((.[^;]+)\)/.exec(data)?.[1] ?? ''; //Get the data else return null.
-        if (obj == '') {
-            throw new Error(`Failed to find page details script for manga ${mangaId}`); //If null, throw error, else parse data to json.
+        //@ts-expect-error Ignore index
+        const readerScript = $('script').filter((i, el) => {
+            return $(el).html()?.includes('ts_reader.run');
+        });
+        if (!readerScript) {
+            throw new Error(`Failed to find page details script for manga ${mangaId}`); // If null, throw error, else parse data to json.
         }
-        obj = JSON.parse(obj);
-        if (!obj?.sources) {
+        const scriptMatch = readerScript.html()?.match(/ts_reader\.run\((.*?"})/);
+        let scriptObj = '';
+        if (scriptMatch && scriptMatch[1]) {
+            scriptObj = scriptMatch[1];
+        }
+        if (!scriptObj) {
+            throw new Error(`Failed to parse script for manga ${mangaId}`); // If null, throw error, else parse data to json.
+        }
+        scriptObj = JSON.parse(scriptObj);
+        if (!scriptObj?.sources) {
             throw new Error(`Failed for find sources property for manga ${mangaId}`);
         }
-        for (const index of obj.sources) { // Check all sources, if empty continue.
+        for (const index of scriptObj.sources) { // Check all sources, if empty continue.
             if (index?.images.length == 0)
                 continue;
             index.images.map((p) => pages.push(encodeURI(p)));
