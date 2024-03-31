@@ -126,23 +126,36 @@ export class MangaStreamParser {
     }
 
     parseChapterDetails($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails {
-        const data = $.html()
-
         const pages: string[] = []
 
-        // To avoid our regex capturing more scrips, we stop at the first match of ";", also known as the first ending the matching script.
-        let obj: any = /ts_reader.run\((.[^;]+)\)/.exec(data)?.[1] ?? '' //Get the data else return null.
-        if (obj == '') {
-            throw new Error(`Failed to find page details script for manga ${mangaId}`) //If null, throw error, else parse data to json.
+        //@ts-expect-error Ignore index
+        const readerScript = $('script').filter((i, el) => {
+            return $(el).html()?.includes('ts_reader.run')
+        })
+
+        if (!readerScript) {
+            throw new Error(`Failed to find page details script for manga ${mangaId}`) // If null, throw error, else parse data to json.
         }
 
-        obj = JSON.parse(obj)
+        const scriptMatch = readerScript.html()?.match(/ts_reader\.run\((.*?"})/)
 
-        if (!obj?.sources) {
+        let scriptObj: any = ''
+
+        if (scriptMatch && scriptMatch[1]) {
+            scriptObj = scriptMatch[1]
+        }
+
+        if (!scriptObj) {
+            throw new Error(`Failed to parse script for manga ${mangaId}`) // If null, throw error, else parse data to json.
+        }
+
+        scriptObj = JSON.parse(scriptObj)
+
+        if (!scriptObj?.sources) {
             throw new Error(`Failed for find sources property for manga ${mangaId}`)
         }
 
-        for (const index of obj.sources) { // Check all sources, if empty continue.
+        for (const index of scriptObj.sources) { // Check all sources, if empty continue.
             if (index?.images.length == 0) continue
             index.images.map((p: string) => pages.push(encodeURI(p)))
         }
