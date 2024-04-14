@@ -161,7 +161,7 @@ export class MangaStreamParser {
 
         for (const index of scriptObj.sources) { // Check all sources, if empty continue.
             if (index?.images.length == 0) continue
-            index.images.map((p: string) => pages.push(encodeURI(p)))
+            index.images.map((p: string) => pages.push(encodeURI(p.trim())))
         }
 
         const chapterDetails = App.createChapterDetails({
