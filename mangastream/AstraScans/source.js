@@ -1438,9 +1438,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AstraScans = exports.AstraScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://astrascans.com';
+const DOMAIN = 'https://astrascans.org';
 exports.AstraScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'AstraScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
