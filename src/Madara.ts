@@ -21,7 +21,7 @@ import {
 } from '@paperback/types'
 
 import { Parser } from './MadaraParser'
-import { URLBuilder } from './MadaraHelper'
+import { URLBuilder, CloudflareErrors } from './MadaraHelper'
 
 const BASE_VERSION = '3.1.3'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
@@ -599,12 +599,58 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
 
     checkResponseError(response: Response): void {
         const status = response.status
+        if (status >= 200 && status <= 299) {
+            return
+        }
+        
         switch (status) {
             case 403:
             case 503:
                 throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`)
             case 404:
                 throw new Error(`The requested page ${response.request.url} was not found!`)
+            default: {
+                const cloudfareError: CloudflareErrors | null = this.checkCloudflareError(response)
+
+                if (cloudfareError) {
+                    throw new Error(`The requested page ${response.request.url} returned a Cloudflare error: ${cloudfareError}`)
+                }
+                
+                throw new Error(`The requested page ${response.request.url} returned an unpredicted status code (${status})`)
+            }
         }
+    }
+
+    checkCloudflareError(response: Response): CloudflareErrors | null {
+        const data = response.data as string
+        // We can safely assume this text snippet is in every, with cloudlflare related, generated error page.
+        if (data.search('Cloudflare Ray ID:') == -1) {
+            return null
+        }
+        
+        const status = response.status
+
+        switch (status) {
+            case 503:
+                return CloudflareErrors.BotCaptcha
+            case 520:
+                return CloudflareErrors.Unknown
+            case 521:
+                return CloudflareErrors.RefuseConnection
+            case 522:
+                return CloudflareErrors.TimeOut
+            case 523:
+                return CloudflareErrors.Unreachable
+            case 524:
+                return CloudflareErrors.TimeOut
+            case 525:
+                return CloudflareErrors.HandshakeFail
+            case 526:
+                return CloudflareErrors.HandshakeFail
+            case 530:
+                return CloudflareErrors.OneXXX
+        }
+
+        return null
     }
 }

@@ -42,3 +42,13 @@ export class URLBuilder {
         return finalUrl
     }
 }
+
+export enum CloudflareErrors {
+    BotCaptcha,
+    Unknown,
+    RefuseConnection,
+    TimeOut,
+    Unreachable,
+    HandshakeFail,
+    OneXXX
+}
