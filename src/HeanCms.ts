@@ -147,7 +147,7 @@ export abstract class HeanCms implements SearchResultsProviding, MangaProviding,
     getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         return this.ExecRequest(
             { url: `${this.apiUrl}/chapter/${HeanCmsParser.convertMangaIdToSlug(mangaId)}/${chapterId}` },
-            (data: ChapterDetailDto) => HeanCmsParser.parseChapterDetails(data, mangaId, chapterId)
+            (data: ChapterDetailDto) => HeanCmsParser.parseChapterDetails(data, mangaId, chapterId, this.apiUrl)
         )
     }
 

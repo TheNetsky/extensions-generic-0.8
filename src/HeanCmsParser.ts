@@ -77,11 +77,14 @@ export class HeanCmsParser {
         return Number(numTab[1])
     }
   
-    static parseChapterDetails(data: ChapterDetailDto, mangaId: string, chapterId: string): ChapterDetails {
+    static parseChapterDetails(data: ChapterDetailDto, mangaId: string, chapterId: string, api_url: string): ChapterDetails {
+        const pages = (data.chapter.chapter_data?.images ?? data.data ?? [])
+            .map(a => a.startsWith('https://') ? a : `${api_url}/${a}`)
+            
         return App.createChapterDetails({
             id: chapterId,
             mangaId: mangaId,
-            pages: data.chapter.chapter_data?.images ?? data.data ?? []
+            pages: pages
         })
     }
 
