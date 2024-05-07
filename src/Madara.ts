@@ -23,7 +23,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder, CloudflareErrors } from './MadaraHelper'
 
-const BASE_VERSION = '3.1.3'
+const BASE_VERSION = '3.1.4'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
