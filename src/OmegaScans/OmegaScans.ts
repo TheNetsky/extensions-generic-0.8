@@ -1,30 +1,32 @@
 import {
     ContentRating,
-    SourceInfo
+    SourceInfo,
+    SourceIntents
 } from '@paperback/types'
 
-const BASE_URL = 'https://omegascans.org'
-const SOURCE_NAME = 'OmegaScans'
-const VERSION = '0.0.0'
+import {
+    getExportVersion,
+    Hean
+} from '../Hean'
 
-import { 
-    BaseSourceInfo, 
-    HeanCms, 
-    getExportDesciption, 
-    getExportVersion
-} from '../HeanCms'
+const DOMAIN = 'https://omegascans.org'
 
 export const OmegaScansInfo: SourceInfo = {
-    ...BaseSourceInfo,
-    name: SOURCE_NAME,
-    version: getExportVersion(VERSION),
-    description: getExportDesciption(BASE_URL),
+    version: getExportVersion('0.0.0'),
+    name: 'OmegaScans',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'YvesPa',
+    authorWebsite: 'http://github.com/YvesPa',
+    icon: 'icon.png',
     contentRating: ContentRating.ADULT,
-    websiteBaseURL: BASE_URL
+    websiteBaseURL: DOMAIN,
+    sourceTags: [],
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
-export abstract class OmegaScans extends HeanCms {
-    constructor() {
-        super(BASE_URL)
-    }
+export class OmegaScans extends Hean {
+
+    baseUrl: string = DOMAIN
+
+    apiUrl: string = DOMAIN.replace('://', '://api.')
 }

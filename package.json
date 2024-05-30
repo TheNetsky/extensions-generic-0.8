@@ -1,8 +1,8 @@
 {
   "name": "extensions-generic-0.8",
   "version": "0.8.0",
-  "repositoryName": "HeanCms Generic (0.8)",
-  "description": "HeanCms Generic for 0.8!",
+  "repositoryName": "Hean Generic (0.8)",
+  "description": "Hean Generic for 0.8!",
   "main": "index.js",
   "scripts": {
     "bundle": "npx paperback bundle",

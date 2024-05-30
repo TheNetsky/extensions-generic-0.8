@@ -1,34 +1,40 @@
 import {
-    BadgeColor,
     ContentRating,
-    SourceInfo
+    SourceInfo,
+    SourceIntents,
+    BadgeColor
 } from '@paperback/types'
 
-const BASE_URL = 'https://modescanlator.com'
-const SOURCE_NAME = 'ModeScanlator'
-const VERSION = '0.0.0'
-const SOURCE_TAGS= [{text: 'Portuguese (Brazil)', type: BadgeColor.GREY}]
+import {
+    getExportVersion,
+    Hean
+} from '../Hean'
 
-import { 
-    BaseSourceInfo, 
-    HeanCms, 
-    getExportDesciption, 
-    getExportVersion
-} from '../HeanCms'
+const DOMAIN = 'https://modescanlator.com'
 
 export const ModeScanlatorInfo: SourceInfo = {
-    ...BaseSourceInfo,
-    name: SOURCE_NAME,
-    version: getExportVersion(VERSION),
-    description: getExportDesciption(BASE_URL),
-    websiteBaseURL: BASE_URL,
-    contentRating: ContentRating.EVERYONE,
-    sourceTags: SOURCE_TAGS
+    version: getExportVersion('0.0.0'),
+    name: 'ModeScanlator',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'YvesPa',
+    authorWebsite: 'http://github.com/YvesPa',
+    icon: 'icon.png',
+    contentRating: ContentRating.MATURE,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [
+        {
+            text: 'Brazil',
+            type: BadgeColor.GREY
+        }
+    ],
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
-export abstract class ModeScanlator extends HeanCms {
-    constructor() {
-        super(BASE_URL)
-        this.useGenres = false
-    }
+export class ModeScanlator extends Hean {
+
+    baseUrl: string = DOMAIN
+
+    apiUrl: string = DOMAIN.replace('://', '://api.')
+
+    override language = '🇧🇷'
 }

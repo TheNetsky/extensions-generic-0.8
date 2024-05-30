@@ -1,52 +1,34 @@
 import {
-    CloudflareBypassRequestProviding,
     ContentRating,
     SourceInfo,
     SourceIntents
 } from '@paperback/types'
 
-const BASE_URL = 'https://templescan.net'
-const API_URL = 'https://templescan.net/apiv1'
-const SOURCE_NAME = 'TempleScan'
-const VERSION = '0.0.0'
+import {
+    getExportVersion,
+    Hean
+} from '../Hean'
 
-import { 
-    BaseSourceInfo, 
-    HeanCms, 
-    getExportDesciption, 
-    getExportVersion
-} from '../HeanCms'
+const DOMAIN = 'https://templescan.net'
 
 export const TempleScanInfo: SourceInfo = {
-    ...BaseSourceInfo,
-    name: SOURCE_NAME,
-    version: getExportVersion(VERSION),
-    description: getExportDesciption(BASE_URL),
-    websiteBaseURL: BASE_URL,
-    contentRating: ContentRating.ADULT,
-    intents: BaseSourceInfo.intents | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
+    version: getExportVersion('0.0.0'),
+    name: 'TempleScan',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'YvesPa',
+    authorWebsite: 'http://github.com/YvesPa',
+    icon: 'icon.png',
+    contentRating: ContentRating.MATURE,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [],
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
-export abstract class TempleScan extends HeanCms implements CloudflareBypassRequestProviding {
-    constructor() {
-        super(BASE_URL, false)
-        this.apiUrl = API_URL
-        this.rateLimit = 2
-        this.useChapterQuery = false
+export class TempleScan extends Hean {
 
-        this.init()
-    }
-    
-    async getCloudflareBypassRequestAsync() {
-        return App.createRequest({
-            url: BASE_URL,
-            method: 'GET',
-            headers: {
-                'referer': `${BASE_URL}/`,
-                'origin': `${BASE_URL}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent()
-            }
-        })
-    }
+    baseUrl: string = DOMAIN
 
+    apiUrl = 'https://templescan.net/apiv1'
+
+    override useChapterQuery = false
 }
