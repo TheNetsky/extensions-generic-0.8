@@ -21499,50 +21499,33 @@ exports.defaultTreeAdapter = {
 },{"../common/html.js":128}],139:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HeanCms = exports.BaseSourceInfo = exports.getExportDesciption = exports.getExportVersion = void 0;
+exports.Hean = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
-const HeanCmsParser_1 = require("./HeanCmsParser");
-const BASE_VERSION = '0.8.3';
+const HeanParser_1 = require("./HeanParser");
+const BASE_VERSION = '1.0.0';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
 exports.getExportVersion = getExportVersion;
-const getExportDesciption = (BASE_URL) => {
-    return `Extension that pulls manga from ${BASE_URL}`;
-};
-exports.getExportDesciption = getExportDesciption;
-exports.BaseSourceInfo = {
-    author: 'YvesPa',
-    authorWebsite: 'http://github.com/YvesPa',
-    icon: 'icon.png',
-    sourceTags: [],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.SETTINGS_UI
-};
-class HeanCms {
-    constructor(baseUrl, init = true) {
-        this.paramsToString = (params) => {
-            return '?' + Object.keys(params).map(key => `${key}=${params[key]}`).join('&');
-        };
-        this.baseUrl = baseUrl;
-        this.apiUrl = baseUrl.replace('://', '://api.');
-        this.mangaSubdivision = 'series';
-        this.rateLimit = 2;
-        this.useChapterQuery = true;
-        this.useGenres = true;
-        if (init)
-            this.init();
-    }
-    init() {
+class Hean {
+    constructor() {
+        /**
+         *  Request manager override
+         */
+        this.requestsPerSecond = 5;
+        this.requestTimeout = 20000;
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: this.rateLimit,
-            requestTimeout: 20000,
+            requestsPerSecond: this.requestsPerSecond,
+            requestTimeout: this.requestTimeout,
             interceptor: {
                 interceptRequest: async (request) => {
                     request.headers = {
                         ...(request.headers ?? {}),
-                        'Referer': this.baseUrl + '/',
-                        'Origin': this.baseUrl,
-                        'user-agent': await this.requestManager.getDefaultUserAgent()
+                        ...{
+                            'user-agent': await this.requestManager.getDefaultUserAgent(),
+                            'referer': `${this.baseUrl}/`,
+                            'origin': `${this.baseUrl}/`
+                        }
                     };
                     return request;
                 },
@@ -21551,96 +21534,121 @@ class HeanCms {
                 }
             }
         });
-    }
-    async ExecRequest(infos, parseMethods) {
-        const request = App.createRequest({ ...infos, method: 'GET' });
-        const response = await this.requestManager.schedule(request, 1);
-        const data = JSON.parse(response.data);
-        return parseMethods.call(HeanCmsParser_1.HeanCmsParser, data);
+        /**
+         * The language code the source's content is served in in string form.
+         */
+        this.language = '🇬🇧';
+        /**
+         * The common directory path for items after the baseURL
+         */
+        this.directoryPath = 'series';
+        /** Insert stuff here */
+        this.useChapterQuery = true;
+        /** Insert stuff here */
+        this.useGenres = true;
+        this.parser = new HeanParser_1.HeanParser();
+        this.paramsToString = (params) => {
+            return '?' + Object.keys(params).map(key => `${key}=${params[key]}`).join('&');
+        };
     }
     getMangaShareUrl(mangaId) {
-        const slug = HeanCmsParser_1.HeanCmsParser.convertMangaIdToSlug(mangaId);
-        return `${this.baseUrl}/${this.mangaSubdivision}/${slug}`;
+        const slug = this.parser.convertMangaIdToSlug(mangaId);
+        return `${this.baseUrl}/${this.directoryPath}/${slug}`;
     }
-    getMangaDetails(mangaId) {
-        return this.ExecRequest({ url: `${this.apiUrl}/${this.mangaSubdivision}/id/${HeanCmsParser_1.HeanCmsParser.convertMangaIdToId(mangaId)}` }, HeanCmsParser_1.HeanCmsParser.parseDetails);
+    async getMangaDetails(mangaId) {
+        const id = this.parser.convertMangaIdToSlug(mangaId);
+        const request = App.createRequest({
+            url: `${this.apiUrl}/${this.directoryPath}/${id}`,
+            method: 'GET'
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
+        const data = JSON.parse(response.data);
+        return this.parser.parseDetails(data);
     }
     async getChapters(mangaId) {
-        if (this.useChapterQuery)
-            return this.getChaptersForChapterQuery(mangaId);
-        else
-            return this.getChaptersForMangaQuery(mangaId);
+        if (this.useChapterQuery) {
+            const chapters = [];
+            const params = { page: 1, perPage: 500, series_id: this.parser.convertMangaIdToId(mangaId) };
+            let hasMore = true;
+            while (hasMore) {
+                const request = App.createRequest({
+                    url: `${this.apiUrl}/chapter/query`,
+                    method: 'GET',
+                    param: this.paramsToString(params)
+                });
+                const response = await this.requestManager.schedule(request, 1);
+                this.checkResponseError(response);
+                const data = JSON.parse(response.data);
+                const result = this.parser.parseChaptersList(this, data, params.page);
+                chapters.push(...result.chapters);
+                params.page++;
+                hasMore = result.hasMore;
+            }
+            return chapters;
+        }
+        else {
+            const slug = this.parser.convertMangaIdToSlug(mangaId);
+            const request = App.createRequest({
+                url: `${this.apiUrl}/${this.directoryPath}/${slug}`,
+                method: 'GET'
+            });
+            const response = await this.requestManager.schedule(request, 1);
+            this.checkResponseError(response);
+            const data = JSON.parse(response.data);
+            return this.parser.parseChapterFromMangaDetails(this, data);
+        }
     }
-    async getChaptersForChapterQuery(mangaId) {
-        const chapters = [];
-        const params = { page: 1, perPage: 500, series_id: HeanCmsParser_1.HeanCmsParser.convertMangaIdToId(mangaId) };
-        let hasMore = false;
-        do {
-            const result = await this.ExecRequest({
-                url: `${this.apiUrl}/chapter/query`,
-                param: this.paramsToString(params)
-            }, (data) => HeanCmsParser_1.HeanCmsParser.parseChaptersList(data, params.page));
-            chapters.push(...result.chapters);
-            params.page++;
-            hasMore = result.hasMore;
-        } while (hasMore);
-        return chapters;
+    async getChapterDetails(mangaId, chapterId) {
+        const slug = this.parser.convertMangaIdToSlug(mangaId);
+        const request = App.createRequest({
+            url: `${this.apiUrl}/chapter/${slug}/${chapterId}`,
+            method: 'GET'
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
+        const data = JSON.parse(response.data);
+        return this.parser.parseChapterDetails(data, mangaId, chapterId, this.apiUrl);
     }
-    async getChaptersForMangaQuery(mangaId) {
-        return this.ExecRequest({ url: `${this.apiUrl}/${this.mangaSubdivision}/id/${HeanCmsParser_1.HeanCmsParser.convertMangaIdToId(mangaId)}` }, HeanCmsParser_1.HeanCmsParser.parseChapterFromMangaDetails);
+    /*
+    Better the keep this removed since there are usually not enough to fill the slot on the homepage
+    getCarouselTitles(): Promise<PagedResults> {
+        return this.ExecRequest(
+            { url: `${this.apiUrl}/series/banners` },
+            HeanParser.parseCarouselTitles)
     }
-    getChapterDetails(mangaId, chapterId) {
-        return this.ExecRequest({ url: `${this.apiUrl}/chapter/${HeanCmsParser_1.HeanCmsParser.convertMangaIdToSlug(mangaId)}/${chapterId}` }, (data) => HeanCmsParser_1.HeanCmsParser.parseChapterDetails(data, mangaId, chapterId, this.apiUrl));
-    }
-    getCarouselTitles() {
-        return this.ExecRequest({ url: `${this.apiUrl}/series/banners` }, HeanCmsParser_1.HeanCmsParser.parseCarouselTitles);
-    }
-    getLatestReleasesTitles(metadata) {
-        const param = { order: 'desc', orderBy: 'latest' };
-        return this.getTitles(param, metadata);
-    }
-    getDailyTitles(metadata) {
-        const param = { order: 'desc', orderBy: 'day_views' };
-        return this.getTitles(param, metadata);
-    }
-    getMostViewedTitles(metadata) {
-        const param = { order: 'desc', orderBy: 'latest' };
-        return this.getTitles(param, metadata);
-    }
-    getTitles(queryParams, metadata) {
-        if (metadata && metadata.current_page === metadata.last_page)
+    */
+    async getTitles(queryParams, metadata) {
+        if (metadata && metadata.current_page === metadata.last_page) {
             return Promise.resolve(App.createPagedResults({}));
+        }
         const params = {
             ...queryParams,
             adult: true,
             page: (metadata?.current_page ?? 0) + 1,
             per_page: metadata?.per_page ?? 10
         };
-        return this.ExecRequest({
+        const request = App.createRequest({
             url: `${this.apiUrl}/query`,
+            method: 'GET',
             param: this.paramsToString(params)
-        }, HeanCmsParser_1.HeanCmsParser.parseSearchResults);
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
+        const data = JSON.parse(response.data);
+        return this.parser.parseSearchResults(data);
     }
-    getSearchResults(query, metadata) {
+    async getSearchResults(query, metadata) {
         const params = {
             query_string: query?.title ?? '',
             tags_ids: `[${(query?.includedTags.map(a => a.id) ?? []).join(',')}]`
         };
-        return this.getTitles(params, metadata);
+        return await this.getTitles(params, metadata);
     }
     async getHomePageSections(sectionCallback) {
         const sections = [
             {
-                request: this.getCarouselTitles(),
-                section: App.createHomeSection({
-                    id: 'test',
-                    title: 'test',
-                    containsMoreItems: true,
-                    type: types_1.HomeSectionType.featured
-                })
-            },
-            {
-                request: this.getLatestReleasesTitles(),
+                request: this.getTitles({ order: 'desc', orderBy: 'latest' }),
                 section: App.createHomeSection({
                     id: 'latest_releases',
                     title: 'Our latest releases on comics',
@@ -21649,7 +21657,7 @@ class HeanCms {
                 })
             },
             {
-                request: this.getDailyTitles(),
+                request: this.getTitles({ order: 'desc', orderBy: 'day_views' }),
                 section: App.createHomeSection({
                     id: 'daily',
                     title: 'Daily trending',
@@ -21658,7 +21666,7 @@ class HeanCms {
                 })
             },
             {
-                request: this.getMostViewedTitles(),
+                request: this.getTitles({ order: 'desc', orderBy: 'latest' }),
                 section: App.createHomeSection({
                     id: 'most_viewed',
                     title: 'Most viewed all times',
@@ -21676,32 +21684,68 @@ class HeanCms {
         }
     }
     async getSearchTags() {
-        return this.useGenres
-            ? [
-                App.createTagSection({
+        if (this.useGenres) {
+            const request = App.createRequest({
+                url: `${this.apiUrl}/tags`,
+                method: 'GET'
+            });
+            const response = await this.requestManager.schedule(request, 1);
+            this.checkResponseError(response);
+            const data = JSON.parse(response.data);
+            const tags = this.parser.parseGenres(data);
+            return [App.createTagSection({
                     id: '0',
                     label: 'genres',
-                    tags: await this.ExecRequest({ url: `${this.apiUrl}/tags` }, HeanCmsParser_1.HeanCmsParser.parseGenres)
-                })
-            ]
-            : [];
+                    tags: tags
+                })];
+        }
+        else {
+            return [];
+        }
     }
-    getViewMoreItems(homepageSectionId, metadata) {
+    async getViewMoreItems(homepageSectionId, metadata) {
+        let param;
         switch (homepageSectionId) {
             case 'latest_releases':
-                return this.getLatestReleasesTitles(metadata);
+                param = { order: 'desc', orderBy: 'latest' };
+                break;
             case 'daily':
-                return this.getDailyTitles(metadata);
+                param = { order: 'desc', orderBy: 'day_views' };
+                break;
             case 'most_viewed':
-                return this.getMostViewedTitles(metadata);
+                param = { order: 'desc', orderBy: 'latest' };
+                break;
             default:
                 throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
         }
+        return await this.getTitles(param, metadata);
+    }
+    async getCloudflareBypassRequestAsync() {
+        return App.createRequest({
+            url: this.baseUrl,
+            method: 'GET',
+            headers: {
+                'referer': `${this.baseUrl}/`,
+                'origin': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
+        });
+    }
+    // Utils
+    checkResponseError(response) {
+        const status = response.status;
+        switch (status) {
+            case 403:
+            case 503:
+                throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
+            case 404:
+                throw new Error(`The requested page ${response.request.url} was not found!`);
+        }
     }
 }
-exports.HeanCms = HeanCms;
+exports.Hean = Hean;
 
-},{"./HeanCmsParser":140,"@paperback/types":61}],140:[function(require,module,exports){
+},{"./HeanParser":140,"@paperback/types":61}],140:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -21727,31 +21771,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HeanCmsParser = void 0;
+exports.HeanParser = void 0;
 const cheerio = __importStar(require("cheerio"));
-class HeanCmsParser {
-    static parseDetails(data) {
+const entities = require("entities");
+class HeanParser {
+    parseDetails(data) {
+        const $ = cheerio.load(data.description);
+        const description = $('*').text();
         return App.createSourceManga({
             id: this.convertIdSlugToMangaId(data.id, data.series_slug),
             mangaInfo: App.createMangaInfo({
                 image: data.thumbnail,
-                titles: [data.title],
+                titles: [this.decodeHTMLEntity(data.title)],
                 author: data.author,
                 artist: data.studio ?? '',
-                desc: cheerio.load(data.description).text().trim(),
+                desc: this.decodeHTMLEntity(description),
                 tags: this.parseTagList(data.tags),
                 status: data.status
             })
         });
     }
-    static parseChapterFromMangaDetails(data) {
+    parseChapterFromMangaDetails(source, data) {
         return data.seasons
             ?.map(a => a.chapters
-            .map(chap => this.parseChapter(chap)))
+            .map(chap => this.parseChapter(source, chap)))
             .reduce((acc, val) => acc.concat(val), [])
             ?? [];
     }
-    static parseTagList(tags) {
+    parseTagList(tags) {
         if (!tags || tags.length === 0)
             return undefined;
         return [
@@ -21762,25 +21809,26 @@ class HeanCmsParser {
             })
         ];
     }
-    static parseChaptersList(data, pageNumber) {
+    parseChaptersList(source, data, pageNumber) {
         const chapters = data.data
             .filter(chapter => chapter.price === 0)
-            .map(chapter => this.parseChapter(chapter));
+            .map(chapter => this.parseChapter(source, chapter));
         return { chapters: chapters, hasMore: pageNumber !== data.meta.last_page };
     }
-    static parseChapter(chapter) {
+    parseChapter(source, chapter) {
         return App.createChapter({
             id: chapter.chapter_slug,
             chapNum: this.parseNum(chapter.chapter_name),
-            name: chapter.chapter_title ?? '',
-            time: new Date(chapter.created_at)
+            name: chapter.chapter_title ? this.decodeHTMLEntity(chapter.chapter_title) : 'Chapter ' + this.parseNum(chapter.chapter_name),
+            time: new Date(chapter.created_at),
+            langCode: source.language
         });
     }
-    static parseNum(chapter_name) {
+    parseNum(chapter_name) {
         const numTab = chapter_name.trim().split(' ');
         return Number(numTab[1]);
     }
-    static parseChapterDetails(data, mangaId, chapterId, api_url) {
+    parseChapterDetails(data, mangaId, chapterId, api_url) {
         const pages = (data.chapter.chapter_data?.images ?? data.data ?? [])
             .map(a => a.startsWith('https://') ? a : `${api_url}/${a}`);
         return App.createChapterDetails({
@@ -21789,92 +21837,84 @@ class HeanCmsParser {
             pages: pages
         });
     }
-    static parseCarouselTitles(data) {
+    parseCarouselTitles(data) {
         const items = data.map(elem => this.parseMangaFromCarouselElement(elem));
         return App.createPagedResults({
             results: items
         });
     }
-    static parseMangaFromCarouselElement(elem) {
+    parseMangaFromCarouselElement(elem) {
         return App.createPartialSourceManga({
             mangaId: this.convertIdSlugToMangaId(elem.series.id, elem.series.series_slug),
-            title: elem.series.title,
+            title: this.decodeHTMLEntity(elem.series.title),
             image: elem.banner
         });
     }
-    static parseSearchResults(data) {
+    parseSearchResults(data) {
         const items = data.data.map(item => this.parseSearchListItem(item));
         return App.createPagedResults({
             results: items,
             metadata: data.meta
         });
     }
-    static parseSearchListItem(item) {
+    parseSearchListItem(item) {
         return App.createPartialSourceManga({
             mangaId: this.convertIdSlugToMangaId(item.id, item.series_slug),
-            title: item.title,
+            title: this.decodeHTMLEntity(item.title),
+            subtitle: item.free_chapters ? item.free_chapters[item.free_chapters.length - 1]?.chapter_name : item.status,
             image: item.thumbnail
         });
     }
-    static parseGenres(data) {
+    parseGenres(data) {
         return data
             .sort((a, b) => a.id - b.id)
             .map(tag => App.createTag({ id: tag.id.toString(), label: tag.name }));
     }
-    static convertMangaIdToId(mangaId) {
+    convertMangaIdToId(mangaId) {
         const tab = mangaId.split('$$');
         return tab.length === 2 && tab[0] ? tab[0] : mangaId;
     }
-    static convertMangaIdToSlug(mangaId) {
+    convertMangaIdToSlug(mangaId) {
         const tab = mangaId.split('$$');
         return tab.length === 2 && tab[1] ? tab[1] : mangaId;
     }
-    static convertIdSlugToMangaId(id, slug) {
+    convertIdSlugToMangaId(id, slug) {
         return `${id}$$${slug}`;
     }
+    decodeHTMLEntity(str) {
+        return entities.decodeHTML(str);
+    }
 }
-exports.HeanCmsParser = HeanCmsParser;
+exports.HeanParser = HeanParser;
 
-},{"cheerio":74}],141:[function(require,module,exports){
+},{"cheerio":74,"entities":116}],141:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TempleScan = exports.TempleScanInfo = void 0;
 const types_1 = require("@paperback/types");
-const BASE_URL = 'https://templescan.net';
-const API_URL = 'https://templescan.net/apiv1';
-const SOURCE_NAME = 'TempleScan';
-const VERSION = '0.0.0';
-const HeanCms_1 = require("../HeanCms");
+const Hean_1 = require("../Hean");
+const DOMAIN = 'https://templescan.net';
 exports.TempleScanInfo = {
-    ...HeanCms_1.BaseSourceInfo,
-    name: SOURCE_NAME,
-    version: (0, HeanCms_1.getExportVersion)(VERSION),
-    description: (0, HeanCms_1.getExportDesciption)(BASE_URL),
-    websiteBaseURL: BASE_URL,
-    contentRating: types_1.ContentRating.ADULT,
-    intents: HeanCms_1.BaseSourceInfo.intents | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
+    version: (0, Hean_1.getExportVersion)('0.0.0'),
+    name: 'TempleScan',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'YvesPa',
+    authorWebsite: 'http://github.com/YvesPa',
+    icon: 'icon.png',
+    contentRating: types_1.ContentRating.MATURE,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [],
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 };
-class TempleScan extends HeanCms_1.HeanCms {
+class TempleScan extends Hean_1.Hean {
     constructor() {
-        super(BASE_URL, false);
-        this.apiUrl = API_URL;
-        this.rateLimit = 2;
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+        this.apiUrl = 'https://templescan.net/apiv1';
         this.useChapterQuery = false;
-        this.init();
-    }
-    async getCloudflareBypassRequestAsync() {
-        return App.createRequest({
-            url: BASE_URL,
-            method: 'GET',
-            headers: {
-                'referer': `${BASE_URL}/`,
-                'origin': `${BASE_URL}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent()
-            }
-        });
     }
 }
 exports.TempleScan = TempleScan;
 
-},{"../HeanCms":139,"@paperback/types":61}]},{},[141])(141)
+},{"../Hean":139,"@paperback/types":61}]},{},[141])(141)
 });
