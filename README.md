@@ -1,2 +1,2 @@
 # MangaStream Extensions
-[Click me](https://thenetsky.github.io/extensions-generic-0.8/) to go to the index page!
+[Click me](https://ivanmatthew.github.io/netsky-fork-generic/) to go to the index page!
