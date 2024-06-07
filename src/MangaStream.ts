@@ -36,7 +36,7 @@ import {
 } from './MangaStreamInterfaces'
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '3.0.3'
+const BASE_VERSION = '3.1.3'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -320,15 +320,33 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
-        const chapter = $('div#chapterlist').find('li[data-num="' + chapterId + '"]')
-        if (!chapter) {
-            throw new Error(`Unable to fetch a chapter for chapter numer: ${chapterId}`)
+        let chapter = $('div#chapterlist').find('li[data-num="' + chapterId + '"]')
+        if (chapter.length === 0) {
+            // final attempt is to search for the chapter number in the chapter title, and also only list the ones wi thout data-num
+            const chapters = $('div#chapterlist li:not([data-num]),li[data-num=""]').toArray()
+
+            for (let i = 0; i < chapters.length; i++) {
+                // @ts-expect-error Always defined.
+                const matches = $('a', chapters[i])
+                if (matches.length === 0) {
+                    continue
+                }
+
+                if (matches.attr('href')?.includes(chapterId)) {
+                    chapter = $(chapters[i])
+                    break
+                }
+            }
+
+            if (chapter.length === 0) {
+                throw new Error(`Unable to fetch a chapter for chapter number: ${chapterId}`)
+            }
         }
 
         // Fetch the ID (URL) of the chapter
         const id = $('a', chapter).attr('href') ?? ''
         if (!id) {
-            throw new Error(`Unable to fetch id for chapter numer: ${chapterId}`)
+            throw new Error(`Unable to fetch id for chapter number: ${chapterId}`)
         }
         // Request the chapter page
         const _request = App.createRequest({

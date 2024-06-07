@@ -87,6 +87,15 @@ export class MangaStreamParser {
         // Usually for Manhwa sites
         if (mangaId.toUpperCase().endsWith('-RAW') && source.language == '🇬🇧') language = '🇰🇷'
 
+        let lowestNumber = 0
+        const unresolvedChapters: {
+            metadata: {
+                title: string
+                date: Date
+            },
+            belongingIndex: number
+        }[] = []
+
         for (const chapter of $('li', 'div#chapterlist').toArray()) {
             const title = $('span.chapternum', chapter).text().trim()
             const date = convertDate($('span.chapterdate', chapter).text().trim(), source)
@@ -95,6 +104,19 @@ export class MangaStreamParser {
             let chapterNumber = 0
             if (chapterNumberRegex && chapterNumberRegex[1]) {
                 chapterNumber = Number(chapterNumberRegex[1])
+                if (chapterNumber < lowestNumber) {
+                    lowestNumber = chapterNumber
+                }
+            } else {
+                unresolvedChapters.push({
+                    metadata: {
+                        title: title,
+                        date: date
+                    },
+                    belongingIndex: sortingIndex
+                })
+                sortingIndex--
+                continue
             }
 
             if (!id || typeof id === 'undefined') {
@@ -112,6 +134,25 @@ export class MangaStreamParser {
                 group: ''
             })
             sortingIndex--
+        }
+
+        // If there are unresolved chapters, attempt to resolve them
+        if (unresolvedChapters.length > 0) {
+            for (const unresolvedChapter of unresolvedChapters) {
+                chapters.push({
+                    // Should be unique enough
+                    id: lowestNumber.toString(),
+                    langCode: language,
+                    chapNum: lowestNumber,
+                    name: unresolvedChapter.metadata.title,
+                    time: unresolvedChapter.metadata.date,
+                    sortingIndex: unresolvedChapter.belongingIndex,
+                    volume: 0,
+                    group: ''
+                })
+
+                lowestNumber--
+            }
         }
 
         // If there are no chapters, throw error to avoid losing progress
