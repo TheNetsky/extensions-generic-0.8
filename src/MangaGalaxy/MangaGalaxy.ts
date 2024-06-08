@@ -15,7 +15,7 @@ import { MangaGalaxyParser } from './MangaGalaxyParser'
 const DOMAIN = 'https://mangagalaxy.me'
 
 export const MangaGalaxyInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.1.0'),
     name: 'MangaGalaxy',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
