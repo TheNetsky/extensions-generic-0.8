@@ -1461,9 +1461,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaGalaxy = exports.MangaGalaxyInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
+const MangaGalaxyParser_1 = require("./MangaGalaxyParser");
 const DOMAIN = 'https://mangagalaxy.me';
 exports.MangaGalaxyInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.1.0'),
     name: 'MangaGalaxy',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -1479,14 +1480,141 @@ class MangaGalaxy extends MangaStream_1.MangaStream {
         super(...arguments);
         this.baseUrl = DOMAIN;
         this.directoryPath = 'series';
+        this.parser = new MangaGalaxyParser_1.MangaGalaxyParser();
     }
     configureSections() {
         this.homescreen_sections['new_titles'].enabled = false;
     }
+    async getChapterDetails(mangaId, chapterId) {
+        // Request the manga page
+        const request = App.createRequest({
+            url: await this.getUsePostIds() ? `${this.baseUrl}/?p=${mangaId}/` : `${this.baseUrl}/${this.directoryPath}/${mangaId}/`,
+            method: 'GET'
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
+        const $ = this.cheerio.load(response.data);
+        let chapter = $('div#chapterlist').find('li[data-num="' + chapterId + '"]');
+        if (chapter.length === 0) {
+            // final attempt is to search for the chapter number in the chapter title, and also only list the ones wi thout data-num
+            const chapters = $('div#chapterlist li:not([data-num]),li[data-num=""]').toArray();
+            for (let i = 0; i < chapters.length; i++) {
+                // @ts-expect-error Always defined.
+                const matches = $('a', chapters[i]);
+                if (matches.length === 0) {
+                    continue;
+                }
+                if (matches.attr('href')?.includes(chapterId)) {
+                    chapter = $(chapters[i]);
+                    break;
+                }
+            }
+            if (chapter.length === 0) {
+                throw new Error(`Unable to fetch a chapter for chapter number: ${chapterId}`);
+            }
+        }
+        // Fetch the ID (URL) of the chapter
+        const id = $('a', chapter).attr('href') ?? '';
+        if (!id) {
+            throw new Error(`Unable to fetch id for chapter number: ${chapterId}`);
+        }
+        // Request the chapter page
+        const _request = App.createRequest({
+            url: id,
+            method: 'GET'
+        });
+        const _response = await this.requestManager.schedule(_request, 1);
+        this.checkResponseError(_response);
+        const _$ = this.cheerio.load(_response.data);
+        return this.parser.parseChapterDetails(_$, mangaId, chapterId);
+    }
 }
 exports.MangaGalaxy = MangaGalaxy;
 
-},{"../MangaStream":72,"@paperback/types":61}],72:[function(require,module,exports){
+},{"../MangaStream":73,"./MangaGalaxyParser":72,"@paperback/types":61}],72:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MangaGalaxyParser = void 0;
+const MangaStreamParser_1 = require("../MangaStreamParser");
+const LanguageUtils_1 = require("../LanguageUtils");
+class MangaGalaxyParser extends MangaStreamParser_1.MangaStreamParser {
+    parseChapterList($, mangaId, source) {
+        const chapters = [];
+        let sortingIndex = 0;
+        let language = source.language;
+        // Usually for Manhwa sites
+        if (mangaId.toUpperCase().endsWith('-RAW') && source.language == '🇬🇧')
+            language = '🇰🇷';
+        let lowestNumber = 0;
+        const unresolvedChapters = [];
+        for (const chapter of $('li', 'div#chapterlist').toArray()) {
+            const title = $('span.chapternum', chapter).text().trim();
+            const date = (0, LanguageUtils_1.convertDate)($('span.chapterdate', chapter).text().trim(), source);
+            const id = chapter.attribs['data-num'] ?? ''; // Set data-num attribute as id
+            const chapterNumberRegex = id.match(/(\d+\.?\d?)+/);
+            let chapterNumber = 0;
+            if (chapterNumberRegex && chapterNumberRegex[1]) {
+                chapterNumber = Number(chapterNumberRegex[1]);
+                if (chapterNumber < lowestNumber) {
+                    lowestNumber = chapterNumber;
+                }
+            }
+            else {
+                unresolvedChapters.push({
+                    metadata: {
+                        title: title,
+                        date: date
+                    },
+                    belongingIndex: sortingIndex
+                });
+                sortingIndex--;
+                continue;
+            }
+            if (!id || typeof id === 'undefined') {
+                throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`);
+            }
+            chapters.push({
+                id: id, // Store chapterNumber as id
+                langCode: language,
+                chapNum: chapterNumber,
+                name: title,
+                time: date,
+                sortingIndex,
+                volume: 0,
+                group: ''
+            });
+            sortingIndex--;
+        }
+        // If there are unresolved chapters, attempt to resolve them
+        if (unresolvedChapters.length > 0) {
+            for (const unresolvedChapter of unresolvedChapters) {
+                chapters.push({
+                    // Should be unique enough
+                    id: lowestNumber.toString(),
+                    langCode: language,
+                    chapNum: lowestNumber,
+                    name: unresolvedChapter.metadata.title,
+                    time: unresolvedChapter.metadata.date,
+                    sortingIndex: unresolvedChapter.belongingIndex,
+                    volume: 0,
+                    group: ''
+                });
+                lowestNumber--;
+            }
+        }
+        // If there are no chapters, throw error to avoid losing progress
+        if (chapters.length == 0) {
+            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`);
+        }
+        return chapters.map((chapter) => {
+            chapter.sortingIndex += chapters.length;
+            return App.createChapter(chapter);
+        });
+    }
+}
+exports.MangaGalaxyParser = MangaGalaxyParser;
+
+},{"../LanguageUtils":70,"../MangaStreamParser":75}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaStream = exports.getExportVersion = void 0;
@@ -1981,7 +2109,7 @@ class MangaStream {
 }
 exports.MangaStream = MangaStream;
 
-},{"./MangaStreamHelper":73,"./MangaStreamParser":74,"./UrlBuilder":75,"@paperback/types":61}],73:[function(require,module,exports){
+},{"./MangaStreamHelper":74,"./MangaStreamParser":75,"./UrlBuilder":76,"@paperback/types":61}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFilterTagsBySection = exports.getIncludedTagBySection = exports.createHomeSection = exports.DefaultHomeSectionData = void 0;
@@ -2020,7 +2148,7 @@ function getFilterTagsBySection(section, tags, included, supportsExclusion = fal
 }
 exports.getFilterTagsBySection = getFilterTagsBySection;
 
-},{"@paperback/types":61}],74:[function(require,module,exports){
+},{"@paperback/types":61}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaStreamParser = void 0;
@@ -2310,7 +2438,7 @@ class MangaStreamParser {
 }
 exports.MangaStreamParser = MangaStreamParser;
 
-},{"./LanguageUtils":70,"entities":69}],75:[function(require,module,exports){
+},{"./LanguageUtils":70,"entities":69}],76:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
