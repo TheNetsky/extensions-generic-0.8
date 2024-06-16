@@ -459,16 +459,39 @@ __exportStar(require("./compat/DyamicUI"), exports);
 
 },{"./base/index":7,"./compat/DyamicUI":16,"./generated/_exports":60}],62:[function(require,module,exports){
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodeXML = exports.decodeHTMLStrict = exports.decodeHTML = exports.determineBranch = exports.BinTrieFlags = exports.fromCodePoint = exports.replaceCodePoint = exports.decodeCodePoint = exports.xmlDecodeTree = exports.htmlDecodeTree = void 0;
+exports.decodeXML = exports.decodeHTMLStrict = exports.decodeHTMLAttribute = exports.decodeHTML = exports.determineBranch = exports.EntityDecoder = exports.DecodingMode = exports.BinTrieFlags = exports.fromCodePoint = exports.replaceCodePoint = exports.decodeCodePoint = exports.xmlDecodeTree = exports.htmlDecodeTree = void 0;
 var decode_data_html_js_1 = __importDefault(require("./generated/decode-data-html.js"));
 exports.htmlDecodeTree = decode_data_html_js_1.default;
 var decode_data_xml_js_1 = __importDefault(require("./generated/decode-data-xml.js"));
 exports.xmlDecodeTree = decode_data_xml_js_1.default;
-var decode_codepoint_js_1 = __importDefault(require("./decode_codepoint.js"));
+var decode_codepoint_js_1 = __importStar(require("./decode_codepoint.js"));
 exports.decodeCodePoint = decode_codepoint_js_1.default;
 var decode_codepoint_js_2 = require("./decode_codepoint.js");
 Object.defineProperty(exports, "replaceCodePoint", { enumerable: true, get: function () { return decode_codepoint_js_2.replaceCodePoint; } });
@@ -477,99 +500,421 @@ var CharCodes;
 (function (CharCodes) {
     CharCodes[CharCodes["NUM"] = 35] = "NUM";
     CharCodes[CharCodes["SEMI"] = 59] = "SEMI";
+    CharCodes[CharCodes["EQUALS"] = 61] = "EQUALS";
     CharCodes[CharCodes["ZERO"] = 48] = "ZERO";
     CharCodes[CharCodes["NINE"] = 57] = "NINE";
     CharCodes[CharCodes["LOWER_A"] = 97] = "LOWER_A";
     CharCodes[CharCodes["LOWER_F"] = 102] = "LOWER_F";
     CharCodes[CharCodes["LOWER_X"] = 120] = "LOWER_X";
-    /** Bit that needs to be set to convert an upper case ASCII character to lower case */
-    CharCodes[CharCodes["To_LOWER_BIT"] = 32] = "To_LOWER_BIT";
+    CharCodes[CharCodes["LOWER_Z"] = 122] = "LOWER_Z";
+    CharCodes[CharCodes["UPPER_A"] = 65] = "UPPER_A";
+    CharCodes[CharCodes["UPPER_F"] = 70] = "UPPER_F";
+    CharCodes[CharCodes["UPPER_Z"] = 90] = "UPPER_Z";
 })(CharCodes || (CharCodes = {}));
+/** Bit that needs to be set to convert an upper case ASCII character to lower case */
+var TO_LOWER_BIT = 32;
 var BinTrieFlags;
 (function (BinTrieFlags) {
     BinTrieFlags[BinTrieFlags["VALUE_LENGTH"] = 49152] = "VALUE_LENGTH";
     BinTrieFlags[BinTrieFlags["BRANCH_LENGTH"] = 16256] = "BRANCH_LENGTH";
     BinTrieFlags[BinTrieFlags["JUMP_TABLE"] = 127] = "JUMP_TABLE";
 })(BinTrieFlags = exports.BinTrieFlags || (exports.BinTrieFlags = {}));
-function getDecoder(decodeTree) {
-    return function decodeHTMLBinary(str, strict) {
-        var ret = "";
-        var lastIdx = 0;
-        var strIdx = 0;
-        while ((strIdx = str.indexOf("&", strIdx)) >= 0) {
-            ret += str.slice(lastIdx, strIdx);
-            lastIdx = strIdx;
-            // Skip the "&"
-            strIdx += 1;
-            // If we have a numeric entity, handle this separately.
-            if (str.charCodeAt(strIdx) === CharCodes.NUM) {
-                // Skip the leading "&#". For hex entities, also skip the leading "x".
-                var start = strIdx + 1;
-                var base = 10;
-                var cp = str.charCodeAt(start);
-                if ((cp | CharCodes.To_LOWER_BIT) === CharCodes.LOWER_X) {
-                    base = 16;
-                    strIdx += 1;
-                    start += 1;
+function isNumber(code) {
+    return code >= CharCodes.ZERO && code <= CharCodes.NINE;
+}
+function isHexadecimalCharacter(code) {
+    return ((code >= CharCodes.UPPER_A && code <= CharCodes.UPPER_F) ||
+        (code >= CharCodes.LOWER_A && code <= CharCodes.LOWER_F));
+}
+function isAsciiAlphaNumeric(code) {
+    return ((code >= CharCodes.UPPER_A && code <= CharCodes.UPPER_Z) ||
+        (code >= CharCodes.LOWER_A && code <= CharCodes.LOWER_Z) ||
+        isNumber(code));
+}
+/**
+ * Checks if the given character is a valid end character for an entity in an attribute.
+ *
+ * Attribute values that aren't terminated properly aren't parsed, and shouldn't lead to a parser error.
+ * See the example in https://html.spec.whatwg.org/multipage/parsing.html#named-character-reference-state
+ */
+function isEntityInAttributeInvalidEnd(code) {
+    return code === CharCodes.EQUALS || isAsciiAlphaNumeric(code);
+}
+var EntityDecoderState;
+(function (EntityDecoderState) {
+    EntityDecoderState[EntityDecoderState["EntityStart"] = 0] = "EntityStart";
+    EntityDecoderState[EntityDecoderState["NumericStart"] = 1] = "NumericStart";
+    EntityDecoderState[EntityDecoderState["NumericDecimal"] = 2] = "NumericDecimal";
+    EntityDecoderState[EntityDecoderState["NumericHex"] = 3] = "NumericHex";
+    EntityDecoderState[EntityDecoderState["NamedEntity"] = 4] = "NamedEntity";
+})(EntityDecoderState || (EntityDecoderState = {}));
+var DecodingMode;
+(function (DecodingMode) {
+    /** Entities in text nodes that can end with any character. */
+    DecodingMode[DecodingMode["Legacy"] = 0] = "Legacy";
+    /** Only allow entities terminated with a semicolon. */
+    DecodingMode[DecodingMode["Strict"] = 1] = "Strict";
+    /** Entities in attributes have limitations on ending characters. */
+    DecodingMode[DecodingMode["Attribute"] = 2] = "Attribute";
+})(DecodingMode = exports.DecodingMode || (exports.DecodingMode = {}));
+/**
+ * Token decoder with support of writing partial entities.
+ */
+var EntityDecoder = /** @class */ (function () {
+    function EntityDecoder(
+    /** The tree used to decode entities. */
+    decodeTree, 
+    /**
+     * The function that is called when a codepoint is decoded.
+     *
+     * For multi-byte named entities, this will be called multiple times,
+     * with the second codepoint, and the same `consumed` value.
+     *
+     * @param codepoint The decoded codepoint.
+     * @param consumed The number of bytes consumed by the decoder.
+     */
+    emitCodePoint, 
+    /** An object that is used to produce errors. */
+    errors) {
+        this.decodeTree = decodeTree;
+        this.emitCodePoint = emitCodePoint;
+        this.errors = errors;
+        /** The current state of the decoder. */
+        this.state = EntityDecoderState.EntityStart;
+        /** Characters that were consumed while parsing an entity. */
+        this.consumed = 1;
+        /**
+         * The result of the entity.
+         *
+         * Either the result index of a numeric entity, or the codepoint of a
+         * numeric entity.
+         */
+        this.result = 0;
+        /** The current index in the decode tree. */
+        this.treeIndex = 0;
+        /** The number of characters that were consumed in excess. */
+        this.excess = 1;
+        /** The mode in which the decoder is operating. */
+        this.decodeMode = DecodingMode.Strict;
+    }
+    /** Resets the instance to make it reusable. */
+    EntityDecoder.prototype.startEntity = function (decodeMode) {
+        this.decodeMode = decodeMode;
+        this.state = EntityDecoderState.EntityStart;
+        this.result = 0;
+        this.treeIndex = 0;
+        this.excess = 1;
+        this.consumed = 1;
+    };
+    /**
+     * Write an entity to the decoder. This can be called multiple times with partial entities.
+     * If the entity is incomplete, the decoder will return -1.
+     *
+     * Mirrors the implementation of `getDecoder`, but with the ability to stop decoding if the
+     * entity is incomplete, and resume when the next string is written.
+     *
+     * @param string The string containing the entity (or a continuation of the entity).
+     * @param offset The offset at which the entity begins. Should be 0 if this is not the first call.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.write = function (str, offset) {
+        switch (this.state) {
+            case EntityDecoderState.EntityStart: {
+                if (str.charCodeAt(offset) === CharCodes.NUM) {
+                    this.state = EntityDecoderState.NumericStart;
+                    this.consumed += 1;
+                    return this.stateNumericStart(str, offset + 1);
                 }
-                do
-                    cp = str.charCodeAt(++strIdx);
-                while ((cp >= CharCodes.ZERO && cp <= CharCodes.NINE) ||
-                    (base === 16 &&
-                        (cp | CharCodes.To_LOWER_BIT) >= CharCodes.LOWER_A &&
-                        (cp | CharCodes.To_LOWER_BIT) <= CharCodes.LOWER_F));
-                if (start !== strIdx) {
-                    var entity = str.substring(start, strIdx);
-                    var parsed = parseInt(entity, base);
-                    if (str.charCodeAt(strIdx) === CharCodes.SEMI) {
-                        strIdx += 1;
-                    }
-                    else if (strict) {
-                        continue;
-                    }
-                    ret += (0, decode_codepoint_js_1.default)(parsed);
-                    lastIdx = strIdx;
-                }
-                continue;
+                this.state = EntityDecoderState.NamedEntity;
+                return this.stateNamedEntity(str, offset);
             }
-            var resultIdx = 0;
-            var excess = 1;
-            var treeIdx = 0;
-            var current = decodeTree[treeIdx];
-            for (; strIdx < str.length; strIdx++, excess++) {
-                treeIdx = determineBranch(decodeTree, current, treeIdx + 1, str.charCodeAt(strIdx));
-                if (treeIdx < 0)
-                    break;
-                current = decodeTree[treeIdx];
-                var masked = current & BinTrieFlags.VALUE_LENGTH;
-                // If the branch is a value, store it and continue
-                if (masked) {
-                    // If we have a legacy entity while parsing strictly, just skip the number of bytes
-                    if (!strict || str.charCodeAt(strIdx) === CharCodes.SEMI) {
-                        resultIdx = treeIdx;
-                        excess = 0;
-                    }
-                    // The mask is the number of bytes of the value, including the current byte.
-                    var valueLength = (masked >> 14) - 1;
-                    if (valueLength === 0)
-                        break;
-                    treeIdx += valueLength;
-                }
+            case EntityDecoderState.NumericStart: {
+                return this.stateNumericStart(str, offset);
             }
-            if (resultIdx !== 0) {
-                var valueLength = (decodeTree[resultIdx] & BinTrieFlags.VALUE_LENGTH) >> 14;
-                ret +=
-                    valueLength === 1
-                        ? String.fromCharCode(decodeTree[resultIdx] & ~BinTrieFlags.VALUE_LENGTH)
-                        : valueLength === 2
-                            ? String.fromCharCode(decodeTree[resultIdx + 1])
-                            : String.fromCharCode(decodeTree[resultIdx + 1], decodeTree[resultIdx + 2]);
-                lastIdx = strIdx - excess + 1;
+            case EntityDecoderState.NumericDecimal: {
+                return this.stateNumericDecimal(str, offset);
+            }
+            case EntityDecoderState.NumericHex: {
+                return this.stateNumericHex(str, offset);
+            }
+            case EntityDecoderState.NamedEntity: {
+                return this.stateNamedEntity(str, offset);
             }
         }
-        return ret + str.slice(lastIdx);
+    };
+    /**
+     * Switches between the numeric decimal and hexadecimal states.
+     *
+     * Equivalent to the `Numeric character reference state` in the HTML spec.
+     *
+     * @param str The string containing the entity (or a continuation of the entity).
+     * @param offset The current offset.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.stateNumericStart = function (str, offset) {
+        if (offset >= str.length) {
+            return -1;
+        }
+        if ((str.charCodeAt(offset) | TO_LOWER_BIT) === CharCodes.LOWER_X) {
+            this.state = EntityDecoderState.NumericHex;
+            this.consumed += 1;
+            return this.stateNumericHex(str, offset + 1);
+        }
+        this.state = EntityDecoderState.NumericDecimal;
+        return this.stateNumericDecimal(str, offset);
+    };
+    EntityDecoder.prototype.addToNumericResult = function (str, start, end, base) {
+        if (start !== end) {
+            var digitCount = end - start;
+            this.result =
+                this.result * Math.pow(base, digitCount) +
+                    parseInt(str.substr(start, digitCount), base);
+            this.consumed += digitCount;
+        }
+    };
+    /**
+     * Parses a hexadecimal numeric entity.
+     *
+     * Equivalent to the `Hexademical character reference state` in the HTML spec.
+     *
+     * @param str The string containing the entity (or a continuation of the entity).
+     * @param offset The current offset.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.stateNumericHex = function (str, offset) {
+        var startIdx = offset;
+        while (offset < str.length) {
+            var char = str.charCodeAt(offset);
+            if (isNumber(char) || isHexadecimalCharacter(char)) {
+                offset += 1;
+            }
+            else {
+                this.addToNumericResult(str, startIdx, offset, 16);
+                return this.emitNumericEntity(char, 3);
+            }
+        }
+        this.addToNumericResult(str, startIdx, offset, 16);
+        return -1;
+    };
+    /**
+     * Parses a decimal numeric entity.
+     *
+     * Equivalent to the `Decimal character reference state` in the HTML spec.
+     *
+     * @param str The string containing the entity (or a continuation of the entity).
+     * @param offset The current offset.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.stateNumericDecimal = function (str, offset) {
+        var startIdx = offset;
+        while (offset < str.length) {
+            var char = str.charCodeAt(offset);
+            if (isNumber(char)) {
+                offset += 1;
+            }
+            else {
+                this.addToNumericResult(str, startIdx, offset, 10);
+                return this.emitNumericEntity(char, 2);
+            }
+        }
+        this.addToNumericResult(str, startIdx, offset, 10);
+        return -1;
+    };
+    /**
+     * Validate and emit a numeric entity.
+     *
+     * Implements the logic from the `Hexademical character reference start
+     * state` and `Numeric character reference end state` in the HTML spec.
+     *
+     * @param lastCp The last code point of the entity. Used to see if the
+     *               entity was terminated with a semicolon.
+     * @param expectedLength The minimum number of characters that should be
+     *                       consumed. Used to validate that at least one digit
+     *                       was consumed.
+     * @returns The number of characters that were consumed.
+     */
+    EntityDecoder.prototype.emitNumericEntity = function (lastCp, expectedLength) {
+        var _a;
+        // Ensure we consumed at least one digit.
+        if (this.consumed <= expectedLength) {
+            (_a = this.errors) === null || _a === void 0 ? void 0 : _a.absenceOfDigitsInNumericCharacterReference(this.consumed);
+            return 0;
+        }
+        // Figure out if this is a legit end of the entity
+        if (lastCp === CharCodes.SEMI) {
+            this.consumed += 1;
+        }
+        else if (this.decodeMode === DecodingMode.Strict) {
+            return 0;
+        }
+        this.emitCodePoint((0, decode_codepoint_js_1.replaceCodePoint)(this.result), this.consumed);
+        if (this.errors) {
+            if (lastCp !== CharCodes.SEMI) {
+                this.errors.missingSemicolonAfterCharacterReference();
+            }
+            this.errors.validateNumericCharacterReference(this.result);
+        }
+        return this.consumed;
+    };
+    /**
+     * Parses a named entity.
+     *
+     * Equivalent to the `Named character reference state` in the HTML spec.
+     *
+     * @param str The string containing the entity (or a continuation of the entity).
+     * @param offset The current offset.
+     * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+     */
+    EntityDecoder.prototype.stateNamedEntity = function (str, offset) {
+        var decodeTree = this.decodeTree;
+        var current = decodeTree[this.treeIndex];
+        // The mask is the number of bytes of the value, including the current byte.
+        var valueLength = (current & BinTrieFlags.VALUE_LENGTH) >> 14;
+        for (; offset < str.length; offset++, this.excess++) {
+            var char = str.charCodeAt(offset);
+            this.treeIndex = determineBranch(decodeTree, current, this.treeIndex + Math.max(1, valueLength), char);
+            if (this.treeIndex < 0) {
+                return this.result === 0 ||
+                    // If we are parsing an attribute
+                    (this.decodeMode === DecodingMode.Attribute &&
+                        // We shouldn't have consumed any characters after the entity,
+                        (valueLength === 0 ||
+                            // And there should be no invalid characters.
+                            isEntityInAttributeInvalidEnd(char)))
+                    ? 0
+                    : this.emitNotTerminatedNamedEntity();
+            }
+            current = decodeTree[this.treeIndex];
+            valueLength = (current & BinTrieFlags.VALUE_LENGTH) >> 14;
+            // If the branch is a value, store it and continue
+            if (valueLength !== 0) {
+                // If the entity is terminated by a semicolon, we are done.
+                if (char === CharCodes.SEMI) {
+                    return this.emitNamedEntityData(this.treeIndex, valueLength, this.consumed + this.excess);
+                }
+                // If we encounter a non-terminated (legacy) entity while parsing strictly, then ignore it.
+                if (this.decodeMode !== DecodingMode.Strict) {
+                    this.result = this.treeIndex;
+                    this.consumed += this.excess;
+                    this.excess = 0;
+                }
+            }
+        }
+        return -1;
+    };
+    /**
+     * Emit a named entity that was not terminated with a semicolon.
+     *
+     * @returns The number of characters consumed.
+     */
+    EntityDecoder.prototype.emitNotTerminatedNamedEntity = function () {
+        var _a;
+        var _b = this, result = _b.result, decodeTree = _b.decodeTree;
+        var valueLength = (decodeTree[result] & BinTrieFlags.VALUE_LENGTH) >> 14;
+        this.emitNamedEntityData(result, valueLength, this.consumed);
+        (_a = this.errors) === null || _a === void 0 ? void 0 : _a.missingSemicolonAfterCharacterReference();
+        return this.consumed;
+    };
+    /**
+     * Emit a named entity.
+     *
+     * @param result The index of the entity in the decode tree.
+     * @param valueLength The number of bytes in the entity.
+     * @param consumed The number of characters consumed.
+     *
+     * @returns The number of characters consumed.
+     */
+    EntityDecoder.prototype.emitNamedEntityData = function (result, valueLength, consumed) {
+        var decodeTree = this.decodeTree;
+        this.emitCodePoint(valueLength === 1
+            ? decodeTree[result] & ~BinTrieFlags.VALUE_LENGTH
+            : decodeTree[result + 1], consumed);
+        if (valueLength === 3) {
+            // For multi-byte values, we need to emit the second byte.
+            this.emitCodePoint(decodeTree[result + 2], consumed);
+        }
+        return consumed;
+    };
+    /**
+     * Signal to the parser that the end of the input was reached.
+     *
+     * Remaining data will be emitted and relevant errors will be produced.
+     *
+     * @returns The number of characters consumed.
+     */
+    EntityDecoder.prototype.end = function () {
+        var _a;
+        switch (this.state) {
+            case EntityDecoderState.NamedEntity: {
+                // Emit a named entity if we have one.
+                return this.result !== 0 &&
+                    (this.decodeMode !== DecodingMode.Attribute ||
+                        this.result === this.treeIndex)
+                    ? this.emitNotTerminatedNamedEntity()
+                    : 0;
+            }
+            // Otherwise, emit a numeric entity if we have one.
+            case EntityDecoderState.NumericDecimal: {
+                return this.emitNumericEntity(0, 2);
+            }
+            case EntityDecoderState.NumericHex: {
+                return this.emitNumericEntity(0, 3);
+            }
+            case EntityDecoderState.NumericStart: {
+                (_a = this.errors) === null || _a === void 0 ? void 0 : _a.absenceOfDigitsInNumericCharacterReference(this.consumed);
+                return 0;
+            }
+            case EntityDecoderState.EntityStart: {
+                // Return 0 if we have no entity.
+                return 0;
+            }
+        }
+    };
+    return EntityDecoder;
+}());
+exports.EntityDecoder = EntityDecoder;
+/**
+ * Creates a function that decodes entities in a string.
+ *
+ * @param decodeTree The decode tree.
+ * @returns A function that decodes entities in a string.
+ */
+function getDecoder(decodeTree) {
+    var ret = "";
+    var decoder = new EntityDecoder(decodeTree, function (str) { return (ret += (0, decode_codepoint_js_1.fromCodePoint)(str)); });
+    return function decodeWithTrie(str, decodeMode) {
+        var lastIndex = 0;
+        var offset = 0;
+        while ((offset = str.indexOf("&", offset)) >= 0) {
+            ret += str.slice(lastIndex, offset);
+            decoder.startEntity(decodeMode);
+            var len = decoder.write(str, 
+            // Skip the "&"
+            offset + 1);
+            if (len < 0) {
+                lastIndex = offset + decoder.end();
+                break;
+            }
+            lastIndex = offset + len;
+            // If `len` is 0, skip the current `&` and continue.
+            offset = len === 0 ? lastIndex + 1 : lastIndex;
+        }
+        var result = ret + str.slice(lastIndex);
+        // Make sure we don't keep a reference to the final string.
+        ret = "";
+        return result;
     };
 }
+/**
+ * Determines the branch of the current node that is taken given the current
+ * character. This function is used to traverse the trie.
+ *
+ * @param decodeTree The trie.
+ * @param current The current node.
+ * @param nodeIdx The index right after the current node and its value.
+ * @param char The current character.
+ * @returns The index of the next node, or -1 if no branch is taken.
+ */
 function determineBranch(decodeTree, current, nodeIdx, char) {
     var branchCount = (current & BinTrieFlags.BRANCH_LENGTH) >> 7;
     var jumpOffset = current & BinTrieFlags.JUMP_TABLE;
@@ -607,33 +952,45 @@ exports.determineBranch = determineBranch;
 var htmlDecoder = getDecoder(decode_data_html_js_1.default);
 var xmlDecoder = getDecoder(decode_data_xml_js_1.default);
 /**
- * Decodes an HTML string, allowing for entities not terminated by a semi-colon.
+ * Decodes an HTML string.
+ *
+ * @param str The string to decode.
+ * @param mode The decoding mode.
+ * @returns The decoded string.
+ */
+function decodeHTML(str, mode) {
+    if (mode === void 0) { mode = DecodingMode.Legacy; }
+    return htmlDecoder(str, mode);
+}
+exports.decodeHTML = decodeHTML;
+/**
+ * Decodes an HTML string in an attribute.
  *
  * @param str The string to decode.
  * @returns The decoded string.
  */
-function decodeHTML(str) {
-    return htmlDecoder(str, false);
+function decodeHTMLAttribute(str) {
+    return htmlDecoder(str, DecodingMode.Attribute);
 }
-exports.decodeHTML = decodeHTML;
+exports.decodeHTMLAttribute = decodeHTMLAttribute;
 /**
- * Decodes an HTML string, requiring all entities to be terminated by a semi-colon.
+ * Decodes an HTML string, requiring all entities to be terminated by a semicolon.
  *
  * @param str The string to decode.
  * @returns The decoded string.
  */
 function decodeHTMLStrict(str) {
-    return htmlDecoder(str, true);
+    return htmlDecoder(str, DecodingMode.Strict);
 }
 exports.decodeHTMLStrict = decodeHTMLStrict;
 /**
- * Decodes an XML string, requiring all entities to be terminated by a semi-colon.
+ * Decodes an XML string, requiring all entities to be terminated by a semicolon.
  *
  * @param str The string to decode.
  * @returns The decoded string.
  */
 function decodeXML(str) {
-    return xmlDecoder(str, true);
+    return xmlDecoder(str, DecodingMode.Strict);
 }
 exports.decodeXML = decodeXML;
 
@@ -645,6 +1002,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.replaceCodePoint = exports.fromCodePoint = void 0;
 var decodeMap = new Map([
     [0, 65533],
+    // C1 Unicode control character reference replacements
     [128, 8364],
     [130, 8218],
     [131, 402],
@@ -673,6 +1031,9 @@ var decodeMap = new Map([
     [158, 382],
     [159, 376],
 ]);
+/**
+ * Polyfill for `String.fromCodePoint`. It is used to create a string from a Unicode code point.
+ */
 exports.fromCodePoint = 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, node/no-unsupported-features/es-builtins
 (_a = String.fromCodePoint) !== null && _a !== void 0 ? _a : function (codePoint) {
@@ -685,6 +1046,11 @@ exports.fromCodePoint =
     output += String.fromCharCode(codePoint);
     return output;
 };
+/**
+ * Replace the given code point with a replacement character if it is a
+ * surrogate or is outside the valid range. Otherwise return the code
+ * point unchanged.
+ */
 function replaceCodePoint(codePoint) {
     var _a;
     if ((codePoint >= 0xd800 && codePoint <= 0xdfff) || codePoint > 0x10ffff) {
@@ -693,6 +1059,13 @@ function replaceCodePoint(codePoint) {
     return (_a = decodeMap.get(codePoint)) !== null && _a !== void 0 ? _a : codePoint;
 }
 exports.replaceCodePoint = replaceCodePoint;
+/**
+ * Replace the code point if relevant, then convert it to a string.
+ *
+ * @deprecated Use `fromCodePoint(replaceCodePoint(codePoint))` instead.
+ * @param codePoint The code point to decode.
+ * @returns The decoded code point.
+ */
 function decodeCodePoint(codePoint) {
     return (0, exports.fromCodePoint)(replaceCodePoint(codePoint));
 }
@@ -761,7 +1134,7 @@ function encodeHTMLTrieRe(regExp, str) {
             }
             next = next.v;
         }
-        // We might have a tree node without a value; skip and use a numeric entitiy.
+        // We might have a tree node without a value; skip and use a numeric entity.
         if (next !== undefined) {
             ret += next;
             lastIdx = i + 1;
@@ -840,6 +1213,16 @@ exports.encodeXML = encodeXML;
  * @param data String to escape.
  */
 exports.escape = encodeXML;
+/**
+ * Creates a function that escapes all characters matched by the given regular
+ * expression using the given map of characters to escape to their entities.
+ *
+ * @param regex Regular expression to match characters to escape.
+ * @param map Map of characters to escape to their entities.
+ *
+ * @returns Function that escapes all characters matched by the given regular
+ * expression using the given map of characters to escape to their entities.
+ */
 function getEscaper(regex, map) {
     return function escape(data) {
         var match;
@@ -849,7 +1232,7 @@ function getEscaper(regex, map) {
             if (lastIdx !== match.index) {
                 result += data.substring(lastIdx, match.index);
             }
-            // We know that this chararcter will be in the map.
+            // We know that this character will be in the map.
             result += map.get(match[0].charCodeAt(0));
             // Every match will be of length 1
             lastIdx = match.index + 1;
@@ -925,7 +1308,7 @@ exports.default = new Map(/* #__PURE__ */ restoreDiff([[9, "&Tab;"], [0, "&NewLi
 },{}],69:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodeXMLStrict = exports.decodeHTML5Strict = exports.decodeHTML4Strict = exports.decodeHTML5 = exports.decodeHTML4 = exports.decodeHTMLStrict = exports.decodeHTML = exports.decodeXML = exports.encodeHTML5 = exports.encodeHTML4 = exports.encodeNonAsciiHTML = exports.encodeHTML = exports.escapeText = exports.escapeAttribute = exports.escapeUTF8 = exports.escape = exports.encodeXML = exports.encode = exports.decodeStrict = exports.decode = exports.EncodingMode = exports.DecodingMode = exports.EntityLevel = void 0;
+exports.decodeXMLStrict = exports.decodeHTML5Strict = exports.decodeHTML4Strict = exports.decodeHTML5 = exports.decodeHTML4 = exports.decodeHTMLAttribute = exports.decodeHTMLStrict = exports.decodeHTML = exports.decodeXML = exports.DecodingMode = exports.EntityDecoder = exports.encodeHTML5 = exports.encodeHTML4 = exports.encodeNonAsciiHTML = exports.encodeHTML = exports.escapeText = exports.escapeAttribute = exports.escapeUTF8 = exports.escape = exports.encodeXML = exports.encode = exports.decodeStrict = exports.decode = exports.EncodingMode = exports.EntityLevel = void 0;
 var decode_js_1 = require("./decode.js");
 var encode_js_1 = require("./encode.js");
 var escape_js_1 = require("./escape.js");
@@ -937,14 +1320,6 @@ var EntityLevel;
     /** Support HTML entities, which are a superset of XML entities. */
     EntityLevel[EntityLevel["HTML"] = 1] = "HTML";
 })(EntityLevel = exports.EntityLevel || (exports.EntityLevel = {}));
-/** Determines whether some entities are allowed to be written without a trailing `;`. */
-var DecodingMode;
-(function (DecodingMode) {
-    /** Support legacy HTML entities. */
-    DecodingMode[DecodingMode["Legacy"] = 0] = "Legacy";
-    /** Do not support legacy HTML entities. */
-    DecodingMode[DecodingMode["Strict"] = 1] = "Strict";
-})(DecodingMode = exports.DecodingMode || (exports.DecodingMode = {}));
 var EncodingMode;
 (function (EncodingMode) {
     /**
@@ -982,12 +1357,10 @@ var EncodingMode;
  */
 function decode(data, options) {
     if (options === void 0) { options = EntityLevel.XML; }
-    var opts = typeof options === "number" ? { level: options } : options;
-    if (opts.level === EntityLevel.HTML) {
-        if (opts.mode === DecodingMode.Strict) {
-            return (0, decode_js_1.decodeHTMLStrict)(data);
-        }
-        return (0, decode_js_1.decodeHTML)(data);
+    var level = typeof options === "number" ? options : options.level;
+    if (level === EntityLevel.HTML) {
+        var mode = typeof options === "object" ? options.mode : undefined;
+        return (0, decode_js_1.decodeHTML)(data, mode);
     }
     return (0, decode_js_1.decodeXML)(data);
 }
@@ -1000,15 +1373,11 @@ exports.decode = decode;
  * @deprecated Use `decode` with the `mode` set to `Strict`.
  */
 function decodeStrict(data, options) {
+    var _a;
     if (options === void 0) { options = EntityLevel.XML; }
     var opts = typeof options === "number" ? { level: options } : options;
-    if (opts.level === EntityLevel.HTML) {
-        if (opts.mode === DecodingMode.Legacy) {
-            return (0, decode_js_1.decodeHTML)(data);
-        }
-        return (0, decode_js_1.decodeHTMLStrict)(data);
-    }
-    return (0, decode_js_1.decodeXML)(data);
+    (_a = opts.mode) !== null && _a !== void 0 ? _a : (opts.mode = decode_js_1.DecodingMode.Strict);
+    return decode(data, opts);
 }
 exports.decodeStrict = decodeStrict;
 /**
@@ -1050,9 +1419,12 @@ Object.defineProperty(exports, "encodeNonAsciiHTML", { enumerable: true, get: fu
 Object.defineProperty(exports, "encodeHTML4", { enumerable: true, get: function () { return encode_js_2.encodeHTML; } });
 Object.defineProperty(exports, "encodeHTML5", { enumerable: true, get: function () { return encode_js_2.encodeHTML; } });
 var decode_js_2 = require("./decode.js");
+Object.defineProperty(exports, "EntityDecoder", { enumerable: true, get: function () { return decode_js_2.EntityDecoder; } });
+Object.defineProperty(exports, "DecodingMode", { enumerable: true, get: function () { return decode_js_2.DecodingMode; } });
 Object.defineProperty(exports, "decodeXML", { enumerable: true, get: function () { return decode_js_2.decodeXML; } });
 Object.defineProperty(exports, "decodeHTML", { enumerable: true, get: function () { return decode_js_2.decodeHTML; } });
 Object.defineProperty(exports, "decodeHTMLStrict", { enumerable: true, get: function () { return decode_js_2.decodeHTMLStrict; } });
+Object.defineProperty(exports, "decodeHTMLAttribute", { enumerable: true, get: function () { return decode_js_2.decodeHTMLAttribute; } });
 // Legacy aliases (deprecated)
 Object.defineProperty(exports, "decodeHTML4", { enumerable: true, get: function () { return decode_js_2.decodeHTML; } });
 Object.defineProperty(exports, "decodeHTML5", { enumerable: true, get: function () { return decode_js_2.decodeHTML; } });
@@ -1063,30 +1435,98 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":62,"./encode.js":64,"./escape.js":65}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BuddyComplex = exports.getExportVersion = void 0;
+exports.MangaBat = exports.MangaBatInfo = void 0;
 const types_1 = require("@paperback/types");
-const BuddyComplexParser_1 = require("./BuddyComplexParser");
-const BuddyComplexHelper_1 = require("./BuddyComplexHelper");
-// Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '2.0.2';
+const MangaBox_1 = require("../MangaBox");
+const SITE_DOMAIN = 'https://h.mangabat.com';
+exports.MangaBatInfo = {
+    version: (0, MangaBox_1.getExportVersion)('0.0.3'),
+    name: 'MangaBat',
+    icon: 'icon.png',
+    author: 'Batmeow',
+    authorWebsite: 'https://github.com/Batmeow',
+    description: `Extension that pulls manga from ${SITE_DOMAIN}.`,
+    contentRating: types_1.ContentRating.MATURE,
+    websiteBaseURL: SITE_DOMAIN,
+    sourceTags: [],
+    intents: types_1.SourceIntents.SETTINGS_UI | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.MANGA_CHAPTERS
+};
+class MangaBat extends MangaBox_1.MangaBox {
+    constructor() {
+        super(...arguments);
+        // Website base URL.
+        this.baseURL = SITE_DOMAIN;
+        // Language code supported by the source.
+        this.languageCode = '🇬🇧';
+        // Path for manga list.
+        this.mangaListPath = 'manga-list-all';
+        // Selector for manga in manga list.
+        this.mangaListSelector = 'div.panel-list-story div.list-story-item';
+        // Selector for subtitle in manga list.
+        this.mangaSubtitleSelector = 'div.item-right > a.item-chapter';
+    }
+}
+exports.MangaBat = MangaBat;
+
+},{"../MangaBox":71,"@paperback/types":61}],71:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MangaBox = exports.getExportVersion = void 0;
+const types_1 = require("@paperback/types");
+const MangaBoxParser_1 = require("./MangaBoxParser");
+const MangaBoxHelpers_1 = require("./MangaBoxHelpers");
+const MangaBoxSettings_1 = require("./MangaBoxSettings");
+const BASE_VERSION = '4.0.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
 exports.getExportVersion = getExportVersion;
-class BuddyComplex {
+class MangaBox {
     constructor(cheerio) {
         this.cheerio = cheerio;
-        //----REQUEST MANAGER----
+        // Selector for genre list items.
+        this.genreListSelector = 'div.advanced-search-tool-genres-list span.advanced-search-tool-genres-item';
+        // Selector for status list items.
+        this.statusListSelector = 'div.advanced-search-tool-status select.advanced-search-tool-status-content option';
+        // Root selector for getMangaDetails.
+        this.mangaRootSelector = 'div.panel-story-info, div.manga-info-top';
+        // Selector for manga thumbnail.
+        this.mangaThumbnailSelector = 'span.info-image img, div.manga-info-pic img';
+        // Selector for manga main title.
+        this.mangaTitleSelector = 'div.story-info-right h1, ul.manga-info-text li:first-of-type h1';
+        // Selector for manga alternative titles.
+        this.mangaAltTitleSelector = 'div.story-info-right td:contains(Alternative) + td h2,'
+            + 'ul.manga-info-text h2.story-alternative';
+        // Selector for manga status.
+        this.mangaStatusSelector = 'div.story-info-right td:contains(Status) + td,'
+            + 'ul.manga-info-text li:contains(Status)';
+        // Selector for manga author.
+        this.mangaAuthorSelector = 'div.story-info-right td:contains(Author) + td a,'
+            + 'ul.manga-info-text li:contains(Author) a';
+        // Selector for manga description.
+        this.mangaDescSelector = 'div#panel-story-info-description, div#noidungm';
+        // Selector for manga tags.
+        this.mangaGenresSelector = 'div.story-info-right td:contains(Genre) + td a,'
+            + 'ul.manga-info-text li:contains(Genres) a';
+        // Selector for manga chapter list.
+        this.chapterListSelector = 'div.panel-story-chapter-list ul.row-content-chapter li,'
+            + 'div.manga-info-chapter div.chapter-list div.row';
+        // Selector for manga chapter time updated.
+        this.chapterTimeSelector = 'span.chapter-time, span';
+        // Selector for manga chapter images.
+        this.chapterImagesSelector = 'div.container-chapter-reader img';
+        this.parser = new MangaBoxParser_1.MangaBoxParser();
+        this.stateManager = App.createSourceStateManager();
         this.requestManager = App.createRequestManager({
-            requestsPerSecond: 4,
-            requestTimeout: 15000,
+            requestsPerSecond: 3,
+            requestTimeout: 20000,
             interceptor: {
                 interceptRequest: async (request) => {
                     request.headers = {
                         ...(request.headers ?? {}),
                         ...{
-                            'user-agent': await this.requestManager.getDefaultUserAgent(),
-                            'referer': `${this.baseUrl}/`
+                            'referer': `${this.baseURL}/`,
+                            'user-agent': await this.requestManager.getDefaultUserAgent()
                         }
                     };
                     return request;
@@ -1096,142 +1536,170 @@ class BuddyComplex {
                 }
             }
         });
-        this.parser = new BuddyComplexParser_1.BuddyComplexParser();
     }
-    getMangaShareUrl(mangaId) {
-        return `${this.baseUrl}/${mangaId}/`;
+    async getSourceMenu() {
+        return App.createDUISection({
+            id: 'main',
+            header: 'Source Settings',
+            isHidden: false,
+            rows: async () => [(0, MangaBoxSettings_1.chapterSettings)(this.stateManager)]
+        });
+    }
+    getMangaShareUrl(mangaId) { return `${mangaId}`; }
+    async getHomePageSections(sectionCallback) {
+        const sections = [
+            {
+                request: App.createRequest({
+                    url: new MangaBoxHelpers_1.URLBuilder(this.baseURL)
+                        .addPathComponent(this.mangaListPath)
+                        .addQueryParameter('type', 'latest')
+                        .buildUrl(),
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: 'latest',
+                    title: 'Latest Updates',
+                    type: types_1.HomeSectionType.singleRowLarge,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: App.createRequest({
+                    url: new MangaBoxHelpers_1.URLBuilder(this.baseURL)
+                        .addPathComponent(this.mangaListPath)
+                        .addQueryParameter('type', 'newest')
+                        .buildUrl(),
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: 'newest',
+                    title: 'New Titles',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            },
+            {
+                request: App.createRequest({
+                    url: new MangaBoxHelpers_1.URLBuilder(this.baseURL)
+                        .addPathComponent(this.mangaListPath)
+                        .addQueryParameter('type', 'topview')
+                        .buildUrl(),
+                    method: 'GET'
+                }),
+                section: App.createHomeSection({
+                    id: 'topview',
+                    title: 'Most Popular',
+                    type: types_1.HomeSectionType.singleRowNormal,
+                    containsMoreItems: true
+                })
+            }
+        ];
+        const promises = [];
+        for (const section of sections) {
+            sectionCallback(section.section);
+            promises.push(this.requestManager.schedule(section.request, 1)
+                .then(response => {
+                const $ = this.cheerio.load(response.data);
+                const items = this.parser.parseManga($, this);
+                section.section.items = items;
+                sectionCallback(section.section);
+            }));
+        }
     }
     async getMangaDetails(mangaId) {
         const request = App.createRequest({
-            url: `${this.baseUrl}/${mangaId}/`,
+            url: `${mangaId}`,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        return this.parser.parseMangaDetails($, mangaId);
+        return this.parser.parseMangaDetails($, mangaId, this);
     }
     async getChapters(mangaId) {
         const request = App.createRequest({
-            url: `${this.baseUrl}/api/manga/${mangaId}/chapters?source=detail`,
+            url: `${mangaId}`,
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        return this.parser.parseChapterList($, mangaId);
+        return this.parser.parseChapters($, mangaId, this);
     }
     async getChapterDetails(mangaId, chapterId) {
+        const cookieDomainRegex = chapterId.match(/(.*.com\/).*$/g);
+        const cookieDomain = cookieDomainRegex ? cookieDomainRegex[0] : this.baseURL;
+        const imageServer = await (0, MangaBoxSettings_1.getImageServer)(this.stateManager).then(value => value[0]);
         const request = App.createRequest({
-            url: `${this.baseUrl}/${mangaId}/${chapterId}/`,
+            url: `${chapterId}`,
+            method: 'GET',
+            cookies: [
+                App.createCookie({
+                    name: 'content_server',
+                    value: imageServer ?? 'server1',
+                    domain: cookieDomain
+                })
+            ]
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseChapterDetails($, mangaId, chapterId, this);
+    }
+    async getViewMoreItems(homePageSectionId, metadata) {
+        const page = metadata?.page ?? 1;
+        const request = App.createRequest({
+            url: new MangaBoxHelpers_1.URLBuilder(this.baseURL)
+                .addPathComponent(`${this.mangaListPath}/${page}`)
+                .addQueryParameter('type', homePageSectionId)
+                .buildUrl(),
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        return this.parser.parseChapterDetails($, mangaId, chapterId);
+        const results = this.parser.parseManga($, this);
+        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
+        return App.createPagedResults({
+            results: results,
+            metadata: metadata
+        });
+    }
+    async supportsTagExclusion() {
+        return true;
     }
     async getSearchTags() {
         const request = App.createRequest({
-            url: `${this.baseUrl}/`,
+            url: new MangaBoxHelpers_1.URLBuilder(this.baseURL)
+                .addPathComponent('advanced_search')
+                .buildUrl(),
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
         const $ = this.cheerio.load(response.data);
-        return this.parser.parseTags($);
+        return this.parser.parseTags($, this);
     }
     async getSearchResults(query, metadata) {
         const page = metadata?.page ?? 1;
-        const url = new BuddyComplexHelper_1.URLBuilder(this.baseUrl)
-            .addPathComponent('search')
-            .addQueryParameter('page', page)
-            .addQueryParameter('q', encodeURI(query?.title || ''))
-            .buildUrl() + query.includedTags?.map((x) => `&genre%5B%5D=${x.id}`).join('');
         const request = App.createRequest({
-            url: url,
+            url: new MangaBoxHelpers_1.URLBuilder(this.baseURL)
+                .addPathComponent('advanced_search')
+                .addQueryParameter('keyw', query.title?.replace(/[^a-zA-Z0-9 ]/g, '').replace(/ +/g, '_').toLowerCase() ?? '')
+                .addQueryParameter('g_i', `_${query.includedTags?.map(t => t.id).join('_')}_`)
+                .addQueryParameter('g_e', `_${query.excludedTags?.map(t => t.id).join('_')}_`)
+                .addQueryParameter('page', page)
+                .buildUrl(),
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
         const $ = this.cheerio.load(response.data);
-        const manga = this.parser.parseViewMore($);
+        const results = this.parser.parseManga($, this);
         metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
         return App.createPagedResults({
-            results: manga,
-            metadata
+            results: results,
+            metadata: metadata
         });
-    }
-    async getHomePageSections(sectionCallback) {
-        const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section2 = App.createHomeSection({ id: 'latest_update', title: 'Latest Updates', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section3 = App.createHomeSection({ id: 'top_today', title: 'Top Today', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section4 = App.createHomeSection({ id: 'top_weekly', title: 'Top Weekly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const section5 = App.createHomeSection({ id: 'top_monthly', title: 'Top Monthly', type: types_1.HomeSectionType.singleRowNormal, containsMoreItems: true });
-        const sections = [section1, section2, section3, section4, section5];
-        const request = App.createRequest({
-            url: `${this.baseUrl}/`,
-            method: 'GET'
-        });
-        const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        this.parser.parseHomeSections($, sections, sectionCallback);
-    }
-    async getViewMoreItems(homepageSectionId, metadata) {
-        const page = metadata?.page ?? 1;
-        let param = '';
-        switch (homepageSectionId) {
-            case 'hot_updates':
-                param = 'popular';
-                break;
-            case 'latest_update':
-                param = 'latest';
-                break;
-            case 'top_today':
-                param = 'top/day';
-                break;
-            case 'top_weekly':
-                param = 'top/week';
-                break;
-            case 'top_monthly':
-                param = 'top/month';
-                break;
-            default:
-                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
-        }
-        const request = App.createRequest({
-            url: `${this.baseUrl}/${param}?page=${page}`,
-            method: 'GET'
-        });
-        const response = await this.requestManager.schedule(request, 1);
-        const $ = this.cheerio.load(response.data);
-        const manga = this.parser.parseViewMore($);
-        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
-        return App.createPagedResults({
-            results: manga,
-            metadata
-        });
-    }
-    async getCloudflareBypassRequestAsync() {
-        return App.createRequest({
-            url: this.baseUrl,
-            method: 'GET',
-            headers: {
-                'referer': `${this.baseUrl}/`,
-                'origin': `${this.baseUrl}/`,
-                'user-agent': await this.requestManager.getDefaultUserAgent()
-            }
-        });
-    }
-    CloudFlareError(status) {
-        if (status == 503 || status == 403) {
-            throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > ${this.baseUrl} and press Cloudflare Bypass`);
-        }
     }
 }
-exports.BuddyComplex = BuddyComplex;
+exports.MangaBox = MangaBox;
 
-},{"./BuddyComplexHelper":71,"./BuddyComplexParser":72,"@paperback/types":61}],71:[function(require,module,exports){
+},{"./MangaBoxHelpers":72,"./MangaBoxParser":73,"./MangaBoxSettings":74,"@paperback/types":61}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -1255,16 +1723,16 @@ class URLBuilder {
         finalUrl += addTrailingSlash ? '/' : '';
         finalUrl += Object.values(this.parameters).length > 0 ? '?' : '';
         finalUrl += Object.entries(this.parameters).map(entry => {
-            if (!entry[1] && !includeUndefinedParameters) {
-                return undefined;
-            }
             if (Array.isArray(entry[1])) {
-                return entry[1].map(value => value || includeUndefinedParameters ? `${entry[0]}[]=${value}` : undefined)
+                return entry[1]
+                    .map(value => value || includeUndefinedParameters ? `${entry[0]}[]=${value}` : undefined)
                     .filter(x => x !== undefined)
                     .join('&');
             }
             if (typeof entry[1] === 'object') {
-                return Object.keys(entry[1]).map(key => entry[1][key] || includeUndefinedParameters ? `${entry[0]}[${key}]=${entry[1][key]}` : undefined)
+                return Object
+                    .keys(entry[1])
+                    .map(key => entry[1][key] || includeUndefinedParameters ? `${entry[0]}[${key}]=${entry[1][key]}` : undefined)
                     .filter(x => x !== undefined)
                     .join('&');
             }
@@ -1275,384 +1743,232 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BuddyComplexParser = void 0;
-const entities = require("entities");
-class BuddyComplexParser {
+exports.MangaBoxParser = void 0;
+const entities_1 = require("entities");
+class MangaBoxParser {
     constructor() {
-        this.parseViewMore = ($) => {
-            const mangas = [];
-            const collectedIds = [];
-            for (const manga of $('div.book-item', 'div.list').toArray()) {
-                const id = this.idCleaner($('a', manga).attr('href') ?? '');
-                const title = $('div.title', manga).text().trim();
-                const image = this.getImageSrc($('img', manga));
-                const subtitle = $('span.latest-chapter', manga).text().trim();
-                if (!id || !title || collectedIds.includes(id))
+        this.parseManga = ($, source) => {
+            const mangaItems = [];
+            const collecedIds = [];
+            for (const manga of $(source.mangaListSelector).toArray()) {
+                const mangaId = $('a', manga).first().attr('href');
+                const image = $('img', manga).first().attr('src')?.trim() ?? '';
+                const title = (0, entities_1.decodeHTML)($('a', manga).first().attr('title')?.trim() ?? '');
+                const subtitle = $(source.mangaSubtitleSelector, manga).first().text().trim() ?? '';
+                if (!mangaId || !title || collecedIds.includes(mangaId))
                     continue;
-                mangas.push(App.createPartialSourceManga({
-                    mangaId: id,
+                mangaItems.push(App.createPartialSourceManga({
+                    mangaId: mangaId,
                     image: image,
-                    title: this.decodeHTMLEntity(title),
-                    subtitle: this.decodeHTMLEntity(subtitle)
+                    title: title,
+                    subtitle: subtitle ? subtitle : 'No Chapters'
                 }));
-                collectedIds.push(id);
+                collecedIds.push(mangaId);
             }
-            return mangas;
+            return mangaItems;
         };
-        this.isLastPage = ($) => {
-            let isLast = false;
-            const currentPage = Number($('a.link.active', 'div.paginator').text().trim());
-            const pages = [];
-            for (const page of $('a.link', 'div.paginator').toArray()) {
-                const p = Number($(page).text().trim());
-                if (isNaN(p))
+        this.parseMangaDetails = ($, mangaId, source) => {
+            const mangaRootSelector = $(source.mangaRootSelector);
+            const image = $(source.mangaThumbnailSelector).attr('src') ?? '';
+            const titles = [];
+            titles.push((0, entities_1.decodeHTML)($(source.mangaTitleSelector, mangaRootSelector).text().trim()));
+            // Alternative Titles
+            for (const altTitle of $(source.mangaAltTitleSelector, mangaRootSelector)
+                .text()
+                ?.split(/,|;|\//)) {
+                if (altTitle == '')
                     continue;
-                pages.push(p);
+                titles.push((0, entities_1.decodeHTML)(altTitle.trim()));
             }
-            const lastPage = Math.max(...pages);
-            if (currentPage >= lastPage)
-                isLast = true;
-            return isLast;
+            const rawStatus = $(source.mangaStatusSelector, mangaRootSelector).text().trim() ?? 'ONGOING';
+            let status = 'ONGOING';
+            switch (rawStatus.toUpperCase()) {
+                case 'ONGOING':
+                    status = 'Ongoing';
+                    break;
+                case 'COMPLETED':
+                    status = 'Completed';
+                    break;
+                default:
+                    status = 'Ongoing';
+                    break;
+            }
+            const author = $(source.mangaAuthorSelector, mangaRootSelector)
+                .toArray()
+                .map(x => $(x).text().trim())
+                .join(', ') ?? '';
+            const desc = (0, entities_1.decodeHTML)($(source.mangaDescSelector).first().children().remove().end().text().trim());
+            const tags = [];
+            for (const tag of $(source.mangaGenresSelector, mangaRootSelector).toArray()) {
+                const id = $(tag).attr('href');
+                const label = $(tag).text().trim();
+                if (!id || !label)
+                    continue;
+                tags.push({ id: id, label: label });
+            }
+            const TagSection = [
+                App.createTagSection({
+                    id: '0',
+                    label: 'genres',
+                    tags: tags.map(t => App.createTag(t))
+                })
+            ];
+            return App.createSourceManga({
+                id: mangaId,
+                mangaInfo: App.createMangaInfo({
+                    image: image,
+                    titles: titles,
+                    status: status,
+                    author: author ? author : 'Unkown',
+                    desc: desc,
+                    tags: TagSection
+                })
+            });
+        };
+        this.parseChapters = ($, mangaId, source) => {
+            const chapters = [];
+            let sortingIndex = 0;
+            for (const chapter of $(source.chapterListSelector).toArray()) {
+                const id = $('a', chapter).attr('href') ?? '';
+                if (!id)
+                    continue;
+                const name = (0, entities_1.decodeHTML)($('a', chapter).text().trim());
+                const time = this.parseDate($(source.chapterTimeSelector, chapter).last().text().trim() ?? '');
+                let chapNum = 0;
+                const chapRegex = id.match(/(?:chap.*)[-_](\d+\.?\d?)/);
+                if (chapRegex && chapRegex[1])
+                    chapNum = Number(chapRegex[1].replace(/\\/g, '.'));
+                chapters.push({
+                    id: id,
+                    chapNum: isNaN(chapNum) ? 0 : chapNum,
+                    volume: 0,
+                    name: name,
+                    group: '',
+                    time: time,
+                    langCode: source.languageCode,
+                    sortingIndex: sortingIndex
+                });
+                sortingIndex--;
+            }
+            // If there are no chapters, throw error to avoid losing progress
+            if (chapters.length == 0) {
+                throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`);
+            }
+            return chapters.map((chapter) => {
+                chapter.sortingIndex += chapters.length;
+                return App.createChapter(chapter);
+            });
+        };
+        this.parseChapterDetails = async ($, mangaId, chapterId, source) => {
+            const pages = [];
+            for (const img of $(source.chapterImagesSelector).toArray()) {
+                let image = $(img).attr('src') ?? '';
+                if (!image)
+                    image = $(img).attr('data-src') ?? '';
+                if (!image)
+                    throw new Error(`Unable to parse image(s) for Chapter ID: ${chapterId}`);
+                pages.push(image);
+            }
+            const chapterDetails = App.createChapterDetails({
+                id: chapterId,
+                mangaId: mangaId,
+                pages: pages
+            });
+            return chapterDetails;
+        };
+        this.parseTags = ($, source) => {
+            const genres = [];
+            for (const genre of $(source.genreListSelector).toArray()) {
+                const id = $(genre).attr('data-i');
+                const label = $(genre).text().trim();
+                if (!id || !label)
+                    continue;
+                genres.push({ id: id, label: label });
+            }
+            const TagSection = [
+                App.createTagSection({
+                    id: '0',
+                    label: 'genres',
+                    tags: genres.map(t => App.createTag(t))
+                })
+            ];
+            return TagSection;
         };
         this.parseDate = (date) => {
-            date = date.toUpperCase();
             let time;
-            const number = Number((/\d*/.exec(date) ?? [])[0]);
-            if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
-                time = new Date(Date.now());
-            }
-            else if (date.includes('YEAR') || date.includes('YEARS')) {
-                time = new Date(Date.now() - (number * 31556952000));
-            }
-            else if (date.includes('MONTH') || date.includes('MONTHS')) {
-                time = new Date(Date.now() - (number * 2592000000));
-            }
-            else if (date.includes('WEEK') || date.includes('WEEKS')) {
-                time = new Date(Date.now() - (number * 604800000));
-            }
-            else if (date.includes('YESTERDAY')) {
-                time = new Date(Date.now() - 86400000);
-            }
-            else if (date.includes('DAY') || date.includes('DAYS')) {
-                time = new Date(Date.now() - (number * 86400000));
+            let number = Number((/\d*/.exec(date) ?? [])[0]);
+            number = (number == 0 && date.includes('a')) ? 1 : number;
+            date = date.toUpperCase();
+            if (date.includes('MINUTE') || date.includes('MINUTES') || date.includes('MINS')) {
+                time = new Date(Date.now() - (number * 60000));
             }
             else if (date.includes('HOUR') || date.includes('HOURS')) {
                 time = new Date(Date.now() - (number * 3600000));
             }
-            else if (date.includes('MINUTE') || date.includes('MINUTES')) {
-                time = new Date(Date.now() - (number * 60000));
+            else if (date.includes('DAY') || date.includes('DAYS')) {
+                time = new Date(Date.now() - (number * 86400000));
             }
-            else if (date.includes('SECOND') || date.includes('SECONDS')) {
-                time = new Date(Date.now() - (number * 1000));
+            else if (date.includes('YEAR') || date.includes('YEARS')) {
+                time = new Date(Date.now() - (number * 31556952000));
             }
             else {
                 time = new Date(date);
             }
             return time;
         };
-    }
-    parseMangaDetails($, mangaId) {
-        const titles = [];
-        titles.push(this.decodeHTMLEntity($('div.name.box > h1').text().trim()));
-        const altTitles = $('div.name.box > h2').text().split(/, |; |\| |\/ /);
-        for (const title of altTitles) {
-            if (title == '')
-                continue;
-            titles.push(this.decodeHTMLEntity(title.trim()));
-        }
-        const authors = [];
-        for (const authorRaw of $('p:contains(Authors) > a', 'div.detail').toArray()) {
-            authors.push($(authorRaw).attr('title')?.trim());
-        }
-        const image = this.getImageSrc($('img', 'div.img-cover'));
-        const description = this.decodeHTMLEntity($('div.section-body > p.content').text().trim());
-        const arrayTags = [];
-        for (const tag of $('p:contains(Genres) > a', 'div.detail').toArray()) {
-            const label = $(tag).text().replace(',', '').trim();
-            const id = encodeURI(this.idCleaner($(tag).attr('href') ?? ''));
-            if (!id || !label)
-                continue;
-            arrayTags.push({ id: id, label: label });
-        }
-        const tagSections = [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })];
-        const rawStatus = $('p:contains(Status) > a', 'div.detail').first().text().trim();
-        let status;
-        switch (rawStatus.toUpperCase()) {
-            case 'ONGOING':
-                status = 'Ongoing';
-                break;
-            case 'COMPLETED':
-                status = 'Completed';
-                break;
-            default:
-                status = 'Ongoing';
-                break;
-        }
-        return App.createSourceManga({
-            id: mangaId,
-            mangaInfo: App.createMangaInfo({
-                titles: titles,
-                image: image,
-                status: status,
-                author: authors.length > 0 ? authors.join(', ') : 'Unknown',
-                artist: authors.length > 0 ? authors.join(', ') : 'Unknown',
-                tags: tagSections,
-                desc: description
-            })
-        });
-    }
-    parseChapterList($, mangaId) {
-        const chapters = [];
-        let sortingIndex = 0;
-        for (const chapter of $('li', 'ul.chapter-list').toArray()) {
-            const title = $('strong.chapter-title', chapter).text().trim();
-            const id = this.idCleaner($('a', chapter).attr('href') ?? '');
-            const date = new Date($('time.chapter-update', chapter)?.text() ?? '');
-            if (!id)
-                continue;
-            // Check chapter/ch-* regex first
-            const byChapter = id.match(/(?:chapter|ch)-((\d+)(?:[-.]\d+)?)/);
-            const byNumber = (id.split('-').pop() ?? '').match(/(\d+)(?:[-.]\d+)?/);
-            const chapterNumberRegex = (byChapter && byChapter[1]) ? byChapter[1] : byNumber ? byNumber[0] : '0';
-            let chapterNumber = Number(chapterNumberRegex.replace('-', '.'));
-            chapterNumber = isNaN(chapterNumber) ? 0 : chapterNumber;
-            chapters.push({
-                id: id,
-                name: title,
-                chapNum: chapterNumber,
-                time: date,
-                volume: 0,
-                sortingIndex,
-                langCode: '🇬🇧',
-                group: ''
-            });
-            sortingIndex--;
-        }
-        // If there are no chapters, throw error to avoid losing progress
-        if (chapters.length == 0) {
-            throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}!`);
-        }
-        return chapters.map(chapter => {
-            chapter.sortingIndex += chapters.length;
-            return App.createChapter(chapter);
-        });
-    }
-    parseChapterDetails($, mangaId, chapterId) {
-        const pages = [];
-        const imageRegex = $.html().match(/chapImages\s=\s(.+)(?=')/);
-        let imageScript = null;
-        if (imageRegex && imageRegex[1])
-            imageScript = imageRegex[1];
-        // If script has a match, use the script
-        if (imageScript) {
-            imageScript = imageScript.replace(/'/g, '');
-            const images = imageScript.split(',');
-            for (const image of images) {
-                let img = image;
-                if (!img.startsWith('https')) {
-                    img = 'https://s1.mbbcdnv1.xyz/manga/' + image;
-                }
-                pages.push(image);
+        this.isLastPage = ($) => {
+            const currentPage = $('.page-select, .page_select').text();
+            let totalPages = $('.page-last, .page_last').text();
+            if (currentPage) {
+                totalPages = (/(\d+)/g.exec(totalPages) ?? [''])[0];
+                return (+totalPages) == (+currentPage);
             }
-        }
-        else {
-            // Else parse the manual way
-            for (const image of $('div.chapter-image', 'div#chapter-images.container').toArray()) {
-                pages.push(this.getImageSrc($('img', image)));
-            }
-        }
-        const chapterDetails = App.createChapterDetails({
-            id: chapterId,
-            mangaId: mangaId,
-            pages: pages
-        });
-        return chapterDetails;
-    }
-    parseTags($) {
-        const arrayTags = [];
-        for (const tag of $('li', $('a:contains(GENRES)', 'ul.header__links-list').next()).toArray()) {
-            const label = $(tag).text().replace(',', '').trim();
-            const id = encodeURI(this.idCleaner($('a', tag).attr('href') ?? ''));
-            if (!id || !label)
-                continue;
-            arrayTags.push({ id: id, label: label });
-        }
-        const tagSections = [App.createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => App.createTag(x)) })];
-        return tagSections;
-    }
-    parseHomeSections($, sections, sectionCallback) {
-        for (const section of sections) {
-            // Hot Updates
-            if (section.id == 'hot_updates') {
-                const HotUpdates = [];
-                for (const manga of $('div.trending-item', 'div.main-carousel').toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '');
-                    const title = $('a', manga).attr('title');
-                    const image = this.getImageSrc($('img', manga));
-                    const subtitle = $('span.latest-chapter', manga).text().trim();
-                    if (!id || !title)
-                        continue;
-                    HotUpdates.push(App.createPartialSourceManga({
-                        mangaId: id,
-                        image: image,
-                        title: this.decodeHTMLEntity(title),
-                        subtitle: this.decodeHTMLEntity(subtitle)
-                    }));
-                }
-                section.items = HotUpdates;
-                sectionCallback(section);
-            }
-            // Latest Update
-            if (section.id == 'latest_update') {
-                const latestUpdate = [];
-                for (const manga of $('div.book-item.latest-item', 'div.section.box.grid-items').toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '');
-                    const title = $('div.title > h3 > a', manga).text().trim();
-                    const image = this.getImageSrc($('img', manga));
-                    const subtitle = $('a', $('div.chap-item', manga).first()).text().trim();
-                    if (!id || !title)
-                        continue;
-                    latestUpdate.push(App.createPartialSourceManga({
-                        mangaId: id,
-                        image: image,
-                        title: this.decodeHTMLEntity(title),
-                        subtitle: this.decodeHTMLEntity(subtitle)
-                    }));
-                }
-                section.items = latestUpdate;
-                sectionCallback(section);
-            }
-            // Top Today
-            if (section.id == 'top_today') {
-                const TopTodayManga = [];
-                for (const manga of $('div.top-item', $('div.tab-panel').get(0)).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '');
-                    const title = $('h3.title', manga).text().trim();
-                    const image = this.getImageSrc($('img', manga));
-                    const subtitle = $('h4.chap-item', manga).text().trim();
-                    if (!id || !title)
-                        continue;
-                    TopTodayManga.push(App.createPartialSourceManga({
-                        mangaId: id,
-                        image: image,
-                        title: this.decodeHTMLEntity(title),
-                        subtitle: this.decodeHTMLEntity(subtitle)
-                    }));
-                }
-                section.items = TopTodayManga;
-                sectionCallback(section);
-            }
-            // Top Weekly
-            if (section.id == 'top_weekly') {
-                const TopWeeklyManga = [];
-                for (const manga of $('div.top-item', $('div.tab-panel').get(1)).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '');
-                    const title = $('h3.title', manga).text().trim();
-                    const image = this.getImageSrc($('img', manga));
-                    const subtitle = $('h4.chap-item', manga).text().trim();
-                    if (!id || !title)
-                        continue;
-                    TopWeeklyManga.push(App.createPartialSourceManga({
-                        mangaId: id,
-                        image: image,
-                        title: this.decodeHTMLEntity(title),
-                        subtitle: this.decodeHTMLEntity(subtitle)
-                    }));
-                }
-                section.items = TopWeeklyManga;
-                sectionCallback(section);
-            }
-            // Top Monthly
-            if (section.id == 'top_monthly') {
-                const TopMonthlyManga = [];
-                for (const manga of $('div.top-item', $('div.tab-panel').get(2)).toArray()) {
-                    const id = this.idCleaner($('a', manga).attr('href') ?? '');
-                    const title = $('h3.title', manga).text().trim();
-                    const image = this.getImageSrc($('img', manga));
-                    const subtitle = $('h4.chap-item', manga).text().trim();
-                    if (!id || !title)
-                        continue;
-                    TopMonthlyManga.push(App.createPartialSourceManga({
-                        mangaId: id,
-                        image: image,
-                        title: this.decodeHTMLEntity(title),
-                        subtitle: this.decodeHTMLEntity(subtitle)
-                    }));
-                }
-                section.items = TopMonthlyManga;
-                sectionCallback(section);
-            }
-        }
-    }
-    getImageSrc(imageObj) {
-        let image;
-        const dataLazy = imageObj?.attr('data-lazy-src');
-        const srcset = imageObj?.attr('srcset');
-        const dataSRC = imageObj?.attr('data-src');
-        if ((typeof dataLazy != 'undefined') && !dataLazy?.startsWith('data')) {
-            image = imageObj?.attr('data-lazy-src');
-        }
-        else if ((typeof srcset != 'undefined') && !srcset?.startsWith('data')) {
-            image = imageObj?.attr('srcset')?.split(' ')[0] ?? '';
-        }
-        else if ((typeof dataSRC != 'undefined') && !dataSRC?.startsWith('data')) {
-            image = imageObj?.attr('data-src');
-        }
-        else {
-            image = undefined;
-        }
-        const wpRegex = image?.match(/(https:\/\/i\d.wp.com\/)/);
-        if (wpRegex)
-            image = image?.replace(wpRegex[0], '');
-        if (image?.startsWith('//'))
-            image = `https:${image}`;
-        if (!image?.startsWith('http'))
-            image = `https://${image}`;
-        return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')));
-    }
-    decodeHTMLEntity(str) {
-        return entities.decodeHTML(str);
-    }
-    idCleaner(str) {
-        let cleanId = str;
-        cleanId = cleanId.replace(/\/$/, '');
-        cleanId = cleanId.split('/').pop() ?? null;
-        if (!cleanId)
-            throw new Error(`Unable to parse id for ${str}`); // Log to logger
-        return cleanId;
+            return true;
+        };
     }
 }
-exports.BuddyComplexParser = BuddyComplexParser;
+exports.MangaBoxParser = MangaBoxParser;
 
-},{"entities":69}],73:[function(require,module,exports){
+},{"entities":69}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MangaSaga = exports.MangaSagaInfo = void 0;
-const types_1 = require("@paperback/types");
-const BuddyComplex_1 = require("../BuddyComplex");
-const DOMAIN = 'https://mangasaga.com';
-exports.MangaSagaInfo = {
-    version: (0, BuddyComplex_1.getExportVersion)('0.0.0'),
-    name: 'MangaSaga',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: types_1.ContentRating.MATURE,
-    websiteBaseURL: DOMAIN,
-    sourceTags: [],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
+exports.chapterSettings = exports.getImageServer = void 0;
+const getImageServer = async (stateManager) => {
+    return (await stateManager.retrieve('imageServer')) ?? 'server1';
 };
-class MangaSaga extends BuddyComplex_1.BuddyComplex {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-    }
-}
-exports.MangaSaga = MangaSaga;
+exports.getImageServer = getImageServer;
+const chapterSettings = (stateManager) => {
+    return App.createDUINavigationButton({
+        id: 'chapter_settings',
+        label: 'Chapter Settings',
+        form: App.createDUIForm({
+            sections: async () => [
+                App.createDUISection({
+                    id: 'image_server_settings',
+                    header: 'Image Server Settings',
+                    isHidden: false,
+                    rows: async () => [
+                        App.createDUISelect({
+                            id: 'imageServer',
+                            label: 'Image Server',
+                            options: ['server1', 'server2'],
+                            value: App.createDUIBinding({
+                                get: () => (0, exports.getImageServer)(stateManager).then(value => [value[0]]),
+                                set: async (newValue) => await stateManager.store('imageServer', newValue)
+                            }),
+                            allowsMultiselect: false,
+                            labelResolver: async (value) => (value == 'server1' ? 'Server 1' : 'Server 2')
+                        })
+                    ]
+                })
+            ]
+        })
+    });
+};
+exports.chapterSettings = chapterSettings;
 
-},{"../BuddyComplex":70,"@paperback/types":61}]},{},[73])(73)
+},{}]},{},[70])(70)
 });
