@@ -2146,7 +2146,7 @@ class MangaStreamParser {
                 throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`);
             }
             chapters.push({
-                id: id, // Store chapterNumber as id
+                id: id,
                 langCode: language,
                 chapNum: chapterNumber,
                 name: title,
