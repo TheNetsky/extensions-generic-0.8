@@ -1,4 +1,5 @@
 import {
+    BadgeColor,
     ContentRating,
     SourceInfo,
     SourceIntents
@@ -12,7 +13,7 @@ import {
 const DOMAIN = 'https://omegascans.org'
 
 export const OmegaScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'OmegaScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'YvesPa',
@@ -20,7 +21,12 @@ export const OmegaScansInfo: SourceInfo = {
     icon: 'icon.png',
     contentRating: ContentRating.ADULT,
     websiteBaseURL: DOMAIN,
-    sourceTags: [],
+    sourceTags: [
+        {
+            text: '18+',
+            type: BadgeColor.YELLOW
+        }
+    ],
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
