@@ -21895,7 +21895,7 @@ const types_1 = require("@paperback/types");
 const Hean_1 = require("../Hean");
 const DOMAIN = 'https://omegascans.org';
 exports.OmegaScansInfo = {
-    version: (0, Hean_1.getExportVersion)('0.0.0'),
+    version: (0, Hean_1.getExportVersion)('0.0.1'),
     name: 'OmegaScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'YvesPa',
@@ -21903,7 +21903,12 @@ exports.OmegaScansInfo = {
     icon: 'icon.png',
     contentRating: types_1.ContentRating.ADULT,
     websiteBaseURL: DOMAIN,
-    sourceTags: [],
+    sourceTags: [
+        {
+            text: '18+',
+            type: types_1.BadgeColor.YELLOW
+        }
+    ],
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 };
 class OmegaScans extends Hean_1.Hean {
