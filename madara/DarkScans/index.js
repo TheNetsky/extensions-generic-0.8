@@ -8276,9 +8276,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DarkScans = exports.DarkScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://darkscans.com';
+const DOMAIN = 'https://darkscans.net';
 exports.DarkScansInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: (0, Madara_1.getExportVersion)('0.0.1'),
     name: 'DarkScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
