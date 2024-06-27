@@ -10,10 +10,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://darkscans.com'
+const DOMAIN = 'https://darkscans.net'
 
 export const DarkScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'DarkScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
