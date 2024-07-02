@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://luminouscomics.org'
+const DOMAIN = 'https://luminous-scans.com'
 
 export const LuminousScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.4'),
+    version: getExportVersion('0.0.5'),
     name: 'LuminousScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'yehru',
