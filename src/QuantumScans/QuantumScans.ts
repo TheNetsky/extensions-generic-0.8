@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://readers-point.space'
+const DOMAIN = 'https://qscomics.org'
 
 export const QuantumScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'QuantumScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
