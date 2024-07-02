@@ -1435,7 +1435,7 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":62,"./encode.js":64,"./escape.js":65}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertDate = void 0;
+exports.convertDate = convertDate;
 function convertDate(dateString, source) {
     // Parsed date string
     dateString = dateString.toLowerCase();
@@ -1453,7 +1453,6 @@ function convertDate(dateString, source) {
     }
     return date;
 }
-exports.convertDate = convertDate;
 
 },{}],71:[function(require,module,exports){
 "use strict";
@@ -1953,7 +1952,10 @@ exports.MangaStream = MangaStream;
 },{"./MangaStreamHelper":72,"./MangaStreamParser":73,"./UrlBuilder":74,"@paperback/types":61}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFilterTagsBySection = exports.getIncludedTagBySection = exports.createHomeSection = exports.DefaultHomeSectionData = void 0;
+exports.DefaultHomeSectionData = void 0;
+exports.createHomeSection = createHomeSection;
+exports.getIncludedTagBySection = getIncludedTagBySection;
+exports.getFilterTagsBySection = getFilterTagsBySection;
 /* eslint-disable @typescript-eslint/ban-types */
 const types_1 = require("@paperback/types");
 exports.DefaultHomeSectionData = {
@@ -1970,11 +1972,9 @@ function createHomeSection(id, title, containsMoreItems = true, type = types_1.H
         containsMoreItems
     });
 }
-exports.createHomeSection = createHomeSection;
 function getIncludedTagBySection(section, tags) {
     return (tags?.find((x) => x.id.startsWith(`${section}:`))?.id.replace(`${section}:`, '') ?? '').replace(' ', '+');
 }
-exports.getIncludedTagBySection = getIncludedTagBySection;
 function getFilterTagsBySection(section, tags, included, supportsExclusion = false) {
     if (!included && !supportsExclusion) {
         return [];
@@ -1987,7 +1987,6 @@ function getFilterTagsBySection(section, tags, included, supportsExclusion = fal
         return id;
     });
 }
-exports.getFilterTagsBySection = getFilterTagsBySection;
 
 },{"@paperback/types":61}],73:[function(require,module,exports){
 "use strict";
