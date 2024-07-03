@@ -12,26 +12,26 @@ import { convertDate } from './LanguageUtils'
 
 import { HomeSectionData } from './MangaStreamHelper'
 
-import entities = require('entities')
+import { decode as decodeHTMLEntity } from 'html-entities'
 
 export class MangaStreamParser {
 
     parseMangaDetails($: CheerioStatic, mangaId: string, source: any): SourceManga {
         const titles: string[] = []
-        titles.push(this.decodeHTMLEntity($('h1.entry-title').text().trim()))
+        titles.push(decodeHTMLEntity($('h1.entry-title').text().trim()))
 
         const altTitles = $(`span:contains(${source.manga_selector_AlternativeTitles}), b:contains(${source.manga_selector_AlternativeTitles})+span, .imptdt:contains(${source.manga_selector_AlternativeTitles}) i, h1.entry-title+span`).contents().remove().last().text().split(',') // Language dependant
         for (const title of altTitles) {
             if (title == '') {
                 continue
             }
-            titles.push(this.decodeHTMLEntity(title.trim()))
+            titles.push(decodeHTMLEntity(title.trim()))
         }
 
         const author = $(`span:contains(${source.manga_selector_author}), .fmed b:contains(${source.manga_selector_author})+span, .imptdt:contains(${source.manga_selector_author}) i, tr td:contains(${source.manga_selector_author}) + td`).contents().remove().last().text().trim() // Language dependant
         const artist = $(`span:contains(${source.manga_selector_artist}), .fmed b:contains(${source.manga_selector_artist})+span, .imptdt:contains(${source.manga_selector_artist}) i, tr td:contains(${source.manga_selector_artist}) + td`).contents().remove().last().text().trim() // Language dependant
         const image = this.getImageSrc($('img', 'div[itemprop="image"]'))
-        const description = this.decodeHTMLEntity($('div[itemprop="description"]  p').text().trim())
+        const description = decodeHTMLEntity($('div[itemprop="description"]  p').text().trim())
 
         const arrayTags: Tag[] = []
         for (const tag of $('a', source.manga_tag_selector_box).toArray()) {
@@ -90,7 +90,8 @@ export class MangaStreamParser {
         for (const chapter of $('li', 'div#chapterlist').toArray()) {
             const title = $('span.chapternum', chapter).text().trim()
             const date = convertDate($('span.chapterdate', chapter).text().trim(), source)
-            const id = chapter.attribs['data-num'] ?? '' // Set data-num attribute as id
+            // Set data-num attribute as id
+            const id = chapter.attribs['data-num'] ?? ''
             const chapterNumberRegex = id.match(/(\d+\.?\d?)+/)
             let chapterNumber = 0
             if (chapterNumberRegex && chapterNumberRegex[1]) {
@@ -221,8 +222,8 @@ export class MangaStreamParser {
                 slug,
                 path,
                 image: image || source.fallbackImage,
-                title: this.decodeHTMLEntity(title),
-                subtitle: this.decodeHTMLEntity(subtitle)
+                title: decodeHTMLEntity(title),
+                subtitle: decodeHTMLEntity(subtitle)
             })
         }
 
@@ -250,8 +251,8 @@ export class MangaStreamParser {
             items.push(App.createPartialSourceManga({
                 mangaId,
                 image: image,
-                title: this.decodeHTMLEntity(title),
-                subtitle: this.decodeHTMLEntity(subtitle)
+                title: decodeHTMLEntity(title),
+                subtitle: decodeHTMLEntity(subtitle)
             }))
         }
 
@@ -286,8 +287,8 @@ export class MangaStreamParser {
             items.push(App.createPartialSourceManga({
                 mangaId,
                 image: image,
-                title: this.decodeHTMLEntity(title),
-                subtitle: this.decodeHTMLEntity(subtitle)
+                title: decodeHTMLEntity(title),
+                subtitle: decodeHTMLEntity(subtitle)
             }))
         }
 
@@ -338,11 +339,7 @@ export class MangaStreamParser {
         image = image.replace(/^\//, 'https:/')
 
 
-        return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')))
-    }
-
-    protected decodeHTMLEntity(str: string): string {
-        return entities.decodeHTML(str)
+        return encodeURI(decodeURI(decodeHTMLEntity(image?.trim())))
     }
 
     protected idCleaner(str: string): string {
