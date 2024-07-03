@@ -88,7 +88,7 @@ export class MangaStreamParser {
         if (mangaId.toUpperCase().endsWith('-RAW') && source.language == '🇬🇧') language = '🇰🇷'
 
         for (const chapter of $('li', 'div#chapterlist').toArray()) {
-            const title = $('span.chapternum', chapter).text().trim()
+            const title = decodeHTMLEntity($('span.chapternum', chapter).text().trim())
             const date = convertDate($('span.chapterdate', chapter).text().trim(), source)
             // Set data-num attribute as id
             const id = chapter.attribs['data-num'] ?? ''
@@ -99,7 +99,7 @@ export class MangaStreamParser {
             }
 
             if (!id || typeof id === 'undefined') {
-                throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`)
+                throw new Error(`Could not parse out ID when getting chapters for postId: ${mangaId}`)
             }
 
             chapters.push({
