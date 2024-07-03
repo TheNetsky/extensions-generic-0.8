@@ -320,15 +320,21 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
-        const chapter = $('div#chapterlist').find('li[data-num="' + chapterId + '"]')
+        //const chapter = $('div#chapterlist').find('li[data-num="' + chapterId + '"]')
+        const chapters = $('div#chapterlist').find('li').toArray()
+        if (chapters.length === 0) {
+            throw new Error(`Unable to fetch chapter list for manga with mangaId: ${mangaId}`)
+        }
+
+        const chapter = chapters.find(x => $(x).attr('data-num') === chapterId)
         if (!chapter) {
-            throw new Error(`Unable to fetch a chapter for chapter numer: ${chapterId}`)
+            throw new Error(`Unable to fetch a chapter for chapter number: ${chapterId}`)
         }
 
         // Fetch the ID (URL) of the chapter
         const id = $('a', chapter).attr('href') ?? ''
         if (!id) {
-            throw new Error(`Unable to fetch id for chapter numer: ${chapterId}`)
+            throw new Error(`Unable to fetch id for chapter with chapter id: ${chapterId}`)
         }
         // Request the chapter page
         const _request = App.createRequest({
