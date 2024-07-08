@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://reset-scans.co'
 
 export const ResetScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.3'),
+    version: getExportVersion('0.0.4'),
     name: 'ResetScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
