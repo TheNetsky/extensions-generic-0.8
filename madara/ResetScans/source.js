@@ -9158,9 +9158,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResetScans = exports.ResetScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://resetscan.com';
+const DOMAIN = 'https://reset-scans.co';
 exports.ResetScansInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.3'),
+    version: (0, Madara_1.getExportVersion)('0.0.4'),
     name: 'ResetScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
