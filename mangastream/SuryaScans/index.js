@@ -1324,9 +1324,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SuryaScans = exports.SuryaScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://suryatoon.com';
+const DOMAIN = 'https://genztoons.com';
 exports.SuryaScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.3'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.4'),
     name: 'SuryaScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
