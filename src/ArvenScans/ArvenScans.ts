@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://arvenscans.org'
+const DOMAIN = 'https://arvencomics.com'
 
 export const ArvenScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ArvenScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Gabe',
