@@ -475,9 +475,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArvenScans = exports.ArvenScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://arvenscans.org';
+const DOMAIN = 'https://arvencomics.com';
 exports.ArvenScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'ArvenScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Gabe',
