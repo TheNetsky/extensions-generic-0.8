@@ -154,6 +154,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
      * 0: (POST) Form data https://domain.com/wp-admin/admin-ajax.php
      * 1: (POST) Alternative Ajax page (https://domain.com/manga/manga-slug/ajax/chapters)
      * 2: (POST) Manga page (https://domain.com/manga/manga-slug)
+     * 3: (GET) Manga page (https://domain.com/manga/manga-slug)
      */
     chapterEndpoint = 0
 
@@ -228,7 +229,7 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
                     }
                 }
                 break
-                
+
             case 1:
                 requestConfig = {
                     url: `${this.baseUrl}/${path}/${slug}/ajax/chapters`,
@@ -243,6 +244,16 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
                 requestConfig = {
                     url: `${this.baseUrl}/${path}/${slug}`,
                     method: 'POST',
+                    headers: {
+                        'content-type': 'application/x-www-form-urlencoded'
+                    }
+                }
+                break
+
+            case 3:
+                requestConfig = {
+                    url: `${this.baseUrl}/${path}/${slug}`,
+                    method: 'GET',
                     headers: {
                         'content-type': 'application/x-www-form-urlencoded'
                     }
