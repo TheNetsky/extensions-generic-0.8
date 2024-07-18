@@ -9165,87 +9165,41 @@ exports.Parser = Parser;
 },{"./MadaraDecrypter":107,"entities":105}],110:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MangaReadOrg = exports.MangaReadOrgInfo = void 0;
+exports.ManhwaRaw = exports.ManhwaRawInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
-const MangaReadOrgParser_1 = require("./MangaReadOrgParser");
-const DOMAIN = 'https://www.mangaread.org';
-exports.MangaReadOrgInfo = {
+const DOMAIN = 'https://manhwa-raw.com';
+exports.ManhwaRawInfo = {
     version: (0, Madara_1.getExportVersion)('0.0.0'),
-    name: 'MangaReadOrg',
+    name: 'ManhwaRaw',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: types_1.ContentRating.EVERYONE,
+    contentRating: types_1.ContentRating.ADULT,
     websiteBaseURL: DOMAIN,
-    sourceTags: [],
+    sourceTags: [
+        {
+            text: '18+',
+            type: types_1.BadgeColor.YELLOW
+        },
+        {
+            text: 'Korean',
+            type: types_1.BadgeColor.GREY
+        }
+    ],
     intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
 };
-class MangaReadOrg extends Madara_1.Madara {
+class ManhwaRaw extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.chapterEndpoint = 1;
-        this.parser = new MangaReadOrgParser_1.MangaReadOrgParser();
+        this.chapterEndpoint = 3;
+        this.language = '🇰🇷';
+        this.hasAdvancedSearchPage = false;
     }
 }
-exports.MangaReadOrg = MangaReadOrg;
+exports.ManhwaRaw = ManhwaRaw;
 
-},{"../Madara":106,"./MangaReadOrgParser":111,"@paperback/types":61}],111:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MangaReadOrgParser = void 0;
-const MadaraParser_1 = require("../MadaraParser");
-class MangaReadOrgParser extends MadaraParser_1.Parser {
-    constructor() {
-        super(...arguments);
-        this.parseDate = (date) => {
-            date = date.toUpperCase();
-            let time;
-            const number = Number((/\d*/.exec(date) ?? [])[0]);
-            if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
-                time = new Date(Date.now());
-            }
-            else if (date.includes('YEAR') || date.includes('YEARS')) {
-                time = new Date(Date.now() - (number * 31556952000));
-            }
-            else if (date.includes('MONTH') || date.includes('MONTHS')) {
-                time = new Date(Date.now() - (number * 2592000000));
-            }
-            else if (date.includes('WEEK') || date.includes('WEEKS')) {
-                time = new Date(Date.now() - (number * 604800000));
-            }
-            else if (date.includes('YESTERDAY')) {
-                time = new Date(Date.now() - 86400000);
-            }
-            else if (date.includes('DAY') || date.includes('DAYS')) {
-                time = new Date(Date.now() - (number * 86400000));
-            }
-            else if (date.includes('HOUR') || date.includes('HOURS')) {
-                time = new Date(Date.now() - (number * 3600000));
-            }
-            else if (date.includes('MINUTE') || date.includes('MINUTES') || date.includes('MINS')) {
-                time = new Date(Date.now() - (number * 60000));
-            }
-            else if (date.includes('SECOND') || date.includes('SECONDS')) {
-                time = new Date(Date.now() - (number * 1000));
-            }
-            else if (date.includes('.')) {
-                const dateParts = date.split('.');
-                const year = parseInt(dateParts[2]);
-                const month = parseInt(dateParts[1]) - 1;
-                const day = parseInt(dateParts[0]);
-                time = new Date(year, month, day);
-            }
-            else {
-                time = new Date(date);
-            }
-            return time;
-        };
-    }
-}
-exports.MangaReadOrgParser = MangaReadOrgParser;
-
-},{"../MadaraParser":109}]},{},[110])(110)
+},{"../Madara":106,"@paperback/types":61}]},{},[110])(110)
 });

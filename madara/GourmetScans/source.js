@@ -8407,6 +8407,7 @@ class Madara {
          * 0: (POST) Form data https://domain.com/wp-admin/admin-ajax.php
          * 1: (POST) Alternative Ajax page (https://domain.com/manga/manga-slug/ajax/chapters)
          * 2: (POST) Manga page (https://domain.com/manga/manga-slug)
+         * 3: (GET) Manga page (https://domain.com/manga/manga-slug)
          */
         this.chapterEndpoint = 0;
         /**
@@ -8492,6 +8493,15 @@ class Madara {
                 requestConfig = {
                     url: `${this.baseUrl}/${path}/${slug}`,
                     method: 'POST',
+                    headers: {
+                        'content-type': 'application/x-www-form-urlencoded'
+                    }
+                };
+                break;
+            case 3:
+                requestConfig = {
+                    url: `${this.baseUrl}/${path}/${slug}`,
+                    method: 'GET',
                     headers: {
                         'content-type': 'application/x-www-form-urlencoded'
                     }
@@ -8951,7 +8961,7 @@ class Parser {
         const title = this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim());
         const author = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', '');
         const artist = this.decodeHTMLEntity($('div.artist-content').first().text().replace('\\n', '').trim()).replace('Updating', '');
-        const description = this.decodeHTMLEntity($('div.description-summary').first().text()).replace('Show more', '').trim();
+        const description = this.decodeHTMLEntity($('div.description-summary, div.summary-container').first().text()).replace('Show more', '').trim();
         const image = encodeURI(await this.getImageSrc($('div.summary_image img').first(), source));
         const parsedStatus = $('div.summary-content', $('div.post-content_item').last()).text().trim();
         let status;
