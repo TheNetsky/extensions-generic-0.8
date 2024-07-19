@@ -4,7 +4,8 @@ import {
     BadgeColor,
     SourceIntents,
     HomeSection,
-    HomeSectionType
+    HomeSectionType,
+    Chapter
 } from '@paperback/types'
 
 import {
@@ -15,7 +16,7 @@ import {
 const DOMAIN = 'https://mangabuddy.com'
 
 export const MangaBuddyInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'MangaBuddy',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -49,5 +50,37 @@ export class MangaBuddy extends BuddyComplex {
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
         this.parser.parseHomeSections($, sections, sectionCallback)
+    }
+
+    override async getChapters(mangaId: string): Promise<Chapter[]> {
+        const numericMangaId = await this.getNumericMangaId(mangaId)
+        
+        const request = App.createRequest({
+            url: `${this.baseUrl}/api/manga/${numericMangaId}/chapters?source=detail`,
+            method: 'GET'
+        })
+
+        const response = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(response.status)
+        const $ = this.cheerio.load(response.data as string)
+
+        return this.parser.parseChapterList($, mangaId)
+    }
+
+    async getNumericMangaId(mangaId: string): Promise<string> {
+        const response = await this.requestManager.schedule(App.createRequest({
+            url: `${this.baseUrl}/${mangaId}/`,
+            method: 'GET'
+        }), 1)
+
+        const $ = this.cheerio.load(response.data as string)
+        const correctScript = $('script').get().find(script => $(script).html()?.includes('var bookId ='))
+    
+        const correctScriptMatches = $(correctScript).html()?.match(/var bookId = (\d+);/)
+        const bookId = correctScriptMatches ? correctScriptMatches[1] : null
+        if (!bookId) {
+            throw new Error('Failed to get numeric manga id')
+        }
+        return bookId
     }
 }
