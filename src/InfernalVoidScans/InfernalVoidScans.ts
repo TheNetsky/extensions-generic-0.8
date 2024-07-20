@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://hivescans.com'
+const DOMAIN = 'https://hivetoon.com'
 
 export const InfernalVoidScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'InfernalVoidScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'nicknitewolf',
@@ -30,8 +30,6 @@ export class InfernalVoidScans extends MangaStream {
     baseUrl: string = DOMAIN
 
     override configureSections() {
-        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.uta', $('h2:contains(Project Update)')?.parent()?.next())
-        this.homescreen_sections['new_titles'].selectorFunc = ($: CheerioStatic) => $('li', $('h3:contains(New series)')?.parent()?.next())
         this.homescreen_sections['new_titles'].enabled = false
     }
 }
