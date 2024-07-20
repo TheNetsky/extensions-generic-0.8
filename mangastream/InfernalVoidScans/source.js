@@ -475,9 +475,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InfernalVoidScans = exports.InfernalVoidScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://hivescans.com';
+const DOMAIN = 'https://hivetoon.com';
 exports.InfernalVoidScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.2'),
     name: 'InfernalVoidScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'nicknitewolf',
@@ -494,8 +494,6 @@ class InfernalVoidScans extends MangaStream_1.MangaStream {
         this.baseUrl = DOMAIN;
     }
     configureSections() {
-        this.homescreen_sections['latest_update'].selectorFunc = ($) => $('div.uta', $('h2:contains(Project Update)')?.parent()?.next());
-        this.homescreen_sections['new_titles'].selectorFunc = ($) => $('li', $('h3:contains(New series)')?.parent()?.next());
         this.homescreen_sections['new_titles'].enabled = false;
     }
 }
