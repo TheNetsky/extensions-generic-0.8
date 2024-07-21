@@ -497,9 +497,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LuaScans = exports.LuaScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://luascans.com';
+const DOMAIN = 'https://luacomic.com';
 exports.LuaScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'LuaScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
