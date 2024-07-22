@@ -8,7 +8,7 @@ import {
     HomeSection
 } from '@paperback/types'
 
-import entities = require('entities')
+import { decode as decodeHTML } from 'html-entities'
 
 export interface UpdatedManga {
     ids: string[];
@@ -338,7 +338,7 @@ export class BuddyComplexParser {
     }
 
     protected decodeHTMLEntity(str: string): string {
-        return entities.decodeHTML(str)
+        return decodeHTML(str)
     }
 
     protected parseDate = (date: string): Date => {
