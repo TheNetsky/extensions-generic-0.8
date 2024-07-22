@@ -12,6 +12,7 @@ import {
     getExportVersion,
     BuddyComplex
 } from '../BuddyComplex'
+import { MangaBuddyParser } from './MangaBuddyParser'
 
 const DOMAIN = 'https://mangabuddy.com'
 
@@ -31,6 +32,7 @@ export const MangaBuddyInfo: SourceInfo = {
 export class MangaBuddy extends BuddyComplex {
 
     baseUrl: string = DOMAIN
+    override parser: MangaBuddyParser = new MangaBuddyParser()
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const section1 = App.createHomeSection({ id: 'hot_updates', title: 'Hot Updates', type: HomeSectionType.singleRowNormal, containsMoreItems: true })
@@ -59,12 +61,22 @@ export class MangaBuddy extends BuddyComplex {
             url: `${this.baseUrl}/api/manga/${numericMangaId}/chapters?source=detail`,
             method: 'GET'
         })
-
+        
         const response = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(response.status)
         const $ = this.cheerio.load(response.data as string)
 
-        return this.parser.parseChapterList($, mangaId)
+        // sometimes MangaBuddy misses chapters in this chapter list, so we also need to fetch the chapter list from the manga page
+        const requestMangaPage = App.createRequest({
+            url: `${this.baseUrl}/${mangaId}/`,
+            method: 'GET'
+        })
+
+        const responseMangaPage = await this.requestManager.schedule(requestMangaPage, 1)
+        this.CloudFlareError(responseMangaPage.status)
+        const mangaPage$ = this.cheerio.load(responseMangaPage.data as string)
+
+        return this.parser.fullParseChapterList($, mangaId, mangaPage$)
     }
 
     async getNumericMangaId(mangaId: string): Promise<string> {
