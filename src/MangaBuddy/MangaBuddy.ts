@@ -17,7 +17,7 @@ import { MangaBuddyParser } from './MangaBuddyParser'
 const DOMAIN = 'https://mangabuddy.com'
 
 export const MangaBuddyInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'MangaBuddy',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
