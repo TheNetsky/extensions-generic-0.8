@@ -8,7 +8,7 @@ import {
     HomeSection
 } from '@paperback/types'
 
-import entities = require('entities')
+import { decode as decodeHTML } from 'html-entities'
 
 export interface UpdatedManga {
     ids: string[];
@@ -78,7 +78,7 @@ export class BuddyComplexParser {
         for (const chapter of $('li', 'ul.chapter-list').toArray()) {
             const title = $('strong.chapter-title', chapter).text().trim()
             const id = this.idCleaner($('a', chapter).attr('href') ?? '')
-            const date = new Date($('time.chapter-update', chapter)?.text() ?? '')
+            const date = this.parseDate($('time.chapter-update', chapter)?.text() ?? '')
             if (!id) continue
 
             // Check chapter/ch-* regex first
@@ -108,6 +108,7 @@ export class BuddyComplexParser {
         }
 
         return chapters.map(chapter => {
+            // Inverts the sortingIndex to have the chapters in the correct order
             chapter.sortingIndex += chapters.length
             return App.createChapter(chapter)
         })
@@ -338,13 +339,21 @@ export class BuddyComplexParser {
     }
 
     protected decodeHTMLEntity(str: string): string {
-        return entities.decodeHTML(str)
+        return decodeHTML(str)
     }
 
     protected parseDate = (date: string): Date => {
         date = date.toUpperCase()
         let time: Date
-        const number = Number((/\d*/.exec(date) ?? [])[0])
+        const extractedNumber = (/\d*/.exec(date) ?? [])[0]
+        let number = 0
+        if (extractedNumber == '') {
+            if (date.startsWith('AN') || date.startsWith('A ')) {
+                number = 1
+            }
+        } else {
+            number = isNaN(Number(extractedNumber)) ? 0 : Number(extractedNumber)
+        }
         if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
             time = new Date(Date.now())
         } else if (date.includes('YEAR') || date.includes('YEARS')) {
