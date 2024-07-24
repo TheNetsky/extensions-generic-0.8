@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://luacomic.com'
+const DOMAIN = 'https://luacomic.net'
 
 export const LuaScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'LuaScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
