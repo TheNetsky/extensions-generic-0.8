@@ -475,9 +475,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DrakeScans = exports.DrakeScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://drakescans.com';
+const DOMAIN = 'https://drakecomic.com';
 exports.DrakeScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.0'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.1'),
     name: 'DrakeScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
