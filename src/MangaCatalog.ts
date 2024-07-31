@@ -20,7 +20,7 @@ import {
     SourceBaseData
 } from './MangaCatalogInterface'
 
-const BASE_VERSION = '1.1.0'
+const BASE_VERSION = '1.1.1'
 
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     // Thanks to https://github.com/TheNetsky/
@@ -62,6 +62,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
+                        'user-agent': await this.requestManager.getDefaultUserAgent(),
                         'referer': `${this.baseUrl}/`
                     }
                 }
@@ -82,6 +83,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseMangaDetails($, mangaId, this)
@@ -93,6 +95,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseChapters($, mangaId, this)
@@ -105,6 +108,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId, this)
@@ -168,6 +172,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
 
             const fetchPromise = this.requestManager.schedule(request, 1)
                 .then(response => {
+                    this.checkResponseError(response)
                     const $ = this.cheerio.load(response.data as string)
                     const title: string = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim())
                     const id: string = source.url.split('/')[4] || ''
@@ -192,5 +197,28 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
         await Promise.all(fetchPromises)
 
         return this.sourceData
+    }
+
+    async getCloudflareBypassRequestAsync(): Promise<Request> {
+        return App.createRequest({
+            url: `${this.baseUrl}/`,
+            method: 'GET',
+            headers: {
+                'referer': `${this.baseUrl}/`,
+                'origin': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
+        })
+    }
+
+    checkResponseError(response: Response): void {
+        const status = response.status
+        switch (status) {
+            case 403:
+            case 503:
+                throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`)
+            case 404:
+                throw new Error(`The requested page ${response.request.url} was not found!`)
+        }
     }
 }

@@ -22,7 +22,7 @@ export const ReadBlackCloverInfo: SourceInfo = {
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 }
 

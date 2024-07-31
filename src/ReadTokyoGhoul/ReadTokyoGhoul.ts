@@ -22,7 +22,7 @@ export const ReadTokyoGhoulInfo: SourceInfo = {
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 }
 
