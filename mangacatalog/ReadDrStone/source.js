@@ -1438,7 +1438,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaCatalog = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MangaCatalogParser_1 = require("./MangaCatalogParser");
-const BASE_VERSION = '1.1.0';
+const BASE_VERSION = '1.1.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     // Thanks to https://github.com/TheNetsky/
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
@@ -1466,6 +1466,7 @@ class MangaCatalog {
                     request.headers = {
                         ...(request.headers ?? {}),
                         ...{
+                            'user-agent': await this.requestManager.getDefaultUserAgent(),
                             'referer': `${this.baseUrl}/`
                         }
                     };
@@ -1484,6 +1485,7 @@ class MangaCatalog {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseMangaDetails($, mangaId, this);
     }
@@ -1493,6 +1495,7 @@ class MangaCatalog {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseChapters($, mangaId, this);
     }
@@ -1502,6 +1505,7 @@ class MangaCatalog {
             method: 'GET'
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         return this.parser.parseChapterDetails($, mangaId, chapterId, this);
     }
@@ -1551,6 +1555,7 @@ class MangaCatalog {
             });
             const fetchPromise = this.requestManager.schedule(request, 1)
                 .then(response => {
+                this.checkResponseError(response);
                 const $ = this.cheerio.load(response.data);
                 const title = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim());
                 const id = source.url.split('/')[4] || '';
@@ -1571,6 +1576,27 @@ class MangaCatalog {
         }
         await Promise.all(fetchPromises);
         return this.sourceData;
+    }
+    async getCloudflareBypassRequestAsync() {
+        return App.createRequest({
+            url: `${this.baseUrl}/`,
+            method: 'GET',
+            headers: {
+                'referer': `${this.baseUrl}/`,
+                'origin': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
+        });
+    }
+    checkResponseError(response) {
+        const status = response.status;
+        switch (status) {
+            case 403:
+            case 503:
+                throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
+            case 404:
+                throw new Error(`The requested page ${response.request.url} was not found!`);
+        }
     }
 }
 exports.MangaCatalog = MangaCatalog;
@@ -1680,7 +1706,7 @@ exports.ReadDrStoneInfo = {
     icon: 'icon.png',
     contentRating: types_1.ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS,
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 };
 class ReadDrStone extends MangaCatalog_1.MangaCatalog {
