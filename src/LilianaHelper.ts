@@ -19,8 +19,8 @@ export interface HomeSectionData {
 
 export const DefaultHomeSectionData = {
     titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('h2', element).text().trim(),
-    getImageFunc:() => undefined,
-    getIdFunc:() => undefined,
+    getImageFunc: () => undefined,
+    getIdFunc: () => undefined,
     subtitleSelectorFunc: () => undefined,
     getViewMoreItemsFunc: () => undefined,
     enabled: true
@@ -51,17 +51,17 @@ export function getFilterTagsBySection(section: string, tags: Tag[], included: b
 }
 
 export interface SearchData {
-    list:   SearchList[];
+    list: SearchList[];
 }
 
 export interface SearchList {
-    cover:       string;
-    name:        string;
-    url:         string;
+    cover: string;
+    name: string;
+    url: string;
     description: string;
-    genres:      string;
-    last:        string;
-    update:      string;
+    genres: string;
+    last: string;
+    update: string;
 }
 
 export class URLBuilder {

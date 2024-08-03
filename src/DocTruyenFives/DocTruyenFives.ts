@@ -9,7 +9,7 @@ import {
     getExportVersion
 } from '../Liliana'
 
-const DOMAIN = 'https://manga.io.vn'
+const DOMAIN = 'https://dongmoe.com'
 
 export const DocTruyenFivesInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
@@ -27,6 +27,8 @@ export const DocTruyenFivesInfo: SourceInfo = {
 export class DocTruyenFives extends Liliana {
 
     baseUrl: string = DOMAIN
+
     override usesPostSearch = true
+
     override language = '🇻🇳'
 }

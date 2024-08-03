@@ -17,7 +17,6 @@ export class Parser {
 
         const mangas = section.selectorFunc($)
         if (!mangas.length) {
-            console.log(`Unable to parse valid ${section.section.title} section!`)
             return items
         }
 
@@ -28,7 +27,6 @@ export class Parser {
             const mangaId: string = this.idCleaner(section.getIdFunc($, manga) ?? '')
 
             if (!mangaId || !title) {
-                console.log(`Failed to parse homepage sections for ${source.baseUrl} title (${title}) mangaId (${mangaId})`)
                 continue
             }
             items.push(App.createPartialSourceManga({
@@ -45,21 +43,22 @@ export class Parser {
     parseSearchResults($: CheerioSelector, source: any): PartialSourceManga[] {
         const results: PartialSourceManga[] = []
 
-          for (const manga of $('div#main div.grid > div').toArray()) {
+        for (const manga of $('div#main div.grid > div').toArray()) {
 
             const title = $('.text-center a', manga)?.text()?.trim() ?? ''
-            const image =  this.getImageSrc($('img', manga)) ?? ''
+            const subtitle = $('a.clamp.toe.oh', manga).last()?.text()?.trim() ?? ''
+            const image = this.getImageSrc($('img', manga)) ?? ''
             const mangaId: string = this.idCleaner($('a', manga).attr('href') ?? '')
 
             if (!mangaId || !title) {
-                console.log(`Failed to parse homepage sections for ${source.baseUrl}`)
                 continue
             }
 
             results.push(App.createPartialSourceManga({
                 mangaId,
                 image: image.includes('https://') ? image : `${source.baseUrl}/${image}`,
-                title: this.decodeHTMLEntity(title)
+                title: this.decodeHTMLEntity(title),
+                subtitle: this.decodeHTMLEntity(subtitle)
             }))
         }
 
@@ -70,15 +69,13 @@ export class Parser {
         const results: PartialSourceManga[] = []
 
         for (const obj of data.list) {
-
-
             const title = obj?.name ?? ''
             const mangaId = this.idCleaner(obj?.url) ?? ''
             const image = source?.baseUrl + obj?.cover
             const subtitle = obj?.last ?? ''
 
             results.push(App.createPartialSourceManga({
-                mangaId, 
+                mangaId,
                 image,
                 title: this.decodeHTMLEntity(title),
                 subtitle: this.decodeHTMLEntity(subtitle)
@@ -95,7 +92,7 @@ export class Parser {
         const status = $('div.y6x11p i.fas.fa-rss + span.dt').text().trim()
 
         const authors = []
-        for(const author of $('div.y6x11p i.fas.fa-user + span.dt a').toArray()){
+        for (const author of $('div.y6x11p i.fas.fa-user + span.dt a').toArray()) {
             authors.push($(author).text().trim())
         }
 
@@ -103,7 +100,7 @@ export class Parser {
         for (const tag of $(`.a2 div > a[rel='tag'].label`).toArray()) {
             const label = $(tag)?.text()?.trim()
             const id = this.idCleaner($(tag)?.attr('href') ?? '') ?? ''
-    
+
             if (!id || !label) continue
             arrayTags.push({ id: `manga_genres:${id}`, label: label })
         }
@@ -177,32 +174,31 @@ export class Parser {
     parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string, source: any): ChapterDetails => {
         const pages: any[] = []
 
-        if($('div.separator[data-index]').length === 0){
-            let index = 0 
+        if ($('div.separator[data-index]').length === 0) {
+            let index = 0
             for (const img of $('div.separator').toArray()) {
                 const url = $('a', img)?.attr('href') ?? ''
                 if (url !== '') {
-                    pages.push({index, url:`https://intercept.me/${url}`})
+                    pages.push({ index, url: `https://intercept.me/${url}` })
                     index++
                 }
             }
-                
+
         } else {
-            console.log('not null')
             for (const img of $('div.separator[data-index]').toArray()) {
                 const index = Number($(img).attr('data-index'))
                 const url = $('a', img)?.attr('href') ?? ''
                 if (url !== '') {
-                    pages.push({index, url:`https://intercept.me/${url}`})
+                    pages.push({ index, url: `https://intercept.me/${url}` })
                 }
-            }  
+            }
         }
 
         const sortedPages: string[] = []
 
-        const data = pages.sort((a,b) => a.index - b.index)
+        const data = pages.sort((a, b) => a.index - b.index)
 
-        for(const img of data) {
+        for (const img of data) {
             sortedPages.push(img.url)
         }
 
@@ -225,7 +221,7 @@ export class Parser {
             { id: '5', label: 'sort', tags: [] }
         ]
 
-        for (const genre of $('div.advanced-genres .advance-item').toArray()){
+        for (const genre of $('div.advanced-genres .advance-item').toArray()) {
             const label = $('label', genre).text().trim()
             const id = `${tagSections[0].label}:${$('span', genre).attr('data-genre')?.trim()}`
 
@@ -235,19 +231,19 @@ export class Parser {
 
             tagSections[0].tags.push(App.createTag({ id, label }))
         }
-        
-        for (const genre of $('div.advanced-select #select-type option').toArray()){
+
+        for (const genre of $('div.advanced-select #select-type option').toArray()) {
             const label = $(genre).text().trim()
             const id = `${tagSections[1].label}:${$(genre).attr('value')?.trim()}`
 
             if (!id || !label) {
                 continue
             }
-            
+
             tagSections[1].tags.push(App.createTag({ id, label }))
         }
 
-        for (const genre of $('div.advanced-select #select-count option').toArray()){
+        for (const genre of $('div.advanced-select #select-count option').toArray()) {
             const label = $(genre).text().trim()
             const id = `${tagSections[2].label}:${$(genre).attr('value')?.trim()}`
 
@@ -258,7 +254,7 @@ export class Parser {
             tagSections[2].tags.push(App.createTag({ id, label }))
         }
 
-        for (const genre of $('div.advanced-select #select-status option').toArray()){
+        for (const genre of $('div.advanced-select #select-status option').toArray()) {
             const label = $(genre).text().trim()
             const id = `${tagSections[3].label}:${$(genre).attr('value')?.trim()}`
 
@@ -269,7 +265,7 @@ export class Parser {
             tagSections[3].tags.push(App.createTag({ id, label }))
         }
 
-        for (const genre of $('div.advanced-select #select-gender option').toArray()){
+        for (const genre of $('div.advanced-select #select-gender option').toArray()) {
             const label = $(genre).text().trim()
             const id = `${tagSections[4].label}:${$(genre).attr('value')?.trim()}`
 
@@ -280,7 +276,7 @@ export class Parser {
             tagSections[4].tags.push(App.createTag({ id, label }))
         }
 
-        for (const genre of $('div.advanced-select #select-sort option').toArray()){
+        for (const genre of $('div.advanced-select #select-sort option').toArray()) {
             const label = $(genre).text().trim()
             const id = `${tagSections[5].label}:${$(genre).attr('value')?.trim()}`
 
@@ -334,7 +330,7 @@ export class Parser {
 
     isLastPage = ($: CheerioStatic): boolean => {
         let isLast = true
-        
+
         const hasNext = Boolean($('.blog-pager > span.pagecurrent + span')[0])
         if (hasNext) {
             isLast = false

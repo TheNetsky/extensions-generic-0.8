@@ -27,6 +27,8 @@ export const MangaKomaInfo: SourceInfo = {
 export class MangaKoma extends Liliana {
 
     baseUrl: string = DOMAIN
+
     override usesPostSearch = true
+
     override language = '🇯🇵'
 }

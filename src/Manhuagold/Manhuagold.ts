@@ -27,5 +27,6 @@ export const ManhuagoldInfo: SourceInfo = {
 export class Manhuagold extends Liliana {
 
     baseUrl: string = DOMAIN
+
     override usesPostSearch = true
 }

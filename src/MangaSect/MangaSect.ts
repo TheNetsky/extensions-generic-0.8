@@ -27,5 +27,6 @@ export const MangaSectInfo: SourceInfo = {
 export class MangaSect extends Liliana {
 
     baseUrl: string = DOMAIN
+
     override usesPostSearch = true
 }
