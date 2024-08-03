@@ -8847,8 +8847,8 @@ const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://madaradex.org';
 exports.MadaraDexInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.1'),
-    name: 'Madaradex',
+    version: (0, Madara_1.getExportVersion)('0.0.2'),
+    name: 'MadaraDex',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
