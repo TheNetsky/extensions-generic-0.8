@@ -1438,7 +1438,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DocTruyenFives = exports.DocTruyenFivesInfo = void 0;
 const types_1 = require("@paperback/types");
 const Liliana_1 = require("../Liliana");
-const DOMAIN = 'https://manga.io.vn';
+const DOMAIN = 'https://dongmoe.com';
 exports.DocTruyenFivesInfo = {
     version: (0, Liliana_1.getExportVersion)('0.0.0'),
     name: 'DocTruyen5s',
@@ -1486,7 +1486,7 @@ class Liliana {
         this.homescreen_sections = {
             'trending': {
                 ...LilianaHelper_1.DefaultHomeSectionData,
-                section: (0, LilianaHelper_1.createHomeSection)('trending', 'Trending', false, types_1.HomeSectionType.featured),
+                section: (0, LilianaHelper_1.createHomeSection)('trending', 'Currently Trending', false, types_1.HomeSectionType.featured),
                 selectorFunc: ($) => $('#recommend .widget-content figure'),
                 titleSelectorFunc: ($, element) => $('.block img', element).attr('alt')?.trim(),
                 getImageFunc: ($, element) => $('.block img', element),
@@ -1495,9 +1495,10 @@ class Liliana {
             },
             'latest': {
                 ...LilianaHelper_1.DefaultHomeSectionData,
-                section: (0, LilianaHelper_1.createHomeSection)('latest', 'Latest', true, types_1.HomeSectionType.singleRowNormal),
-                selectorFunc: ($) => $('#home-tab-update .full-i'),
+                section: (0, LilianaHelper_1.createHomeSection)('latest', 'Latest Updates', true, types_1.HomeSectionType.singleRowNormal),
+                selectorFunc: ($) => $('#home-tab-update .full-i').parent(),
                 titleSelectorFunc: ($, element) => $('.block img', element).attr('alt')?.trim(),
+                subtitleSelectorFunc: ($, element) => $('a.clamp.toe.oh', element).last().text().trim(),
                 getImageFunc: ($, element) => $('.block img', element),
                 getIdFunc: ($, element) => $('a.block', element).attr('href'),
                 getViewMoreItemsFunc: (page) => `filter/${page}?sort=latest-updated`,
@@ -1505,7 +1506,7 @@ class Liliana {
             },
             'daily': {
                 ...LilianaHelper_1.DefaultHomeSectionData,
-                section: (0, LilianaHelper_1.createHomeSection)('daily', 'Daily', true, types_1.HomeSectionType.singleRowNormal),
+                section: (0, LilianaHelper_1.createHomeSection)('daily', 'Most Popular Daily', true, types_1.HomeSectionType.singleRowNormal),
                 selectorFunc: ($) => $('.listtop #series-day article'),
                 titleSelectorFunc: ($, element) => $(".item-thumbnail img", element).attr('alt')?.trim(),
                 getImageFunc: ($, element) => $('.item-thumbnail img', element),
@@ -1515,7 +1516,7 @@ class Liliana {
             },
             'weekly': {
                 ...LilianaHelper_1.DefaultHomeSectionData,
-                section: (0, LilianaHelper_1.createHomeSection)('weekly', 'Weekly', true, types_1.HomeSectionType.singleRowNormal),
+                section: (0, LilianaHelper_1.createHomeSection)('weekly', 'Most Popular Weekly', true, types_1.HomeSectionType.singleRowNormal),
                 selectorFunc: ($) => $('.listtop #series-week article'),
                 titleSelectorFunc: ($, element) => $(".item-thumbnail img", element).attr('alt')?.trim(),
                 getImageFunc: ($, element) => $('.item-thumbnail img', element),
@@ -1525,7 +1526,7 @@ class Liliana {
             },
             'monthly': {
                 ...LilianaHelper_1.DefaultHomeSectionData,
-                section: (0, LilianaHelper_1.createHomeSection)('monthly', 'Monthly', true, types_1.HomeSectionType.singleRowNormal),
+                section: (0, LilianaHelper_1.createHomeSection)('monthly', 'Most Popular Monthly', true, types_1.HomeSectionType.singleRowNormal),
                 selectorFunc: ($) => $('.listtop #series-month article.grid'),
                 titleSelectorFunc: ($, element) => $(".item-thumbnail img", element).attr('alt')?.trim(),
                 getImageFunc: ($, element) => $('.item-thumbnail img', element),
@@ -1566,7 +1567,9 @@ class Liliana {
             }
         });
     }
-    getMangaShareUrl(mangaId) { return `${this.baseUrl}/manga/${mangaId}`; }
+    getMangaShareUrl(mangaId) {
+        return `${this.baseUrl}/${this.directoryPath}/${mangaId}`;
+    }
     async getHomePageSections(sectionCallback) {
         const request = App.createRequest({
             url: `${this.baseUrl}`,
@@ -1954,7 +1957,6 @@ class Parser {
                 }
             }
             else {
-                console.log('not null');
                 for (const img of $('div.separator[data-index]').toArray()) {
                     const index = Number($(img).attr('data-index'));
                     const url = $('a', img)?.attr('href') ?? '';
@@ -1988,7 +1990,6 @@ class Parser {
         const items = [];
         const mangas = section.selectorFunc($);
         if (!mangas.length) {
-            console.log(`Unable to parse valid ${section.section.title} section!`);
             return items;
         }
         for (const manga of mangas.toArray()) {
@@ -1997,7 +1998,6 @@ class Parser {
             const subtitle = section.subtitleSelectorFunc($, manga) ?? '';
             const mangaId = this.idCleaner(section.getIdFunc($, manga) ?? '');
             if (!mangaId || !title) {
-                console.log(`Failed to parse homepage sections for ${source.baseUrl} title (${title}) mangaId (${mangaId})`);
                 continue;
             }
             items.push(App.createPartialSourceManga({
@@ -2013,16 +2013,17 @@ class Parser {
         const results = [];
         for (const manga of $('div#main div.grid > div').toArray()) {
             const title = $('.text-center a', manga)?.text()?.trim() ?? '';
+            const subtitle = $('a.clamp.toe.oh', manga).last()?.text()?.trim() ?? '';
             const image = this.getImageSrc($('img', manga)) ?? '';
             const mangaId = this.idCleaner($('a', manga).attr('href') ?? '');
             if (!mangaId || !title) {
-                console.log(`Failed to parse homepage sections for ${source.baseUrl}`);
                 continue;
             }
             results.push(App.createPartialSourceManga({
                 mangaId,
                 image: image.includes('https://') ? image : `${source.baseUrl}/${image}`,
-                title: this.decodeHTMLEntity(title)
+                title: this.decodeHTMLEntity(title),
+                subtitle: this.decodeHTMLEntity(subtitle)
             }));
         }
         return results;
