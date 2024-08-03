@@ -13,3 +13,5 @@ Join the [Discord](https://discord.gg/rmf6jQpMU9) for support and more sources!
 | MangaBox      | MangaBox Generic      | [Click me!](https://thenetsky.github.io/extensions-generic-0.8/mangabox/)    |
 | NepNep      | NepNep Generic      | [Click me!](https://thenetsky.github.io/extensions-generic-0.8/nepnep/)    |
 | MangaCatalog      | MangaCatalog Generic      | [Click me!](https://thenetsky.github.io/extensions-generic-0.8/mangacatalog/)    |
+| Hean      | Hean Generic      | [Click me!](https://thenetsky.github.io/extensions-generic-0.8/hean/)    |
+| Liliana      | Liliana Generic      | [Click me!](https://thenetsky.github.io/extensions-generic-0.8/liliana/)    |
