@@ -13,8 +13,8 @@ import {
 const DOMAIN = 'https://madaradex.org'
 
 export const MadaraDexInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
-    name: 'Madaradex',
+    version: getExportVersion('0.0.2'),
+    name: 'MadaraDex',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
