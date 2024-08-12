@@ -8273,129 +8273,6 @@ Object.defineProperty(exports, "decodeXMLStrict", { enumerable: true, get: funct
 },{"./decode.js":98,"./encode.js":100,"./escape.js":101}],106:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BibiManga = exports.BibiMangaInfo = void 0;
-const types_1 = require("@paperback/types");
-const Madara_1 = require("../Madara");
-const DOMAIN = 'https://bibimanga.com';
-exports.BibiMangaInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.1'),
-    name: 'BibiManga',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: types_1.ContentRating.EVERYONE,
-    websiteBaseURL: DOMAIN,
-    sourceTags: [],
-    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
-};
-class BibiManga extends Madara_1.Madara {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-        this.chapterEndpoint = 1;
-        this.usePostIds = false;
-    }
-    async getHomePageSections(sectionCallback) {
-        const sections = [
-            {
-                request: App.createRequest({
-                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=latest`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: '0',
-                    title: 'Recently Updated',
-                    type: types_1.HomeSectionType.singleRowNormal,
-                    containsMoreItems: true
-                })
-            },
-            {
-                request: App.createRequest({
-                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=views`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: '2',
-                    title: 'Most Popular',
-                    type: types_1.HomeSectionType.singleRowNormal,
-                    containsMoreItems: true
-                })
-            },
-            {
-                request: App.createRequest({
-                    url: `${this.baseUrl}/${this.directoryPath}/?m_orderby=new-manga`,
-                    method: 'GET'
-                }),
-                section: App.createHomeSection({
-                    id: '3',
-                    title: 'New Manga',
-                    type: types_1.HomeSectionType.singleRowNormal,
-                    containsMoreItems: true
-                })
-            }
-        ];
-        const promises = [];
-        for (const section of sections) {
-            // Let the app load empty sections
-            sectionCallback(section.section);
-            // Get the section data
-            promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
-                this.checkResponseError(response);
-                const $ = this.cheerio.load(response.data);
-                section.section.items = await this.parser.parseHomeSection($, this);
-                sectionCallback(section.section);
-            }));
-        }
-        // Make sure the function completes
-        await Promise.all(promises);
-    }
-    async getViewMoreItems(homepageSectionId, metadata) {
-        const page = metadata?.page ?? 1;
-        let param;
-        switch (homepageSectionId) {
-            case '0': {
-                param = 'm_orderby=latest';
-                break;
-            }
-            case '1': {
-                param = 'm_orderby=trending';
-                break;
-            }
-            case '2': {
-                param = 'm_orderby=views';
-                break;
-            }
-            case '3': {
-                param = 'm_orderby=new-manga';
-                break;
-            }
-            default:
-                throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
-        }
-        const request = App.createRequest({
-            url: `${this.baseUrl}/${this.directoryPath}/page/${page}/?${param}`,
-            method: 'GET'
-        });
-        const response = await this.requestManager.schedule(request, 1);
-        this.checkResponseError(response);
-        const $ = this.cheerio.load(response.data);
-        const items = await this.parser.parseHomeSection($, this);
-        let mData = { page: (page + 1) };
-        if (!$('a.last')) {
-            mData = undefined;
-        }
-        return App.createPagedResults({
-            results: items,
-            metadata: mData
-        });
-    }
-}
-exports.BibiManga = BibiManga;
-
-},{"../Madara":107,"@paperback/types":61}],107:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MadaraParser_1 = require("./MadaraParser");
@@ -8911,7 +8788,7 @@ class Madara {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":109,"./MadaraParser":110,"@paperback/types":61}],108:[function(require,module,exports){
+},{"./MadaraHelper":108,"./MadaraParser":109,"@paperback/types":61}],107:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -8962,7 +8839,7 @@ function extractVariableValues(chapterData) {
 }
 exports.extractVariableValues = extractVariableValues;
 
-},{"crypto-js":72}],109:[function(require,module,exports){
+},{"crypto-js":72}],108:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -9005,7 +8882,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],110:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -9285,5 +9162,38 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"./MadaraDecrypter":108,"entities":105}]},{},[106])(106)
+},{"./MadaraDecrypter":107,"entities":105}],110:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TheBlank = exports.TheBlankInfo = void 0;
+const types_1 = require("@paperback/types");
+const Madara_1 = require("../Madara");
+const DOMAIN = 'https://theblank.net';
+exports.TheBlankInfo = {
+    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    name: 'TheBlank',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: types_1.ContentRating.ADULT,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [
+        {
+            text: '18+',
+            type: types_1.BadgeColor.YELLOW
+        }
+    ],
+    intents: types_1.SourceIntents.MANGA_CHAPTERS | types_1.SourceIntents.HOMEPAGE_SECTIONS | types_1.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | types_1.SourceIntents.SETTINGS_UI
+};
+class TheBlank extends Madara_1.Madara {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+        this.chapterEndpoint = 1;
+    }
+}
+exports.TheBlank = TheBlank;
+
+},{"../Madara":106,"@paperback/types":61}]},{},[110])(110)
 });

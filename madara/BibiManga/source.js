@@ -9054,7 +9054,7 @@ class Parser {
         const title = this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim());
         const author = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', '');
         const artist = this.decodeHTMLEntity($('div.artist-content').first().text().replace('\\n', '').trim()).replace('Updating', '');
-        const description = this.decodeHTMLEntity($('div.description-summary, div.summary-container').first().text()).replace('Show more', '').trim();
+        const description = this.decodeHTMLEntity($('div.description-summary, div.summary-container, div.manga-excerpt').first().text()).replace('Show more', '').trim();
         const image = encodeURI(await this.getImageSrc($('div.summary_image img').first(), source));
         const parsedStatus = $('div.summary-content', $('div.post-content_item').last()).text().trim();
         let status;
