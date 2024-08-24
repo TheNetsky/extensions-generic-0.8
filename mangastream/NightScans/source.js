@@ -1324,9 +1324,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NightScans = exports.NightScansInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaStream_1 = require("../MangaStream");
-const DOMAIN = 'https://night-scans.com';
+const DOMAIN = 'https://nightsup.net';
 exports.NightScansInfo = {
-    version: (0, MangaStream_1.getExportVersion)('0.0.2'),
+    version: (0, MangaStream_1.getExportVersion)('0.0.3'),
     name: 'NightScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
