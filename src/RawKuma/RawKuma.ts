@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://rawkuma.com'
 
 export const RawKumaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'RawKuma',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -33,5 +33,10 @@ export const RawKumaInfo: SourceInfo = {
 export class RawKuma extends MangaStream {
 
     baseUrl: string = DOMAIN
+
     override language = '🇯🇵'
+
+    override configureSections() {
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.uta', $('h3:contains(Latest Update)')?.parent()?.next())
+    }
 }
