@@ -8277,9 +8277,9 @@ exports.KnightNoScanlation = exports.KnightNoScanlationInfo = void 0;
 const types_1 = require("@paperback/types");
 const Madara_1 = require("../Madara");
 const KnightNoScanlationParser_1 = require("./KnightNoScanlationParser");
-const DOMAIN = 'https://kns.twobluescans.com';
+const DOMAIN = 'https://lectorkns.com';
 exports.KnightNoScanlationInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.2'),
+    version: (0, Madara_1.getExportVersion)('0.0.3'),
     name: 'KnightNoScanlation',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky & Seitenca',
