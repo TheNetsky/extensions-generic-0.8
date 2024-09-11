@@ -1449,7 +1449,7 @@ class Liliana {
         this.cheerio = cheerio;
         this.language = '🇬🇧';
         this.directoryPath = 'manga';
-        this.usesPostSearch = false;
+        this.usePostSearch = false;
         /**
          * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
          */
@@ -1479,7 +1479,7 @@ class Liliana {
                 ...LilianaHelper_1.DefaultHomeSectionData,
                 section: (0, LilianaHelper_1.createHomeSection)('daily', 'Most Popular Daily', true, types_1.HomeSectionType.singleRowNormal),
                 selectorFunc: ($) => $('.listtop #series-day article'),
-                titleSelectorFunc: ($, element) => $(".item-thumbnail img", element).attr('alt')?.trim(),
+                titleSelectorFunc: ($, element) => $('.item-thumbnail img', element).attr('alt')?.trim(),
                 getImageFunc: ($, element) => $('.item-thumbnail img', element),
                 getIdFunc: ($, element) => $('.item-thumbnail a', element).attr('href'),
                 getViewMoreItemsFunc: (page) => `filter/${page}?sort=views_day`,
@@ -1489,7 +1489,7 @@ class Liliana {
                 ...LilianaHelper_1.DefaultHomeSectionData,
                 section: (0, LilianaHelper_1.createHomeSection)('weekly', 'Most Popular Weekly', true, types_1.HomeSectionType.singleRowNormal),
                 selectorFunc: ($) => $('.listtop #series-week article'),
-                titleSelectorFunc: ($, element) => $(".item-thumbnail img", element).attr('alt')?.trim(),
+                titleSelectorFunc: ($, element) => $('.item-thumbnail img', element).attr('alt')?.trim(),
                 getImageFunc: ($, element) => $('.item-thumbnail img', element),
                 getIdFunc: ($, element) => $('.item-thumbnail a', element).attr('href'),
                 getViewMoreItemsFunc: (page) => `filter/${page}?sort=views_week`,
@@ -1499,12 +1499,12 @@ class Liliana {
                 ...LilianaHelper_1.DefaultHomeSectionData,
                 section: (0, LilianaHelper_1.createHomeSection)('monthly', 'Most Popular Monthly', true, types_1.HomeSectionType.singleRowNormal),
                 selectorFunc: ($) => $('.listtop #series-month article.grid'),
-                titleSelectorFunc: ($, element) => $(".item-thumbnail img", element).attr('alt')?.trim(),
+                titleSelectorFunc: ($, element) => $('.item-thumbnail img', element).attr('alt')?.trim(),
                 getImageFunc: ($, element) => $('.item-thumbnail img', element),
                 getIdFunc: ($, element) => $('.item-thumbnail a', element).attr('href'),
                 getViewMoreItemsFunc: (page) => `filter/${page}?sort=views_month`,
                 sortIndex: 50
-            },
+            }
         };
         this.parser = new LilianaParser_1.Parser();
         this.requestManager = App.createRequestManager({
@@ -1518,7 +1518,9 @@ class Liliana {
                         request.headers = {
                             ...(request.headers ?? {}),
                             ...{
-                                'Accept': `image/avif,image/webp,*/*`
+                                'user-agent': await this.requestManager.getDefaultUserAgent(),
+                                'referer': `${this.baseUrl}/`,
+                                'accept': 'image/avif,image/webp,*/*'
                             }
                         };
                     }
@@ -1526,6 +1528,7 @@ class Liliana {
                         request.headers = {
                             ...(request.headers ?? {}),
                             ...{
+                                'user-agent': await this.requestManager.getDefaultUserAgent(),
                                 'referer': `${this.baseUrl}/`
                             }
                         };
@@ -1566,8 +1569,7 @@ class Liliana {
     }
     async getViewMoreItems(homepageSectionId, metadata) {
         const page = metadata?.page ?? 1;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-expect-error Type error
         const param = this.homescreen_sections[homepageSectionId].getViewMoreItemsFunc(page) ?? undefined;
         if (!param) {
             throw new Error(`Invalid homeSectionId | ${homepageSectionId}`);
@@ -1587,7 +1589,7 @@ class Liliana {
     }
     async getSearchResults(query, metadata) {
         const page = metadata?.page ?? 1;
-        if (query?.title && this.usesPostSearch) {
+        if (query?.title && this.usePostSearch) {
             const request = App.createRequest({
                 url: `${this.baseUrl}/ajax/search`,
                 method: 'POST',
@@ -1610,9 +1612,9 @@ class Liliana {
                 metadata
             });
         }
-        const detail_tag = query?.includedTags?.find((x) => x.id.startsWith(`manga_genres:`))?.id.replace(`manga_genres:`, '');
+        const detail_tag = query?.includedTags?.find((x) => x.id.startsWith('manga_genres:'))?.id.replace('manga_genres:', '');
         if (detail_tag) {
-            let urlBuilder = new LilianaHelper_1.URLBuilder(this.baseUrl)
+            const urlBuilder = new LilianaHelper_1.URLBuilder(this.baseUrl)
                 .addPathComponent('genres')
                 .addPathComponent(detail_tag)
                 .addPathComponent(page.toString());
@@ -1852,7 +1854,7 @@ class Parser {
                 authors.push($(author).text().trim());
             }
             const arrayTags = [];
-            for (const tag of $(`.a2 div > a[rel='tag'].label`).toArray()) {
+            for (const tag of $('.a2 div > a[rel=\'tag\'].label').toArray()) {
                 const label = $(tag)?.text()?.trim();
                 const id = this.idCleaner($(tag)?.attr('href') ?? '') ?? '';
                 if (!id || !label)
@@ -1874,7 +1876,7 @@ class Parser {
                     status,
                     author: authors.join(', '),
                     desc: description,
-                    tags: tagSections,
+                    tags: tagSections
                 })
             });
         };
@@ -2132,7 +2134,7 @@ class MangaSect extends Liliana_1.Liliana {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.usesPostSearch = true;
+        this.usePostSearch = true;
     }
 }
 exports.MangaSect = MangaSect;
