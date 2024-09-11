@@ -28,5 +28,5 @@ export class Manhuagold extends Liliana {
 
     baseUrl: string = DOMAIN
 
-    override usesPostSearch = true
+    override usePostSearch = true
 }

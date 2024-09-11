@@ -8,7 +8,10 @@ import {
 } from '@paperback/types'
 
 import entities = require('entities')
-import { HomeSectionData, SearchData } from './LilianaHelper'
+import {
+    HomeSectionData,
+    SearchData
+} from './LilianaHelper'
 
 export class Parser {
 
@@ -97,7 +100,7 @@ export class Parser {
         }
 
         const arrayTags: Tag[] = []
-        for (const tag of $(`.a2 div > a[rel='tag'].label`).toArray()) {
+        for (const tag of $('.a2 div > a[rel=\'tag\'].label').toArray()) {
             const label = $(tag)?.text()?.trim()
             const id = this.idCleaner($(tag)?.attr('href') ?? '') ?? ''
 
@@ -121,7 +124,7 @@ export class Parser {
                 status,
                 author: authors.join(', '),
                 desc: description,
-                tags: tagSections,
+                tags: tagSections
             })
         })
     }

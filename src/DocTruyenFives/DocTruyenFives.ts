@@ -28,7 +28,7 @@ export class DocTruyenFives extends Liliana {
 
     baseUrl: string = DOMAIN
 
-    override usesPostSearch = true
+    override usePostSearch = true
 
     override language = '🇻🇳'
 }

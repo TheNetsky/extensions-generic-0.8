@@ -18,7 +18,15 @@ import {
 } from '@paperback/types'
 
 import { Parser } from './LilianaParser'
-import { DefaultHomeSectionData, HomeSectionData, URLBuilder, createHomeSection, getFilterTagsBySection, getIncludedTagBySection } from './LilianaHelper'
+
+import {
+    DefaultHomeSectionData,
+    HomeSectionData,
+    URLBuilder,
+    createHomeSection,
+    getFilterTagsBySection,
+    getIncludedTagBySection
+} from './LilianaHelper'
 
 const BASE_VERSION = '1.0.0'
 
@@ -36,7 +44,7 @@ export abstract class Liliana implements SearchResultsProviding, MangaProviding,
 
     directoryPath = 'manga'
 
-    usesPostSearch = false
+    usePostSearch = false
 
     /**
      * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
@@ -69,7 +77,7 @@ export abstract class Liliana implements SearchResultsProviding, MangaProviding,
             ...DefaultHomeSectionData,
             section: createHomeSection('daily', 'Most Popular Daily', true, HomeSectionType.singleRowNormal),
             selectorFunc: ($: CheerioStatic) => $('.listtop #series-day article'),
-            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $(".item-thumbnail img", element).attr('alt')?.trim(),
+            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('.item-thumbnail img', element).attr('alt')?.trim(),
             getImageFunc: ($: CheerioStatic, element: CheerioElement) => $('.item-thumbnail img', element),
             getIdFunc: ($: CheerioStatic, element: CheerioElement) => $('.item-thumbnail a', element).attr('href'),
             getViewMoreItemsFunc: (page: string) => `filter/${page}?sort=views_day`,
@@ -79,7 +87,7 @@ export abstract class Liliana implements SearchResultsProviding, MangaProviding,
             ...DefaultHomeSectionData,
             section: createHomeSection('weekly', 'Most Popular Weekly', true, HomeSectionType.singleRowNormal),
             selectorFunc: ($: CheerioStatic) => $('.listtop #series-week article'),
-            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $(".item-thumbnail img", element).attr('alt')?.trim(),
+            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('.item-thumbnail img', element).attr('alt')?.trim(),
             getImageFunc: ($: CheerioStatic, element: CheerioElement) => $('.item-thumbnail img', element),
             getIdFunc: ($: CheerioStatic, element: CheerioElement) => $('.item-thumbnail a', element).attr('href'),
             getViewMoreItemsFunc: (page: string) => `filter/${page}?sort=views_week`,
@@ -89,12 +97,12 @@ export abstract class Liliana implements SearchResultsProviding, MangaProviding,
             ...DefaultHomeSectionData,
             section: createHomeSection('monthly', 'Most Popular Monthly', true, HomeSectionType.singleRowNormal),
             selectorFunc: ($: CheerioStatic) => $('.listtop #series-month article.grid'),
-            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $(".item-thumbnail img", element).attr('alt')?.trim(),
+            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('.item-thumbnail img', element).attr('alt')?.trim(),
             getImageFunc: ($: CheerioStatic, element: CheerioElement) => $('.item-thumbnail img', element),
             getIdFunc: ($: CheerioStatic, element: CheerioElement) => $('.item-thumbnail a', element).attr('href'),
             getViewMoreItemsFunc: (page: string) => `filter/${page}?sort=views_month`,
             sortIndex: 50
-        },
+        }
     }
 
     parser = new Parser()
@@ -104,19 +112,23 @@ export abstract class Liliana implements SearchResultsProviding, MangaProviding,
         requestTimeout: 20000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
+
                 if (request.url.includes('https://intercept.me/')) {
                     const url = request.url.replace('https://intercept.me/', '')
                     request.url = url
                     request.headers = {
                         ...(request.headers ?? {}),
                         ...{
-                            'Accept': `image/avif,image/webp,*/*`
+                            'user-agent': await this.requestManager.getDefaultUserAgent(),
+                            'referer': `${this.baseUrl}/`,
+                            'accept': 'image/avif,image/webp,*/*'
                         }
                     }
                 } else {
                     request.headers = {
                         ...(request.headers ?? {}),
                         ...{
+                            'user-agent': await this.requestManager.getDefaultUserAgent(),
                             'referer': `${this.baseUrl}/`
                         }
                     }
@@ -165,8 +177,7 @@ export abstract class Liliana implements SearchResultsProviding, MangaProviding,
     async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-expect-error Type error
         const param = this.homescreen_sections[homepageSectionId].getViewMoreItemsFunc(page) ?? undefined
         if (!param) {
             throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
@@ -190,7 +201,7 @@ export abstract class Liliana implements SearchResultsProviding, MangaProviding,
 
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
-        if (query?.title && this.usesPostSearch) {
+        if (query?.title && this.usePostSearch) {
             const request = App.createRequest({
                 url: `${this.baseUrl}/ajax/search`,
                 method: 'POST',
@@ -216,9 +227,9 @@ export abstract class Liliana implements SearchResultsProviding, MangaProviding,
             })
         }
 
-        const detail_tag = query?.includedTags?.find((x: Tag) => x.id.startsWith(`manga_genres:`))?.id.replace(`manga_genres:`, '')
+        const detail_tag = query?.includedTags?.find((x: Tag) => x.id.startsWith('manga_genres:'))?.id.replace('manga_genres:', '')
         if (detail_tag) {
-            let urlBuilder: URLBuilder = new URLBuilder(this.baseUrl)
+            const urlBuilder: URLBuilder = new URLBuilder(this.baseUrl)
                 .addPathComponent('genres')
                 .addPathComponent(detail_tag)
                 .addPathComponent(page.toString())
@@ -326,6 +337,7 @@ export abstract class Liliana implements SearchResultsProviding, MangaProviding,
                 url: urlBuilder.buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
                 method: 'GET'
             })
+
         } else {
             let urlBuilder: URLBuilder = new URLBuilder(this.baseUrl)
                 .addPathComponent('filter')

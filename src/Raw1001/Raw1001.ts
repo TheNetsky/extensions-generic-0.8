@@ -28,7 +28,7 @@ export class Raw1001 extends Liliana {
 
     baseUrl: string = DOMAIN
 
-    override usesPostSearch = true
+    override usePostSearch = true
 
     override language = '🇯🇵'
 }
