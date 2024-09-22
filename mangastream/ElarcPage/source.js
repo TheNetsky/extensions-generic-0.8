@@ -1725,9 +1725,9 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   };
 
   // src/ElarcPage/ElarcPage.ts
-  var DOMAIN = "https://elarctoons.ink";
+  var DOMAIN = "https://elarctoons.biz";
   var ElarcPageInfo = {
-    version: getExportVersion("0.0.3"),
+    version: getExportVersion("0.0.4"),
     name: "ElarcPage",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
