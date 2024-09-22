@@ -1,4 +1,4 @@
-import {
+ import {
     BadgeColor,
     ContentRating,
     SourceInfo,
@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://elarctoons.ink'
+const DOMAIN = 'https://elarctoons.biz'
 
 export const ElarcPageInfo: SourceInfo = {
-    version: getExportVersion('0.0.3'),
+    version: getExportVersion('0.0.4'),
     name: 'ElarcPage',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
