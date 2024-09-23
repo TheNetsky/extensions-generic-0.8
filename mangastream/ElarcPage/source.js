@@ -1727,7 +1727,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   // src/ElarcPage/ElarcPage.ts
   var DOMAIN = "https://elarctoons.biz";
   var ElarcPageInfo = {
-    version: getExportVersion("0.0.4"),
+    version: getExportVersion("0.0.5"),
     name: "ElarcPage",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
@@ -1742,7 +1742,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
     constructor() {
       super(...arguments);
       this.baseUrl = DOMAIN;
-      this.directoryPath = "series";
+      this.directoryPath = "library";
     }
     configureSections() {
       this.homescreen_sections["new_titles"].enabled = false;
