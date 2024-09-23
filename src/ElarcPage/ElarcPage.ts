@@ -1,4 +1,4 @@
- import {
+import {
     BadgeColor,
     ContentRating,
     SourceInfo,
@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://elarctoons.biz'
 
 export const ElarcPageInfo: SourceInfo = {
-    version: getExportVersion('0.0.4'),
+    version: getExportVersion('0.0.5'),
     name: 'ElarcPage',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -29,7 +29,7 @@ export class ElarcPage extends MangaStream {
 
     baseUrl: string = DOMAIN
 
-    override directoryPath = 'series'
+    override directoryPath = 'library'
 
     override configureSections(): void {
         this.homescreen_sections['new_titles'].enabled = false
