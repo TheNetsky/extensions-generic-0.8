@@ -1725,9 +1725,9 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   };
 
   // src/InfernalVoidScans/InfernalVoidScans.ts
-  var DOMAIN = "https://hivetoon.com";
+  var DOMAIN = "https://hivetoon.net";
   var InfernalVoidScansInfo = {
-    version: getExportVersion("0.0.2"),
+    version: getExportVersion("0.0.3"),
     name: "InfernalVoidScans",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "nicknitewolf",
