@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://hivetoon.com'
+const DOMAIN = 'https://hivetoon.net'
 
 export const InfernalVoidScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'InfernalVoidScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'nicknitewolf',
