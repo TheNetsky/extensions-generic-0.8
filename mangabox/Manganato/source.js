@@ -1,6 +1,5 @@
-function compat() {
 "use strict";
-var source = (() => {
+var _Sources = (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -1464,7 +1463,7 @@ var source = (() => {
   };
 
   // src/MangaBox.ts
-  var BASE_VERSION = "4.0.1";
+  var BASE_VERSION = "4.0.2";
   var getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split(".").map((x, index) => Number(x) + Number(EXTENSION_VERSION.split(".")[index])).join(".");
   };
@@ -1601,7 +1600,7 @@ var source = (() => {
       return this.parser.parseChapters($, mangaId, this);
     }
     async getChapterDetails(mangaId, chapterId) {
-      const cookieDomainRegex = chapterId.match(/(.*.com\/).*$/g);
+      const cookieDomainRegex = chapterId.match(/(https?:\/\/[^\\/]+\/)/g);
       const cookieDomain = cookieDomainRegex ? cookieDomainRegex[0] : this.baseURL;
       const imageServer = await getImageServer(this.stateManager).then((value) => value[0]);
       const request = App.createRequest({
@@ -1694,4 +1693,4 @@ var source = (() => {
   };
   return __toCommonJS(Manganato_exports);
 })();
-return source;} this.Sources = compat(); if (typeof exports === 'object' && typeof module !== 'undefined') {module.exports = this.Sources;}
+this.Sources = _Sources; if (typeof exports === 'object' && typeof module !== 'undefined') {module.exports.Sources = this.Sources;}
