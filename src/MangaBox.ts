@@ -25,7 +25,7 @@ import {
     getImageServer
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '4.0.1'
+const BASE_VERSION = '4.0.2'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -215,7 +215,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
-        const cookieDomainRegex = chapterId.match(/(.*.com\/).*$/g)
+        const cookieDomainRegex = chapterId.match(/(https?:\/\/[^\\/]+\/)/g)
         const cookieDomain = cookieDomainRegex ? cookieDomainRegex[0] : this.baseURL
         const imageServer = await getImageServer(this.stateManager).then(value => value[0])
 
