@@ -21502,7 +21502,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Hean = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const HeanParser_1 = require("./HeanParser");
-const BASE_VERSION = '1.0.0';
+const BASE_VERSION = '1.0.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -21861,7 +21861,11 @@ class HeanParser {
         return App.createPartialSourceManga({
             mangaId: this.convertIdSlugToMangaId(item.id, item.series_slug),
             title: this.decodeHTMLEntity(item.title),
-            subtitle: item.free_chapters ? item.free_chapters[item.free_chapters.length - 1]?.chapter_name : item.status,
+            subtitle: item.free_chapters
+                ? item.free_chapters
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+                    ?.chapter_name
+                : item.status,
             image: item.thumbnail
         });
     }
