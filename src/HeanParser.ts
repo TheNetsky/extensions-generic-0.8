@@ -121,7 +121,11 @@ export class HeanParser {
         return App.createPartialSourceManga({
             mangaId: this.convertIdSlugToMangaId(item.id, item.series_slug),
             title: this.decodeHTMLEntity(item.title),
-            subtitle: item.free_chapters ? item.free_chapters[item.free_chapters.length - 1]?.chapter_name : item.status,
+            subtitle: item.free_chapters 
+                ? item.free_chapters
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+                    ?.chapter_name 
+                : item.status,
             image: item.thumbnail
         })
     }
