@@ -4,6 +4,11 @@ import {
     SourceInfo,
     SourceIntents
 } from '@paperback/types'
+import {
+    BasicAcceptedElems,
+    CheerioAPI
+} from 'cheerio'
+import { AnyNode } from 'domhandler'
 
 import {
     getExportVersion,
@@ -66,8 +71,8 @@ export class SkyMangas extends MangaStream {
     override manga_selector_status = 'Estado'
 
     override configureSections() {
-        this.homescreen_sections['popular_today'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Popular Today)')?.parent()?.next())
-        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
+        this.homescreen_sections['popular_today'].selectorFunc = ($: CheerioAPI) => $('div.bsx', $('h2:contains(Popular Today)')?.parent()?.next())
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioAPI) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
         this.homescreen_sections['new_titles'].enabled = false
         this.homescreen_sections['top_alltime'].enabled = false
         this.homescreen_sections['top_monthly'].enabled = false
@@ -77,9 +82,9 @@ export class SkyMangas extends MangaStream {
         this.homescreen_sections['project_updates'] = {
             ...DefaultHomeSectionData,
             section: createHomeSection('project_updates', 'Project Updates', true),
-            selectorFunc: ($: CheerioStatic) => $('div.bsx', $('h2:contains(Project Update)')?.parent()?.next()),
-            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('a', element).attr('title'),
-            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('div.epxs', element).text().trim(),
+            selectorFunc: ($: CheerioAPI) => $('div.bsx', $('h2:contains(Project Update)')?.parent()?.next()),
+            titleSelectorFunc: ($: CheerioAPI, element: BasicAcceptedElems<AnyNode>) => $('a', element).attr('title'),
+            subtitleSelectorFunc: ($: CheerioAPI, element: BasicAcceptedElems<AnyNode>) => $('div.epxs', element).first().text().trim(),
             getViewMoreItemsFunc: (page: string) => `project/page/${page}`,
             sortIndex: 11
         }

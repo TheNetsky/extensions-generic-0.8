@@ -4,6 +4,7 @@ import {
     SourceInfo,
     SourceIntents
 } from '@paperback/types'
+import { CheerioAPI } from 'cheerio'
 
 import {
     getExportVersion,
@@ -71,8 +72,8 @@ export class SushiScan extends MangaStream {
     }
 
     override configureSections() {
-        this.homescreen_sections['popular_today'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Populaire Aujourd\'hui)')?.parent()?.next())
-        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.utao', $('h2:contains(Dernières Sorties)')?.parent()?.next())
+        this.homescreen_sections['popular_today'].selectorFunc = ($: CheerioAPI) => $('div.bsx', $('h2:contains(Populaire Aujourd\'hui)')?.parent()?.next())
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioAPI) => $('div.utao', $('h2:contains(Dernières Sorties)')?.parent()?.next())
         this.homescreen_sections['new_titles'].enabled = false
     }
 }

@@ -20,6 +20,9 @@ import {
     TagSection
 } from '@paperback/types'
 
+import * as cheerio from 'cheerio'
+import { AnyNode } from 'domhandler'
+
 import { MangaStreamParser } from './MangaStreamParser'
 import { URLBuilder } from './UrlBuilder'
 import {
@@ -36,13 +39,13 @@ import {
 } from './MangaStreamInterfaces'
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '3.0.4'
+const BASE_VERSION = '3.1.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
 export abstract class MangaStream implements ChapterProviding, HomePageSectionsProviding, MangaProviding, SearchResultsProviding {
-    constructor(public cheerio: CheerioAPI) {
+    constructor() {
         this.configureSections()
     }
 
@@ -230,48 +233,48 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         'popular_today': {
             ...DefaultHomeSectionData,
             section: createHomeSection('popular_today', 'Popular Today', false, HomeSectionType.featured),
-            selectorFunc: ($: CheerioStatic) => $('div.bsx', $('h2:contains(Popular Today)')?.parent()?.next()),
-            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('a', element).attr('title'),
-            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('div.epxs', element).text().trim(),
+            selectorFunc: ($: cheerio.CheerioAPI) => $('div.bsx', $('h2:contains(Popular Today)')?.parent()?.next()),
+            titleSelectorFunc: ($: cheerio.CheerioAPI, element: cheerio.BasicAcceptedElems<AnyNode>) => $('a', element).attr('title'),
+            subtitleSelectorFunc: ($: cheerio.CheerioAPI, element: cheerio.BasicAcceptedElems<AnyNode>) => $('div.epxs', element).first().text().trim(),
             getViewMoreItemsFunc: (page: string) => `${this.directoryPath}/?page=${page}&order=popular`,
             sortIndex: 10
         },
         'latest_update': {
             ...DefaultHomeSectionData,
             section: createHomeSection('latest_update', 'Latest Updates'),
-            selectorFunc: ($: CheerioStatic) => $('div.uta', $('h2:contains(Latest Update)')?.parent()?.next()),
-            titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('a', element).attr('title'),
-            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('li > a, div.epxs', $('div.luf, div.bigor', element)).first().text().trim(),
+            selectorFunc: ($: cheerio.CheerioAPI) => $('div.uta', $('h2:contains(Latest Update)')?.parent()?.next()),
+            titleSelectorFunc: ($: cheerio.CheerioAPI, element: cheerio.BasicAcceptedElems<AnyNode>) => $('a', element).attr('title'),
+            subtitleSelectorFunc: ($: cheerio.CheerioAPI, element: cheerio.BasicAcceptedElems<AnyNode>) => $('li > a, div.epxs', $('div.luf, div.bigor', element)).first().text().trim(),
             getViewMoreItemsFunc: (page: string) => `${this.directoryPath}/?page=${page}&order=update`,
             sortIndex: 20
         },
         'new_titles': {
             ...DefaultHomeSectionData,
             section: createHomeSection('new_titles', 'New Titles'),
-            selectorFunc: ($: CheerioStatic) => $('li', $('h3:contains(New Series)')?.parent()?.next()),
-            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('span a', element).toArray().map(x => $(x).text().trim()).join(', '),
+            selectorFunc: ($: cheerio.CheerioAPI) => $('li', $('h3:contains(New Series)')?.parent()?.next()),
+            subtitleSelectorFunc: ($: cheerio.CheerioAPI, element: cheerio.BasicAcceptedElems<AnyNode>) => $('span a', element).toArray().map(x => $(x).text().trim()).join(', '),
             getViewMoreItemsFunc: (page: string) => `${this.directoryPath}/?page=${page}&order=latest`,
             sortIndex: 30
         },
         'top_alltime': {
             ...DefaultHomeSectionData,
             section: createHomeSection('top_alltime', 'Top All Time', false),
-            selectorFunc: ($: CheerioStatic) => $('li', $('div.serieslist.pop.wpop.wpop-alltime')),
-            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('span a', element).toArray().map(x => $(x).text().trim()).join(', '),
+            selectorFunc: ($: cheerio.CheerioAPI) => $('li', $('div.serieslist.pop.wpop.wpop-alltime')),
+            subtitleSelectorFunc: ($: cheerio.CheerioAPI, element: cheerio.BasicAcceptedElems<AnyNode>) => $('span a', element).toArray().map(x => $(x).text().trim()).join(', '),
             sortIndex: 40
         },
         'top_monthly': {
             ...DefaultHomeSectionData,
             section: createHomeSection('top_monthly', 'Top Monthly', false),
-            selectorFunc: ($: CheerioStatic) => $('li', $('div.serieslist.pop.wpop.wpop-monthly')),
-            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('span a', element).toArray().map(x => $(x).text().trim()).join(', '),
+            selectorFunc: ($: cheerio.CheerioAPI) => $('li', $('div.serieslist.pop.wpop.wpop-monthly')),
+            subtitleSelectorFunc: ($: cheerio.CheerioAPI, element: cheerio.BasicAcceptedElems<AnyNode>) => $('span a', element).toArray().map(x => $(x).text().trim()).join(', '),
             sortIndex: 50
         },
         'top_weekly': {
             ...DefaultHomeSectionData,
             section: createHomeSection('top_weekly', 'Top Weekly', false),
-            selectorFunc: ($: CheerioStatic) => $('li', $('div.serieslist.pop.wpop.wpop-weekly')),
-            subtitleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('span a', element).toArray().map(x => $(x).text().trim()).join(', '),
+            selectorFunc: ($: cheerio.CheerioAPI) => $('li', $('div.serieslist.pop.wpop.wpop-weekly')),
+            subtitleSelectorFunc: ($: cheerio.CheerioAPI, element: cheerio.BasicAcceptedElems<AnyNode>) => $('span a', element).toArray().map(x => $(x).text().trim()).join(', '),
             sortIndex: 60
         }
     }
@@ -291,7 +294,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
         const response = await this.requestManager.schedule(request, 1)
         this.checkResponseError(response)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseMangaDetails($, mangaId, this)
     }
@@ -304,7 +307,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
         const response = await this.requestManager.schedule(request, 1)
         this.checkResponseError(response)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseChapterList($, mangaId, this)
     }
@@ -318,7 +321,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
         const response = await this.requestManager.schedule(request, 1)
         this.checkResponseError(response)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         //const chapter = $('div#chapterlist').find('li[data-num="' + chapterId + '"]')
         const chapters = $('div#chapterlist').find('li').toArray()
@@ -344,7 +347,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
         const _response = await this.requestManager.schedule(_request, 1)
         this.checkResponseError(_response)
-        const _$ = this.cheerio.load(_response.data as string)
+        const _$ = cheerio.load(_response.data as string)
 
         return this.parser.parseChapterDetails(_$, mangaId, chapterId)
     }
@@ -357,7 +360,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
         const response = await this.requestManager.schedule(request, 1)
         this.checkResponseError(response)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         return this.parser.parseTags($)
     }
@@ -368,7 +371,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         const request = await this.constructSearchRequest(page, query)
         const response = await this.requestManager.schedule(request, 1)
         this.checkResponseError(response)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         const results = await this.parser.parseSearchResults($, this)
 
         const manga: PartialSourceManga[] = []
@@ -427,7 +430,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
 
         const response = await this.requestManager.schedule(request, 1)
         this.checkResponseError(response)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         const promises: Promise<void>[] = []
         const sectionValues = Object.values(this.homescreen_sections).sort((n1, n2) => n1.sortIndex - n2.sortIndex)
@@ -471,7 +474,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         const items: PartialSourceManga[] = await this.parser.parseViewMore($, this)
         metadata = !this.parser.isLastPage($, 'view_more') ? { page: page + 1 } : undefined
@@ -511,7 +514,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         let parseSlug: any
         // Step 1: Try to get slug from og-url
@@ -563,7 +566,7 @@ export abstract class MangaStream implements ChapterProviding, HomePageSectionsP
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
 
         // Step 1: Try to get postId from shortlink
         postId = Number($('link[rel="shortlink"]')?.attr('href')?.split('/?p=')[1])

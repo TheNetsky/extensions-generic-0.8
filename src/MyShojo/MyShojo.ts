@@ -4,6 +4,7 @@ import {
     SourceInfo,
     SourceIntents
 } from '@paperback/types'
+import { CheerioAPI } from 'cheerio'
 
 import {
     getExportVersion,
@@ -31,6 +32,6 @@ export class MyShojo extends MangaStream {
 
     override configureSections() {
         this.homescreen_sections['new_titles'].enabled = false
-        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioAPI) => $('div.bsx', $('h2:contains(Latest Update)')?.parent()?.next())
     }
 }

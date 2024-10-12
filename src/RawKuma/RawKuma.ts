@@ -4,6 +4,7 @@ import {
     SourceInfo,
     SourceIntents
 } from '@paperback/types'
+import { CheerioAPI } from 'cheerio'
 
 import {
     getExportVersion,
@@ -37,6 +38,6 @@ export class RawKuma extends MangaStream {
     override language = '🇯🇵'
 
     override configureSections() {
-        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioStatic) => $('div.uta', $('h3:contains(Latest Update)')?.parent()?.next())
+        this.homescreen_sections['latest_update'].selectorFunc = ($: CheerioAPI) => $('div.uta', $('h3:contains(Latest Update)')?.parent()?.next())
     }
 }

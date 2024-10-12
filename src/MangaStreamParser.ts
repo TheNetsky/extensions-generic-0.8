@@ -7,16 +7,21 @@ import {
     Tag,
     TagSection
 } from '@paperback/types'
-
-import { convertDate } from './LanguageUtils'
+import { decode as decodeHTMLEntity } from 'html-entities'
+import {
+    Cheerio,
+    CheerioAPI
+} from 'cheerio'
+import { Element } from 'domhandler'
 
 import { HomeSectionData } from './MangaStreamHelper'
 
-import { decode as decodeHTMLEntity } from 'html-entities'
+import { convertDate } from './LanguageUtils'
+
 
 export class MangaStreamParser {
 
-    parseMangaDetails($: CheerioStatic, mangaId: string, source: any): SourceManga {
+    parseMangaDetails($: CheerioAPI, mangaId: string, source: any): SourceManga {
         const titles: string[] = []
         titles.push(decodeHTMLEntity($('h1.entry-title').text().trim()))
 
@@ -79,7 +84,7 @@ export class MangaStreamParser {
         })
     }
 
-    parseChapterList($: CheerioSelector, mangaId: string, source: any): Chapter[] {
+    parseChapterList($: CheerioAPI, mangaId: string, source: any): Chapter[] {
         const chapters: Chapter[] = []
         let sortingIndex = 0
         let language = source.language
@@ -126,7 +131,7 @@ export class MangaStreamParser {
         })
     }
 
-    parseChapterDetails($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails {
+    parseChapterDetails($: CheerioAPI, mangaId: string, chapterId: string): ChapterDetails {
         const pages: string[] = []
 
         //@ts-expect-error Ignore index
@@ -174,7 +179,7 @@ export class MangaStreamParser {
         return chapterDetails
     }
 
-    parseTags($: CheerioSelector): TagSection[] {
+    parseTags($: CheerioAPI): TagSection[] {
         const tagSections: any[] = [
             { id: '0', label: 'genres', tags: [] },
             { id: '1', label: 'status', tags: [] },
@@ -204,7 +209,7 @@ export class MangaStreamParser {
         return tagSections.map((x) => App.createTagSection(x))
     }
 
-    async parseSearchResults($: CheerioSelector, source: any): Promise<any[]> {
+    async parseSearchResults($: CheerioAPI, source: any): Promise<any[]> {
         const results: any[] = []
 
         for (const obj of $('div.bs', 'div.listupd').toArray()) {
@@ -230,7 +235,7 @@ export class MangaStreamParser {
         return results
     }
 
-    async parseViewMore($: CheerioStatic, source: any): Promise<PartialSourceManga[]> {
+    async parseViewMore($: CheerioAPI, source: any): Promise<PartialSourceManga[]> {
         const items: PartialSourceManga[] = []
 
         for (const manga of $('div.bs', 'div.listupd').toArray()) {
@@ -259,7 +264,7 @@ export class MangaStreamParser {
         return items
     }
 
-    async parseHomeSection($: CheerioStatic, section: HomeSectionData, source: any): Promise<PartialSourceManga[]> {
+    async parseHomeSection($: CheerioAPI, section: HomeSectionData, source: any): Promise<PartialSourceManga[]> {
         const items: PartialSourceManga[] = []
 
         const mangas = section.selectorFunc($)
@@ -295,7 +300,7 @@ export class MangaStreamParser {
         return items
     }
 
-    isLastPage = ($: CheerioStatic, id: string): boolean => {
+    isLastPage = ($: CheerioAPI, id: string): boolean => {
         let isLast = true
         if (id == 'view_more') {
             const hasNext = Boolean($('a.r')[0])
@@ -314,7 +319,7 @@ export class MangaStreamParser {
         return isLast
     }
 
-    getImageSrc(imageObj: Cheerio | undefined): string {
+    getImageSrc(imageObj: Cheerio<Element> | undefined): string {
         let image: string | undefined
         if ((typeof imageObj?.attr('data-src')) != 'undefined') {
             image = imageObj?.attr('data-src')

@@ -1,9 +1,12 @@
-import { MangaStreamParser } from '../MangaStreamParser'
 import { ChapterDetails } from '@paperback/types'
+import { CheerioAPI } from 'cheerio'
+
+import { MangaStreamParser } from '../MangaStreamParser'
+
 
 export class SkyMangasParser extends MangaStreamParser {
 
-    override parseChapterDetails($: CheerioStatic, mangaId: string, chapterId: string): ChapterDetails {
+    override parseChapterDetails($: CheerioAPI, mangaId: string, chapterId: string): ChapterDetails {
         const pages: string[] = []
         let obj: any
 

@@ -5,6 +5,12 @@ import {
     Tag
 } from '@paperback/types'
 
+import {
+    BasicAcceptedElems,
+    CheerioAPI
+} from 'cheerio'
+import { AnyNode } from 'domhandler'
+
 export interface HomeSectionData {
     selectorFunc: Function;
     titleSelectorFunc: Function;
@@ -16,7 +22,7 @@ export interface HomeSectionData {
 }
 
 export const DefaultHomeSectionData = {
-    titleSelectorFunc: ($: CheerioStatic, element: CheerioElement) => $('h2', element).text().trim(),
+    titleSelectorFunc: ($: CheerioAPI, element: BasicAcceptedElems<AnyNode> | null | undefined) => $('h2', element).text().trim(),
     subtitleSelectorFunc: () => undefined,
     getViewMoreItemsFunc: () => undefined,
     enabled: true
