@@ -1610,11 +1610,11 @@ var _Sources = (() => {
     }
   });
 
-  // src/Manhuaus/Manhuaus.ts
-  var Manhuaus_exports = {};
-  __export(Manhuaus_exports, {
-    Manhuaus: () => Manhuaus,
-    ManhuausInfo: () => ManhuausInfo
+  // src/UToon/UToon.ts
+  var UToon_exports = {};
+  __export(UToon_exports, {
+    UToon: () => UToon,
+    UToonInfo: () => UToonInfo
   });
   var import_types3 = __toESM(require_lib());
 
@@ -16140,29 +16140,27 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
     }
   };
 
-  // src/Manhuaus/Manhuaus.ts
-  var DOMAIN = "https://manhuaus.com";
-  var ManhuausInfo = {
+  // src/UToon/UToon.ts
+  var DOMAIN = "https://utoon.net";
+  var UToonInfo = {
     version: getExportVersion("0.0.0"),
-    name: "Manhuaus",
+    name: "UToon",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
     authorWebsite: "http://github.com/TheNetsky",
     icon: "icon.png",
-    contentRating: import_types3.ContentRating.EVERYONE,
+    contentRating: import_types3.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [],
     intents: import_types3.SourceIntents.MANGA_CHAPTERS | import_types3.SourceIntents.HOMEPAGE_SECTIONS | import_types3.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | import_types3.SourceIntents.SETTINGS_UI
   };
-  var Manhuaus = class extends Madara {
+  var UToon = class extends Madara {
     constructor() {
       super(...arguments);
       this.baseUrl = DOMAIN;
       this.chapterEndpoint = 1;
-      this.chapterDetailsSelector = "li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > figure.wp-block-gallery > figure.wp-block-image > img, div.text-left > p > img";
-      this.bypassPage = `${DOMAIN}/?p`;
     }
   };
-  return __toCommonJS(Manhuaus_exports);
+  return __toCommonJS(UToon_exports);
 })();
 this.Sources = _Sources; if (typeof exports === 'object' && typeof module !== 'undefined') {module.exports.Sources = this.Sources;}
