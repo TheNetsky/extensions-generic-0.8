@@ -36,8 +36,9 @@ export class ReaperScansFRParser extends Parser {
             // Check if the date is a valid date, else return the current date
             if (!mangaTime.getTime()) mangaTime = new Date()
 
-            if (!id || typeof id === 'undefined') {
-                throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`)
+            if (!id || typeof id === 'undefined' || id === '#') {
+                console.log(`Could not parse out ID when getting chapters for postId:${mangaId} parsedId: ${id}`)
+                continue
             }
 
             chapters.push({

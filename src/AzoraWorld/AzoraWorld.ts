@@ -8,6 +8,7 @@ import {
     PagedResults,
     PartialSourceManga
 } from '@paperback/types'
+import * as cheerio from 'cheerio'
 
 import {
     getExportVersion,
@@ -111,7 +112,7 @@ export class AzoraWorld extends Madara {
             promises.push(
                 this.requestManager.schedule(section.request, 1).then(async response => {
                     this.checkResponseError(response)
-                    const $ = this.cheerio.load(response.data as string)
+                    const $ = cheerio.load(response.data as string)
                     section.section.items = await this.parser.parseHomeSection($, this)
                     sectionCallback(section.section)
                 })
@@ -155,7 +156,7 @@ export class AzoraWorld extends Madara {
 
         const response = await this.requestManager.schedule(request, 1)
         this.checkResponseError(response)
-        const $ = this.cheerio.load(response.data as string)
+        const $ = cheerio.load(response.data as string)
         const items: PartialSourceManga[] = await this.parser.parseHomeSection($, this)
 
         let mData: any = { page: (page + 1) }

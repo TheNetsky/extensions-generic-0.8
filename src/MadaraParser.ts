@@ -92,8 +92,9 @@ export class Parser {
             // Check if the date is a valid date, else return the current date
             if (!mangaTime.getTime()) mangaTime = new Date()
 
-            if (!id || typeof id === 'undefined') {
-                throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`)
+            if (!id || typeof id === 'undefined' || id === '#') {
+                console.log(`Could not parse out ID when getting chapters for postId:${mangaId} parsedId: ${id}`)
+                continue
             }
 
             chapters.push({
@@ -125,7 +126,8 @@ export class Parser {
         for (const obj of $(selector).get()) {
             const page = await this.getImageSrc($(obj) as Cheerio<Element>, source)
             if (!page) {
-                throw new Error(`Could not parse page for postId:${mangaId} chapterId:${chapterId}`)
+                console.log(`Could not parse pages for postId:${mangaId} chapterId:${chapterId}`)
+                continue
             }
             pages.push(encodeURI(page))
         }
