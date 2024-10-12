@@ -1725,9 +1725,9 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   };
 
   // src/TeamxNovel/TeamxNovel.ts
-  var DOMAIN = "https://teamxnovel.com";
+  var DOMAIN = "https://teamoney.site";
   var TeamxNovelInfo = {
-    version: getExportVersion("0.0.0"),
+    version: getExportVersion("0.0.1"),
     name: "TeamxNovel",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
@@ -1742,6 +1742,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
     constructor() {
       super(...arguments);
       this.baseUrl = DOMAIN;
+      this.language = "\u{1F1E6}\u{1F1EA}";
     }
     configureSections() {
       this.homescreen_sections["new_titles"].enabled = false;
