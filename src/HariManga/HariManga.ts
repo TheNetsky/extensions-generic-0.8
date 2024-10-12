@@ -10,22 +10,22 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://teenmanhua.com'
+const DOMAIN = 'https://harimanga.com'
 
-export const TeenManhuaInfo: SourceInfo = {
+export const HariMangaInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'TeenManhua',
+    name: 'HariManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: ContentRating.EVERYONE,
+    contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [],
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI
 }
 
-export class TeenManhua extends Madara {
+export class HariManga extends Madara {
 
     baseUrl: string = DOMAIN
 

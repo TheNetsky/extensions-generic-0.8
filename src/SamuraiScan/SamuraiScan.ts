@@ -16,10 +16,10 @@ import {
     SamuraiScanParser
 } from './SamuraiScanParser'
 
-const DOMAIN = 'https://samurai.ragnarokscanlation.org'
+const DOMAIN = 'https://latan.visorsmr.com'
 
 export const SamuraiScanInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'SamuraiScan',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky & Seitenca',

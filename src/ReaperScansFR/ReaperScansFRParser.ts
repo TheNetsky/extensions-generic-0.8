@@ -1,11 +1,14 @@
 import { Chapter } from '@paperback/types'
+import { CheerioAPI } from 'cheerio'
+import { decode as decodeHTMLEntity } from 'html-entities'
+
 import {
     Parser
 } from '../MadaraParser'
 
 export class ReaperScansFRParser extends Parser {
 
-    override parseChapterList($: CheerioSelector, mangaId: string, source: any): Chapter[] {
+    override parseChapterList($: CheerioAPI, mangaId: string, source: any): Chapter[] {
         const chapters: Chapter[] = []
         let sortingIndex = 0
 
@@ -41,7 +44,7 @@ export class ReaperScansFRParser extends Parser {
                 id: id,
                 langCode: source.language,
                 chapNum: chapNum,
-                name: chapName ? this.decodeHTMLEntity(chapName) : '',
+                name: chapName ? decodeHTMLEntity(chapName) : '',
                 time: mangaTime,
                 sortingIndex,
                 volume: 0,

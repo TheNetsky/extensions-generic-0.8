@@ -10,22 +10,24 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://mangabob.com'
+const DOMAIN = 'https://utoon.net'
 
-export const MangaBobInfo: SourceInfo = {
+export const UToonInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'MangaBob',
+    name: 'UToon',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: ContentRating.EVERYONE,
+    contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [],
     intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED | SourceIntents.SETTINGS_UI
 }
 
-export class MangaBob extends Madara {
+export class UToon extends Madara {
 
     baseUrl: string = DOMAIN
+
+    override chapterEndpoint = 1
 }

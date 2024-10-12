@@ -14,10 +14,10 @@ import {
     KnightNoScanlationParser
 } from './KnightNoScanlationParser'
 
-const DOMAIN = 'https://lectorkns.com'
+const DOMAIN = 'https://lectorkns.eyudud.net'
 
 export const KnightNoScanlationInfo: SourceInfo = {
-    version: getExportVersion('0.0.3'),
+    version: getExportVersion('0.0.4'),
     name: 'KnightNoScanlation',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky & Seitenca',

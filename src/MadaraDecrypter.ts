@@ -1,4 +1,5 @@
-import CryptoJS from 'crypto-js'
+import * as CryptoJS from './crypto-js.min' // 4.2.0
+
 type CipherParams = CryptoJS.lib.CipherParams
 
 const CryptoJSFormatter = {
