@@ -15652,7 +15652,7 @@ var _Sources = (() => {
   };
 
   // src/Madara.ts
-  var BASE_VERSION = "3.1.3";
+  var BASE_VERSION = "3.2.0";
   var getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split(".").map((x, index2) => Number(x) + Number(EXTENSION_VERSION.split(".")[index2])).join(".");
   };
