@@ -73,7 +73,7 @@ export class SkyMangas extends MangaStream {
         this.homescreen_sections['top_monthly'].enabled = false
         this.homescreen_sections['top_weekly'].enabled = false
 
-        //@ts-ignore
+        //@ts-expect-error We're changing the name to "project_updates"
         this.homescreen_sections['project_updates'] = {
             ...DefaultHomeSectionData,
             section: createHomeSection('project_updates', 'Project Updates', true),

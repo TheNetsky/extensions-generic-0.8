@@ -10,7 +10,7 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://flamecomics.me'
+const DOMAIN = 'https://flamecomics.xyz'
 
 export const FlameComicsInfo: SourceInfo = {
     version: getExportVersion('0.0.1'),

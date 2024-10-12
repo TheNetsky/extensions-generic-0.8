@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://teamxnovel.com'
+const DOMAIN = 'https://teamoney.site'
 
 export const TeamxNovelInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'TeamxNovel',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -28,6 +28,8 @@ export const TeamxNovelInfo: SourceInfo = {
 export class TeamxNovel extends MangaStream {
 
     baseUrl: string = DOMAIN
+
+    override language = '🇦🇪'
 
     override configureSections() {
         this.homescreen_sections['new_titles'].enabled = false

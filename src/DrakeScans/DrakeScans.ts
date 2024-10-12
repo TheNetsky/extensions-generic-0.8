@@ -10,7 +10,7 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://drakecomic.com'
+const DOMAIN = 'https://drakecomic.org'
 
 export const DrakeScansInfo: SourceInfo = {
     version: getExportVersion('0.0.1'),

@@ -10,10 +10,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://cypherscans.xyz'
+const DOMAIN = 'https://cypher-scans.xyz'
 
 export const CypherScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'CypherScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
