@@ -1618,9 +1618,6 @@ var _Sources = (() => {
   });
   var import_types3 = __toESM(require_lib());
 
-  // src/Madara.ts
-  var import_types2 = __toESM(require_lib());
-
   // node_modules/cheerio/dist/browser/static.js
   var static_exports = {};
   __export(static_exports, {
@@ -15329,6 +15326,9 @@ var _Sources = (() => {
   var parse5 = getParse((content, options, isDocument2, context) => options._useHtmlParser2 ? parseDocument(content, options) : parseWithParse5(content, options, isDocument2, context));
   var load = getLoad(parse5, (dom, options) => options._useHtmlParser2 ? esm_default(dom, options) : renderWithParse5(dom));
 
+  // src/Madara.ts
+  var import_types2 = __toESM(require_lib());
+
   // src/MadaraParser.ts
   var import_html_entities = __toESM(require_lib2());
 
@@ -15460,8 +15460,9 @@ var _Sources = (() => {
           mangaTime = this.parseDate($2("span.chapter-release-date > i", obj).text().trim());
         }
         if (!mangaTime.getTime()) mangaTime = /* @__PURE__ */ new Date();
-        if (!id || typeof id === "undefined") {
-          throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`);
+        if (!id || typeof id === "undefined" || id === "#") {
+          console.log(`Could not parse out ID when getting chapters for postId:${mangaId} parsedId: ${id}`);
+          continue;
         }
         chapters.push({
           id,
@@ -15488,7 +15489,8 @@ var _Sources = (() => {
       for (const obj of $2(selector).get()) {
         const page = await this.getImageSrc($2(obj), source);
         if (!page) {
-          throw new Error(`Could not parse page for postId:${mangaId} chapterId:${chapterId}`);
+          console.log(`Could not parse pages for postId:${mangaId} chapterId:${chapterId}`);
+          continue;
         }
         pages.push(encodeURI(page));
       }
@@ -15652,7 +15654,7 @@ var _Sources = (() => {
   };
 
   // src/Madara.ts
-  var BASE_VERSION = "3.2.0";
+  var BASE_VERSION = "3.2.1";
   var getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split(".").map((x, index2) => Number(x) + Number(EXTENSION_VERSION.split(".")[index2])).join(".");
   };
@@ -16241,7 +16243,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
         promises.push(
           this.requestManager.schedule(section.request, 1).then(async (response) => {
             this.checkResponseError(response);
-            const $2 = this.cheerio.load(response.data);
+            const $2 = load(response.data);
             section.section.items = await this.parser.parseHomeSection($2, this);
             sectionCallback(section.section);
           })
