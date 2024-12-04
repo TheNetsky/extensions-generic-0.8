@@ -10,7 +10,7 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://reset-scans.co/'
+const DOMAIN = 'https://reset-scans.co'
 
 export const ResetScansInfo: SourceInfo = {
     version: getExportVersion('0.0.8'),
