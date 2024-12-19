@@ -93,7 +93,7 @@ export class MangaStreamParser {
         if (mangaId.toUpperCase().endsWith('-RAW') && source.language == '🇬🇧') language = '🇰🇷'
 
         for (const chapter of $('li', 'div#chapterlist').toArray()) {
-            const title = decodeHTMLEntity($('span.chapternum', chapter).text().trim())
+            const title = decodeHTMLEntity($('span.chapternum', chapter).text().trim()).replace(/\s+/g, ' ')
             const date = convertDate($('span.chapterdate', chapter).text().trim(), source)
             // Set data-num attribute as id
             const id = chapter.attribs['data-num'] ?? ''
@@ -101,6 +101,11 @@ export class MangaStreamParser {
             let chapterNumber = 0
             if (chapterNumberRegex && chapterNumberRegex[1]) {
                 chapterNumber = Number(chapterNumberRegex[1])
+            }
+
+            const isLocked = $('.text-gold', chapter).length
+            if (isLocked) {
+                continue
             }
 
             if (!id || typeof id === 'undefined') {
