@@ -13,19 +13,15 @@ import {
 const DOMAIN = 'https://mangas-origines.fr'
 
 export const MangaOriginesInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'MangaOrigines',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: ContentRating.ADULT,
+    contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [
-        {
-            text: '18+',
-            type: BadgeColor.YELLOW
-        },
         {
             text: 'French',
             type: BadgeColor.GREY
@@ -42,7 +38,7 @@ export class MangaOrigines extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override chapterEndpoint = 3
+    override chapterEndpoint = 1
 
     override directoryPath = 'oeuvre'
 
