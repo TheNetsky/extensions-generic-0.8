@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://theblank.net'
 
 export const TheBlankInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'TheBlank',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -35,4 +35,6 @@ export class TheBlank extends Madara {
     baseUrl: string = DOMAIN
 
     override chapterEndpoint = 1
+
+    override bypassPage = `${DOMAIN}/manga/`
 }
