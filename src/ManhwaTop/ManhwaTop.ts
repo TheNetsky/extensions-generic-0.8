@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://manhwatop.com'
 
 export const ManhwaTopInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ManhwaTop',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -28,4 +28,6 @@ export const ManhwaTopInfo: SourceInfo = {
 export class ManhwaTop extends Madara {
 
     baseUrl: string = DOMAIN
+
+    override chapterEndpoint = 1
 }
