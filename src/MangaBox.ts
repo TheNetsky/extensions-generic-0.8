@@ -25,7 +25,7 @@ import {
     getImageServer
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '4.0.0'
+const BASE_VERSION = '4.0.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -186,6 +186,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
             promises.push(
                 this.requestManager.schedule(section.request, 1)
                     .then(response => {
+                        this.checkResponseError(response)
                         const $ = this.cheerio.load(response.data as string)
                         const items = this.parser.parseManga($, this)
                         section.section.items = items
@@ -202,6 +203,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
+
         const $ = this.cheerio.load(response.data as string)
         return this.parser.parseMangaDetails($, mangaId, this)
     }
@@ -213,6 +216,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
+
         const $ = this.cheerio.load(response.data as string)
         return this.parser.parseChapters($, mangaId, this)
     }
@@ -235,6 +240,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
+
         const $ = this.cheerio.load(response.data as string)
         return this.parser.parseChapterDetails($, mangaId, chapterId, this)
     }
@@ -251,6 +258,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
+
         const $ = this.cheerio.load(response.data as string)
         const results = this.parser.parseManga($, this)
 
@@ -274,6 +283,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
+
         const $ = this.cheerio.load(response.data as string)
         return this.parser.parseTags($, this)
     }
@@ -293,6 +304,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
+
         const $ = this.cheerio.load(response.data as string)
         const results = this.parser.parseManga($, this)
 
