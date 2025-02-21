@@ -13,7 +13,7 @@ import {
 const SITE_DOMAIN = 'https://manganato.com'
 
 export const ManganatoInfo: SourceInfo = {
-    version: getExportVersion('0.0.3'),
+    version: getExportVersion('0.1.0'),
     name: 'Manganato',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -22,7 +22,7 @@ export const ManganatoInfo: SourceInfo = {
     contentRating: ContentRating.MATURE,
     websiteBaseURL: SITE_DOMAIN,
     sourceTags: [],
-    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
+    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
 export class Manganato extends MangaBox {
@@ -40,4 +40,7 @@ export class Manganato extends MangaBox {
 
     // Selector for subtitle in manga list.
     mangaSubtitleSelector = 'a.genres-item-chap.text-nowrap'
+
+    // Page that requires captcha to access.
+    bypassPage = 'https://chapmanganato.to/'
 }

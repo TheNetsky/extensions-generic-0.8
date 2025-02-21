@@ -24,7 +24,7 @@ import { URLBuilder } from '../MangaBoxHelpers'
 const SITE_DOMAIN = 'https://mangakakalot.com'
 
 export const MangakakalotInfo: SourceInfo = {
-    version: getExportVersion('0.0.3'),
+    version: getExportVersion('0.1.0'),
     name: 'Mangakakalot',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -33,7 +33,7 @@ export const MangakakalotInfo: SourceInfo = {
     contentRating: ContentRating.MATURE,
     websiteBaseURL: SITE_DOMAIN,
     sourceTags: [],
-    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
+    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
 export class Mangakakalot extends MangaBox {
@@ -51,6 +51,9 @@ export class Mangakakalot extends MangaBox {
 
     // Selector for subtitle in manga list.
     mangaSubtitleSelector = 'a.list-story-item-wrap-chapter'
+
+    // Page that requires captcha to access.
+    bypassPage = 'https://chapmanganato.to/'
 
     override async supportsTagExclusion(): Promise<boolean> {
         return false

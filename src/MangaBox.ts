@@ -25,7 +25,7 @@ import {
     getImageServer
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '4.0.2'
+const BASE_VERSION = '4.0.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -45,6 +45,9 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
 
     // Selector for subtitle in manga list.
     abstract mangaSubtitleSelector: string
+
+    // Bypass for sites that use Captcha or CloudFlare.
+    abstract bypassPage: string
 
     // Selector for genre list items.
     genreListSelector = 'div.advanced-search-tool-genres-list span.advanced-search-tool-genres-item'
@@ -298,5 +301,28 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
             results: results,
             metadata: metadata
         })
+    }
+
+    async getCloudflareBypassRequestAsync(): Promise<Request> {
+        return App.createRequest({
+            url: `${this.bypassPage || this.baseURL}/`,
+            method: 'GET',
+            headers: {
+                'referer': `${this.baseURL}/`,
+                'origin': `${this.baseURL}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
+        })
+    }
+
+    checkResponseError(response: Response): void {
+        const status = response.status
+        switch (status) {
+            case 403:
+            case 503:
+                throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseURL}> and press the cloud icon.`)
+            case 404:
+                throw new Error(`The requested page ${response.request.url} was not found!`)
+        }
     }
 }
