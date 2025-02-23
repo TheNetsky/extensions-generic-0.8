@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://platinumscans.com'
 
 export const PlatinumScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'PlatinumScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -28,6 +28,8 @@ export const PlatinumScansInfo: SourceInfo = {
 export class PlatinumScans extends Madara {
 
     baseUrl: string = DOMAIN
+
+    override chapterEndpoint = 1
 
     override hasAdvancedSearchPage = false
 }
