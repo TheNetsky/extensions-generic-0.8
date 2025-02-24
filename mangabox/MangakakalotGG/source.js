@@ -721,16 +721,13 @@ var _Sources = (() => {
     }
   });
 
-  // src/MangaBat/MangaBat.ts
-  var MangaBat_exports = {};
-  __export(MangaBat_exports, {
-    MangaBat: () => MangaBat,
-    MangaBatInfo: () => MangaBatInfo
+  // src/MangakakalotGG/MangakakalotGG.ts
+  var MangakakalotGG_exports = {};
+  __export(MangakakalotGG_exports, {
+    MangakakalotGG: () => MangakakalotGG,
+    MangakakalotGGInfo: () => MangakakalotGGInfo
   });
   var import_types2 = __toESM(require_lib());
-
-  // src/MangaBox.ts
-  var import_types = __toESM(require_lib());
 
   // node_modules/entities/lib/esm/generated/decode-data-html.js
   var decode_data_html_default = new Uint16Array(
@@ -1231,6 +1228,9 @@ var _Sources = (() => {
     EncodingMode2[EncodingMode2["Text"] = 4] = "Text";
   })(EncodingMode || (EncodingMode = {}));
 
+  // src/MangaBox.ts
+  var import_types = __toESM(require_lib());
+
   // src/MangaBoxParser.ts
   var MangaBoxParser = class {
     constructor() {
@@ -1284,7 +1284,7 @@ var _Sources = (() => {
           if (!id || !label) continue;
           tags.push({ id, label });
         }
-        const TagSection2 = [
+        const TagSection3 = [
           App.createTagSection({
             id: "0",
             label: "genres",
@@ -1299,7 +1299,7 @@ var _Sources = (() => {
             status,
             author: author ? author : "Unkown",
             desc,
-            tags: TagSection2
+            tags: TagSection3
           })
         });
       };
@@ -1362,14 +1362,14 @@ var _Sources = (() => {
           if (a.label < b.label) return -1;
           return 0;
         });
-        const TagSection2 = [
+        const TagSection3 = [
           App.createTagSection({
             id: "0",
             label: "genres",
             tags: tags.map((t) => App.createTag(t))
           })
         ];
-        return TagSection2;
+        return TagSection3;
       };
       this.parseDate = (date) => {
         let time;
@@ -1703,11 +1703,11 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
     }
   };
 
-  // src/MangaBat/MangaBat.ts
-  var SITE_DOMAIN = "https://h.mangabat.com";
-  var MangaBatInfo = {
-    version: getExportVersion("4.0.0"),
-    name: "MangaBat",
+  // src/MangakakalotGG/MangakakalotGG.ts
+  var SITE_DOMAIN = "https://www.mangakakalot.gg";
+  var MangakakalotGGInfo = {
+    version: getExportVersion("1.0.0"),
+    name: "MangakakalotGG",
     icon: "icon.png",
     author: "Batmeow",
     authorWebsite: "https://github.com/Batmeow",
@@ -1717,7 +1717,7 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
     sourceTags: [],
     intents: import_types2.SourceIntents.SETTINGS_UI | import_types2.SourceIntents.HOMEPAGE_SECTIONS | import_types2.SourceIntents.MANGA_CHAPTERS
   };
-  var MangaBat = class extends MangaBox {
+  var MangakakalotGG = class extends MangaBox {
     constructor() {
       super(...arguments);
       // Website base URL.
@@ -1725,16 +1725,115 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
       // Language code supported by the source.
       this.languageCode = "\u{1F1EC}\u{1F1E7}";
       // Path for manga list.
-      this.mangaListPath = "manga-list-all";
+      this.mangaListPath = "genre";
       // Appended path for manga list home sections.
-      this.mangaListHomeSectionsPath = "";
+      this.mangaListHomeSectionsPath = "all";
+      // Homepage sections key value mappings.
+      this.mangaListHomeSectionsParams = {
+        key: "filter",
+        values: ["4", "1", "7"]
+      };
       // Selector for manga in manga list.
-      this.mangaListSelector = "div.panel-list-story div.list-story-item";
+      this.mangaListSelector = "div.truyen-list div.list-truyen-item-wrap";
       // Selector for subtitle in manga list.
-      this.mangaSubtitleSelector = "div.item-right > a.item-chapter";
+      this.mangaSubtitleSelector = "a.list-story-item-wrap-chapter";
+      // Page that requires captcha to access.
       this.bypassPage = "";
     }
+    async supportsTagExclusion() {
+      return false;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async getViewMoreItems(homePageSectionId, metadata) {
+      const page = metadata?.page ?? 1;
+      const request = App.createRequest({
+        url: new URLBuilder(this.baseURL).addPathComponent(`${this.mangaListPath}/${this.mangaListHomeSectionsPath}`).addQueryParameter(this.mangaListHomeSectionsParams.key, homePageSectionId).addQueryParameter("page", page).buildUrl(),
+        method: "GET"
+      });
+      const response = await this.requestManager.schedule(request, 1);
+      const $ = this.cheerio.load(response.data);
+      const results = this.parser.parseManga($, this);
+      metadata = !this.parser.isLastPage($) ? { page: page + 1 } : void 0;
+      return App.createPagedResults({
+        results,
+        metadata
+      });
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async getSearchResults(query, metadata) {
+      const page = metadata?.page ?? 1;
+      const tag = query.includedTags[0]?.id ?? "";
+      let results = [];
+      if (tag && tag.length != 0) {
+        const request = App.createRequest({
+          url: new URLBuilder(this.baseURL).addPathComponent(`${this.mangaListPath}/${tag}`).addQueryParameter("page", page).buildUrl(),
+          method: "GET"
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        results = this.parser.parseManga($, this);
+        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : void 0;
+      } else {
+        const request = App.createRequest({
+          url: new URLBuilder(this.baseURL).addPathComponent("search").addPathComponent("story").addPathComponent(query.title?.replace(/[^a-zA-Z0-9 ]/g, "").replace(/ +/g, "_").toLowerCase() ?? "").addQueryParameter("page", page).buildUrl(),
+          method: "GET"
+        });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        const collecedIds = [];
+        for (const manga of $("div.panel_story_list div.story_item").toArray()) {
+          const mangaId = $("a", manga).first().attr("href");
+          const image = $("img", manga).first().attr("src") ?? "";
+          const title = decodeHTML($("h3.story_name a", manga).first().text().trim() ?? "");
+          const subtitle = decodeHTML($("h3.story_name + em.story_chapter a", manga).text().trim() ?? "");
+          if (!mangaId || !title || collecedIds.includes(mangaId)) continue;
+          results.push(App.createPartialSourceManga({
+            mangaId,
+            image,
+            title,
+            subtitle: subtitle ? subtitle : "No Chapters"
+          }));
+          collecedIds.push(mangaId);
+        }
+        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : void 0;
+      }
+      return App.createPagedResults({
+        results,
+        metadata
+      });
+    }
+    parseTagId(url) {
+      return url.split(`${this.mangaListPath}/`).pop()?.replace(/all.*/g, "");
+    }
+    async getSearchTags() {
+      const request = App.createRequest({
+        url: this.baseURL,
+        method: "GET"
+      });
+      const response = await this.requestManager.schedule(request, 1);
+      const $ = this.cheerio.load(response.data);
+      const tags = [];
+      for (const tag of $("div.panel-category tbody a").toArray()) {
+        const id = this.parseTagId($(tag).attr("href") ?? "");
+        const label = $(tag).text().trim();
+        if (!id || !label) continue;
+        tags.push({ id, label });
+      }
+      tags.sort((a, b) => {
+        if (a.label > b.label) return 1;
+        if (a.label < b.label) return -1;
+        return 0;
+      });
+      const TagSection3 = [
+        App.createTagSection({
+          id: "0",
+          label: "genres",
+          tags: tags.map((t) => App.createTag(t))
+        })
+      ];
+      return TagSection3;
+    }
   };
-  return __toCommonJS(MangaBat_exports);
+  return __toCommonJS(MangakakalotGG_exports);
 })();
 this.Sources = _Sources; if (typeof exports === 'object' && typeof module !== 'undefined') {module.exports.Sources = this.Sources;}

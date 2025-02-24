@@ -509,14 +509,14 @@ var _Sources = (() => {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.BadgeColor = void 0;
-      var BadgeColor2;
-      (function(BadgeColor3) {
-        BadgeColor3["BLUE"] = "default";
-        BadgeColor3["GREEN"] = "success";
-        BadgeColor3["GREY"] = "info";
-        BadgeColor3["YELLOW"] = "warning";
-        BadgeColor3["RED"] = "danger";
-      })(BadgeColor2 = exports.BadgeColor || (exports.BadgeColor = {}));
+      var BadgeColor;
+      (function(BadgeColor2) {
+        BadgeColor2["BLUE"] = "default";
+        BadgeColor2["GREEN"] = "success";
+        BadgeColor2["GREY"] = "info";
+        BadgeColor2["YELLOW"] = "warning";
+        BadgeColor2["RED"] = "danger";
+      })(BadgeColor = exports.BadgeColor || (exports.BadgeColor = {}));
     }
   });
 
@@ -1310,7 +1310,7 @@ var _Sources = (() => {
           const id = $("a", chapter).attr("href") ?? "";
           if (!id) continue;
           const name = decodeHTML($("a", chapter).text().trim());
-          const time = this.parseDate($(source.chapterTimeSelector, chapter).last().text().trim() ?? "");
+          const time = this.parseDate($(source.chapterTimeSelector, chapter).attr("title") ?? "");
           let chapNum = 0;
           const chapRegex = id.match(/(?:chap.*)[-_](\d+\.?\d?)/);
           if (chapRegex && chapRegex[1]) chapNum = Number(chapRegex[1].replace(/\\/g, "."));
@@ -1350,18 +1350,23 @@ var _Sources = (() => {
         return chapterDetails;
       };
       this.parseTags = ($, source) => {
-        const genres = [];
-        for (const genre of $(source.genreListSelector).toArray()) {
-          const id = $(genre).attr("data-i");
-          const label = $(genre).text().trim();
+        const tags = [];
+        for (const tag of $(source.genreListSelector).toArray()) {
+          const id = $(tag).attr("data-i");
+          const label = $(tag).text().trim();
           if (!id || !label) continue;
-          genres.push({ id, label });
+          tags.push({ id, label });
         }
+        tags.sort((a, b) => {
+          if (a.label > b.label) return 1;
+          if (a.label < b.label) return -1;
+          return 0;
+        });
         const TagSection2 = [
           App.createTagSection({
             id: "0",
             label: "genres",
-            tags: genres.map((t) => App.createTag(t))
+            tags: tags.map((t) => App.createTag(t))
           })
         ];
         return TagSection2;
@@ -1380,7 +1385,7 @@ var _Sources = (() => {
         } else if (date.includes("YEAR") || date.includes("YEARS")) {
           time = new Date(Date.now() - number * 31556952e3);
         } else {
-          time = new Date(date);
+          time = /* @__PURE__ */ new Date(`${date} UTC`);
         }
         return time;
       };
@@ -1463,13 +1468,18 @@ var _Sources = (() => {
   };
 
   // src/MangaBox.ts
-  var BASE_VERSION = "4.0.1";
+  var BASE_VERSION = "0.1.0";
   var getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split(".").map((x, index) => Number(x) + Number(EXTENSION_VERSION.split(".")[index])).join(".");
   };
   var MangaBox = class {
     constructor(cheerio) {
       this.cheerio = cheerio;
+      // Homepage sections key value mappings.
+      this.mangaListHomeSectionsParams = {
+        key: "type",
+        values: ["latest", "newest", "topview"]
+      };
       // Selector for genre list items.
       this.genreListSelector = "div.advanced-search-tool-genres-list span.advanced-search-tool-genres-item";
       // Selector for status list items.
@@ -1493,7 +1503,7 @@ var _Sources = (() => {
       // Selector for manga chapter list.
       this.chapterListSelector = "div.panel-story-chapter-list ul.row-content-chapter li,div.manga-info-chapter div.chapter-list div.row";
       // Selector for manga chapter time updated.
-      this.chapterTimeSelector = "span.chapter-time, span";
+      this.chapterTimeSelector = "span.chapter-time, span:last-of-type";
       // Selector for manga chapter images.
       this.chapterImagesSelector = "div.container-chapter-reader img";
       this.parser = new MangaBoxParser();
@@ -1533,11 +1543,11 @@ var _Sources = (() => {
       const sections = [
         {
           request: App.createRequest({
-            url: new URLBuilder(this.baseURL).addPathComponent(this.mangaListPath).addQueryParameter("type", "latest").buildUrl(),
+            url: new URLBuilder(this.baseURL).addPathComponent(`${this.mangaListPath}/${this.mangaListHomeSectionsPath}`).addQueryParameter(this.mangaListHomeSectionsParams.key, this.mangaListHomeSectionsParams.values[0]).addQueryParameter("page", "1").buildUrl(),
             method: "GET"
           }),
           section: App.createHomeSection({
-            id: "latest",
+            id: `${this.mangaListHomeSectionsParams.values[0]}`,
             title: "Latest Updates",
             type: import_types.HomeSectionType.singleRowLarge,
             containsMoreItems: true
@@ -1545,11 +1555,11 @@ var _Sources = (() => {
         },
         {
           request: App.createRequest({
-            url: new URLBuilder(this.baseURL).addPathComponent(this.mangaListPath).addQueryParameter("type", "newest").buildUrl(),
+            url: new URLBuilder(this.baseURL).addPathComponent(`${this.mangaListPath}/${this.mangaListHomeSectionsPath}`).addQueryParameter(this.mangaListHomeSectionsParams.key, this.mangaListHomeSectionsParams.values[1]).addQueryParameter("page", "1").buildUrl(),
             method: "GET"
           }),
           section: App.createHomeSection({
-            id: "newest",
+            id: `${this.mangaListHomeSectionsParams.values[1]}`,
             title: "New Titles",
             type: import_types.HomeSectionType.singleRowNormal,
             containsMoreItems: true
@@ -1557,11 +1567,11 @@ var _Sources = (() => {
         },
         {
           request: App.createRequest({
-            url: new URLBuilder(this.baseURL).addPathComponent(this.mangaListPath).addQueryParameter("type", "topview").buildUrl(),
+            url: new URLBuilder(this.baseURL).addPathComponent(`${this.mangaListPath}/${this.mangaListHomeSectionsPath}`).addQueryParameter(this.mangaListHomeSectionsParams.key, this.mangaListHomeSectionsParams.values[2]).addQueryParameter("page", "1").buildUrl(),
             method: "GET"
           }),
           section: App.createHomeSection({
-            id: "topview",
+            id: `${this.mangaListHomeSectionsParams.values[2]}`,
             title: "Most Popular",
             type: import_types.HomeSectionType.singleRowNormal,
             containsMoreItems: true
@@ -1622,10 +1632,11 @@ var _Sources = (() => {
       const $ = this.cheerio.load(response.data);
       return this.parser.parseChapterDetails($, mangaId, chapterId, this);
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getViewMoreItems(homePageSectionId, metadata) {
       const page = metadata?.page ?? 1;
       const request = App.createRequest({
-        url: new URLBuilder(this.baseURL).addPathComponent(`${this.mangaListPath}/${page}`).addQueryParameter("type", homePageSectionId).buildUrl(),
+        url: new URLBuilder(this.baseURL).addPathComponent(`${this.mangaListPath}/${page}`).addQueryParameter(this.mangaListHomeSectionsParams.key, homePageSectionId).buildUrl(),
         method: "GET"
       });
       const response = await this.requestManager.schedule(request, 1);
@@ -1651,6 +1662,7 @@ var _Sources = (() => {
       const $ = this.cheerio.load(response.data);
       return this.parser.parseTags($, this);
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getSearchResults(query, metadata) {
       const page = metadata?.page ?? 1;
       const request = App.createRequest({
@@ -1694,7 +1706,7 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
   // src/Manganato/Manganato.ts
   var SITE_DOMAIN = "https://manganato.com";
   var ManganatoInfo = {
-    version: getExportVersion("0.1.0"),
+    version: getExportVersion("4.0.2"),
     name: "Manganato",
     icon: "icon.png",
     author: "Batmeow",
@@ -1714,6 +1726,8 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
       this.languageCode = "\u{1F1EC}\u{1F1E7}";
       // Path for manga list.
       this.mangaListPath = "genre-all";
+      // Appended path for manga list home sections.
+      this.mangaListHomeSectionsPath = "";
       // Selector for manga in manga list.
       this.mangaListSelector = "div.panel-content-genres div.content-genres-item";
       // Selector for subtitle in manga list.
