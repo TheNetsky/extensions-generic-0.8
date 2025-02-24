@@ -1,5 +1,4 @@
 import {
-    BadgeColor,
     ContentRating,
     SourceInfo,
     SourceIntents
@@ -13,7 +12,7 @@ import {
 const SITE_DOMAIN = 'https://manganato.com'
 
 export const ManganatoInfo: SourceInfo = {
-    version: getExportVersion('0.1.0'),
+    version: getExportVersion('4.0.2'),
     name: 'Manganato',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -34,6 +33,9 @@ export class Manganato extends MangaBox {
 
     // Path for manga list.
     mangaListPath = 'genre-all'
+
+    // Appended path for manga list home sections.
+    mangaListHomeSectionsPath = ''
 
     // Selector for manga in manga list.
     mangaListSelector = 'div.panel-content-genres div.content-genres-item'

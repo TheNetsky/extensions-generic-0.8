@@ -25,9 +25,14 @@ import {
     getImageServer
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '4.0.1'
+const BASE_VERSION = '0.1.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
+}
+
+export interface HomeSectionsParams {
+    key: string
+    values: [latest: string, newest: string, popular: string]
 }
 
 export abstract class MangaBox implements SearchResultsProviding, MangaProviding, ChapterProviding, HomePageSectionsProviding {
@@ -39,6 +44,15 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
 
     // Path for manga list. Eg. https://manganato.com/genre-all the path is 'genre-all'
     abstract mangaListPath: string
+
+    // Appended path for manga list home sections. Eg. https://www.natomanga.com/genre/all the appended path is 'all'
+    abstract mangaListHomeSectionsPath: string
+
+    // Homepage sections key value mappings.
+    mangaListHomeSectionsParams: HomeSectionsParams = {
+        key: 'type',
+        values: ['latest', 'newest', 'topview']
+    }
 
     // Selector for manga in manga list.
     abstract mangaListSelector: string
@@ -88,7 +102,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         + 'div.manga-info-chapter div.chapter-list div.row'
 
     // Selector for manga chapter time updated.
-    chapterTimeSelector = 'span.chapter-time, span'
+    chapterTimeSelector = 'span.chapter-time, span:last-of-type'
 
     // Selector for manga chapter images.
     chapterImagesSelector = 'div.container-chapter-reader img'
@@ -135,13 +149,14 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
             {
                 request: App.createRequest({
                     url: new URLBuilder(this.baseURL)
-                        .addPathComponent(this.mangaListPath)
-                        .addQueryParameter('type', 'latest')
+                        .addPathComponent(`${this.mangaListPath}/${this.mangaListHomeSectionsPath}`)
+                        .addQueryParameter(this.mangaListHomeSectionsParams.key, this.mangaListHomeSectionsParams.values[0])
+                        .addQueryParameter('page', '1')
                         .buildUrl(),
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
-                    id: 'latest',
+                    id: `${this.mangaListHomeSectionsParams.values[0]}`,
                     title: 'Latest Updates',
                     type: HomeSectionType.singleRowLarge,
                     containsMoreItems: true
@@ -150,13 +165,14 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
             {
                 request: App.createRequest({
                     url: new URLBuilder(this.baseURL)
-                        .addPathComponent(this.mangaListPath)
-                        .addQueryParameter('type', 'newest')
+                        .addPathComponent(`${this.mangaListPath}/${this.mangaListHomeSectionsPath}`)
+                        .addQueryParameter(this.mangaListHomeSectionsParams.key, this.mangaListHomeSectionsParams.values[1])
+                        .addQueryParameter('page', '1')
                         .buildUrl(),
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
-                    id: 'newest',
+                    id: `${this.mangaListHomeSectionsParams.values[1]}`,
                     title: 'New Titles',
                     type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
@@ -165,13 +181,14 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
             {
                 request: App.createRequest({
                     url: new URLBuilder(this.baseURL)
-                        .addPathComponent(this.mangaListPath)
-                        .addQueryParameter('type', 'topview')
+                        .addPathComponent(`${this.mangaListPath}/${this.mangaListHomeSectionsPath}`)
+                        .addQueryParameter(this.mangaListHomeSectionsParams.key, this.mangaListHomeSectionsParams.values[2])
+                        .addQueryParameter('page', '1')
                         .buildUrl(),
                     method: 'GET'
                 }),
                 section: App.createHomeSection({
-                    id: 'topview',
+                    id: `${this.mangaListHomeSectionsParams.values[2]}`,
                     title: 'Most Popular',
                     type: HomeSectionType.singleRowNormal,
                     containsMoreItems: true
@@ -246,13 +263,14 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         return this.parser.parseChapterDetails($, mangaId, chapterId, this)
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getViewMoreItems(homePageSectionId: string, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
 
         const request = App.createRequest({
             url: new URLBuilder(this.baseURL)
                 .addPathComponent(`${this.mangaListPath}/${page}`)
-                .addQueryParameter('type', homePageSectionId)
+                .addQueryParameter(this.mangaListHomeSectionsParams.key, homePageSectionId)
                 .buildUrl(),
             method: 'GET'
         })
@@ -289,6 +307,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         return this.parser.parseTags($, this)
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
 

@@ -110,7 +110,7 @@ export class MangaBoxParser {
             if (!id) continue
 
             const name = decodeHTML($('a', chapter).text().trim())
-            const time = this.parseDate($(source.chapterTimeSelector, chapter).last().text().trim() ?? '')
+            const time = this.parseDate($(source.chapterTimeSelector, chapter).attr('title') ?? '')
 
             let chapNum = 0
             const chapRegex = id.match(/(?:chap.*)[-_](\d+\.?\d?)/)
@@ -160,19 +160,25 @@ export class MangaBoxParser {
     }
 
     parseTags = ($: CheerioStatic, source: MangaBox): TagSection[] => {
-        const genres: Tag[] = []
-        for (const genre of $(source.genreListSelector).toArray()) {
-            const id = $(genre).attr('data-i')
-            const label = $(genre).text().trim()
+        const tags: Tag[] = []
+        for (const tag of $(source.genreListSelector).toArray()) {
+            const id = $(tag).attr('data-i')
+            const label = $(tag).text().trim()
             if (!id || !label) continue
-            genres.push({ id: id, label: label })
+            tags.push({ id: id, label: label })
         }
+
+        tags.sort((a, b) => {
+            if (a.label > b.label) return 1
+            if (a.label < b.label) return -1
+            return 0
+        })
 
         const TagSection: TagSection[] = [
             App.createTagSection({
                 id: '0',
                 label: 'genres',
-                tags: genres.map(t => App.createTag(t))
+                tags: tags.map(t => App.createTag(t))
             })
         ]
         return TagSection
@@ -192,7 +198,7 @@ export class MangaBoxParser {
         } else if (date.includes('YEAR') || date.includes('YEARS')) {
             time = new Date(Date.now() - (number * 31556952000))
         } else {
-            time = new Date(date)
+            time = new Date(`${date} UTC`)
         }
 
         return time

@@ -1,5 +1,4 @@
 import {
-    BadgeColor,
     ContentRating,
     SourceInfo,
     SourceIntents
@@ -13,7 +12,7 @@ import {
 const SITE_DOMAIN = 'https://h.mangabat.com'
 
 export const MangaBatInfo: SourceInfo = {
-    version: getExportVersion('0.0.5'),
+    version: getExportVersion('4.0.0'),
     name: 'MangaBat',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -34,6 +33,9 @@ export class MangaBat extends MangaBox {
 
     // Path for manga list.
     mangaListPath = 'manga-list-all'
+
+    // Appended path for manga list home sections.
+    mangaListHomeSectionsPath = ''
 
     // Selector for manga in manga list.
     mangaListSelector = 'div.panel-list-story div.list-story-item'
