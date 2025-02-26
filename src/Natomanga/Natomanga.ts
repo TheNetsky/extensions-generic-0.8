@@ -22,7 +22,7 @@ import { URLBuilder } from '../MangaBoxHelpers'
 const SITE_DOMAIN = 'https://www.natomanga.com'
 
 export const NatomangaInfo: SourceInfo = {
-    version: getExportVersion('1.0.0'),
+    version: getExportVersion('1.0.1'),
     name: 'Natomanga',
     icon: 'icon.png',
     author: 'Batmeow',

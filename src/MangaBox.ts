@@ -91,7 +91,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         + 'ul.manga-info-text li:contains(Author) a'
 
     // Selector for manga description.
-    mangaDescSelector = 'div#panel-story-info-description, div#noidungm'
+    mangaDescSelector = 'div#panel-story-info-description, div#noidungm, div.manga-info-top + div#contentBox'
 
     // Selector for manga tags.
     mangaGenresSelector = 'div.story-info-right td:contains(Genre) + td a,'

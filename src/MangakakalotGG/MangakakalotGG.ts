@@ -22,7 +22,7 @@ import { URLBuilder } from '../MangaBoxHelpers'
 const SITE_DOMAIN = 'https://www.mangakakalot.gg'
 
 export const MangakakalotGGInfo: SourceInfo = {
-    version: getExportVersion('1.0.0'),
+    version: getExportVersion('1.0.1'),
     name: 'MangakakalotGG',
     icon: 'icon.png',
     author: 'Batmeow',
