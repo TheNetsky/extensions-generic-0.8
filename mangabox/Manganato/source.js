@@ -1497,7 +1497,7 @@ var _Sources = (() => {
       // Selector for manga author.
       this.mangaAuthorSelector = "div.story-info-right td:contains(Author) + td a,ul.manga-info-text li:contains(Author) a";
       // Selector for manga description.
-      this.mangaDescSelector = "div#panel-story-info-description, div#noidungm";
+      this.mangaDescSelector = "div#panel-story-info-description, div#noidungm, div.manga-info-top + div#contentBox";
       // Selector for manga tags.
       this.mangaGenresSelector = "div.story-info-right td:contains(Genre) + td a,ul.manga-info-text li:contains(Genres) a";
       // Selector for manga chapter list.
