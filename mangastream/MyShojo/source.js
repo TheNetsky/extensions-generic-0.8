@@ -15459,9 +15459,9 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   };
 
   // src/MyShojo/MyShojo.ts
-  var DOMAIN = "https://myshojo.com";
+  var DOMAIN = "https://mythicscans.com";
   var MyShojoInfo = {
-    version: getExportVersion("0.0.0"),
+    version: getExportVersion("0.0.1"),
     name: "MyShojo",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
