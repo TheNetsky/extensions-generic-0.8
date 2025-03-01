@@ -11,10 +11,10 @@ import {
     MangaStream
 } from '../MangaStream'
 
-const DOMAIN = 'https://myshojo.com'
+const DOMAIN = 'https://mythicscans.com'
 
 export const MyShojoInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'MyShojo',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
