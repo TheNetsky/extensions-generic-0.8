@@ -23,7 +23,7 @@ export const chapterSettings = (stateManager: SourceStateManager): DUINavigation
                             label: 'Image Server',
                             options: ['server1', 'server2'],
                             value: App.createDUIBinding({
-                                get: () => getImageServer(stateManager).then(value => [value[0]]),
+                                get: () => getImageServer(stateManager),
                                 set: async (newValue) => await stateManager.store('imageServer', newValue)
                             }),
                             allowsMultiselect: false,

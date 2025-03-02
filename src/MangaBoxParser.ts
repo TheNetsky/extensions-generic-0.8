@@ -11,6 +11,9 @@ import { decodeHTML } from 'entities'
 
 import { MangaBox } from './MangaBox'
 
+import { getImageServer } from './MangaBoxSettings'
+
+
 export class MangaBoxParser {
     parseManga = ($: CheerioStatic, source: MangaBox): PartialSourceManga[] => {
         const mangaItems: PartialSourceManga[] = []
@@ -145,11 +148,19 @@ export class MangaBoxParser {
 
     parseChapterDetails = async ($: CheerioStatic, mangaId: string, chapterId: string, source: MangaBox): Promise<ChapterDetails> => {
         const pages: string[] = []
+        const imageServer = await getImageServer(source.stateManager)
+            .then(server => parseInt((server[0]?.replace('server', '')) ?? '1') - 1)
+
+        const cdnsMatch = ($('head').toString().match(/var cdns.*]/g) ?? [])[0]?.replace('var cdns = ', '')
+        const cdns = JSON.parse(cdnsMatch)
 
         for (const img of $(source.chapterImagesSelector).toArray()) {
             let image = $(img).attr('src') ?? ''
             if (!image) image = $(img).attr('data-src') ?? ''
             if (!image) throw new Error(`Unable to parse image(s) for Chapter ID: ${chapterId}`)
+            if (Array.isArray(cdns) && typeof cdns[imageServer] !== 'undefined') {
+                for (const url of cdns) image = image.replace(url, cdns[imageServer])
+            }
             pages.push(image)
         }
 
