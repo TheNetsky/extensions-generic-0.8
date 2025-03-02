@@ -26,7 +26,8 @@ import { URLBuilder } from './MangaBoxHelpers'
 
 import {
     chapterSettings,
-    getImageServer
+    getImageServer,
+    resetSettings
 } from './MangaBoxSettings'
 
 const BASE_VERSION = '1.0.0'
@@ -138,12 +139,15 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
     })
 
     async getSourceMenu(): Promise<DUISection> {
-        return App.createDUISection({
+        return Promise.resolve(App.createDUISection({
             id: 'main',
             header: 'Source Settings',
             isHidden: false,
-            rows: async () => [chapterSettings(this.stateManager)]
-        })
+            rows: async () => [
+                chapterSettings(this.stateManager),
+                resetSettings(this.stateManager)
+            ]
+        }))
     }
 
     getMangaShareUrl(mangaId: string): string { return `${mangaId}` }
