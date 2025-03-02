@@ -110,7 +110,10 @@ export class MangaBoxParser {
             if (!id) continue
 
             const name = decodeHTML($('a', chapter).text().trim())
-            const time = this.parseDate($(source.chapterTimeSelector, chapter).attr('title') ?? '')
+            const timeText = $(source.chapterTimeSelector, chapter).text().trim()
+            const time = this.parseDate(
+                (timeText.includes('a') ? timeText : $(source.chapterTimeSelector, chapter).attr('title')) ?? ''
+            )
 
             let chapNum = 0
             const chapRegex = id.match(/(?:chap.*)[-_](\d+\.?\d?)/)

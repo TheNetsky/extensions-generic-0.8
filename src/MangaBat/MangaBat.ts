@@ -9,7 +9,7 @@ import {
     MangaBox
 } from '../MangaBox'
 
-const SITE_DOMAIN = 'https://h.mangabat.com'
+const SITE_DOMAIN = 'https://www.mangabats.com'
 
 export const MangaBatInfo: SourceInfo = {
     version: getExportVersion('4.0.0'),
@@ -32,16 +32,17 @@ export class MangaBat extends MangaBox {
     languageCode = '🇬🇧'
 
     // Path for manga list.
-    mangaListPath = 'manga-list-all'
+    mangaListPath = 'genre'
 
     // Appended path for manga list home sections.
-    mangaListHomeSectionsPath = ''
+    mangaListHomeSectionsPath = 'all'
 
     // Selector for manga in manga list.
-    mangaListSelector = 'div.panel-list-story div.list-story-item'
+    mangaListSelector = 'div.truyen-list div.list-truyen-item-wrap'
 
     // Selector for subtitle in manga list.
-    mangaSubtitleSelector = 'div.item-right > a.item-chapter'
+    mangaSubtitleSelector = 'a.list-story-item-wrap-chapter'
 
+    // CloudFlare Bypass url if required.
     bypassPage = ''
 }
