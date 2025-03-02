@@ -18,11 +18,11 @@ import {
     TagSection
 } from '@paperback/types'
 
+import { decodeHTML } from 'entities'
+
 import { MangaBoxParser } from './MangaBoxParser'
 
 import { URLBuilder } from './MangaBoxHelpers'
-
-import { decodeHTML } from 'entities'
 
 import {
     chapterSettings,
