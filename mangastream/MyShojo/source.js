@@ -15461,7 +15461,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   // src/MyShojo/MyShojo.ts
   var DOMAIN = "https://mythicscans.com";
   var MyShojoInfo = {
-    version: getExportVersion("0.0.1"),
+    version: getExportVersion("0.0.2"),
     name: "MyShojo",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
@@ -15476,6 +15476,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
     constructor() {
       super(...arguments);
       this.baseUrl = DOMAIN;
+      this.directoryPath = "series";
     }
     configureSections() {
       this.homescreen_sections["new_titles"].enabled = false;
