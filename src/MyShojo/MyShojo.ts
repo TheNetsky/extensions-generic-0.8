@@ -14,7 +14,7 @@ import {
 const DOMAIN = 'https://mythicscans.com'
 
 export const MyShojoInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'MyShojo',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -29,6 +29,8 @@ export const MyShojoInfo: SourceInfo = {
 export class MyShojo extends MangaStream {
 
     baseUrl: string = DOMAIN
+
+    override directoryPath = 'series'
 
     override configureSections() {
         this.homescreen_sections['new_titles'].enabled = false
