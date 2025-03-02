@@ -9,10 +9,10 @@ import {
     MangaBox
 } from '../MangaBox'
 
-const SITE_DOMAIN = 'https://manganato.com'
+const SITE_DOMAIN = 'https://www.manganato.gg'
 
 export const ManganatoInfo: SourceInfo = {
-    version: getExportVersion('4.0.2'),
+    version: getExportVersion('4.0.0'),
     name: 'Manganato',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -21,7 +21,7 @@ export const ManganatoInfo: SourceInfo = {
     contentRating: ContentRating.MATURE,
     websiteBaseURL: SITE_DOMAIN,
     sourceTags: [],
-    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
+    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
 }
 
 export class Manganato extends MangaBox {
@@ -32,17 +32,17 @@ export class Manganato extends MangaBox {
     languageCode = '🇬🇧'
 
     // Path for manga list.
-    mangaListPath = 'genre-all'
+    mangaListPath = 'genre'
 
     // Appended path for manga list home sections.
-    mangaListHomeSectionsPath = ''
+    mangaListHomeSectionsPath = 'all'
 
     // Selector for manga in manga list.
-    mangaListSelector = 'div.panel-content-genres div.content-genres-item'
+    mangaListSelector = 'div.truyen-list div.list-truyen-item-wrap'
 
     // Selector for subtitle in manga list.
-    mangaSubtitleSelector = 'a.genres-item-chap.text-nowrap'
+    mangaSubtitleSelector = 'a.list-story-item-wrap-chapter'
 
-    // Page that requires captcha to access.
-    bypassPage = 'https://chapmanganato.to/'
+    // CloudFlare Bypass url if required.
+    bypassPage = ''
 }

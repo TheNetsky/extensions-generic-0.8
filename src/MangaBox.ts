@@ -8,13 +8,17 @@ import {
     HomeSectionType,
     MangaProviding,
     PagedResults,
+    PartialSourceManga,
     Request,
     Response,
     SearchRequest,
     SearchResultsProviding,
     SourceManga,
+    Tag,
     TagSection
 } from '@paperback/types'
+
+import { decodeHTML } from 'entities'
 
 import { MangaBoxParser } from './MangaBoxParser'
 
@@ -22,10 +26,11 @@ import { URLBuilder } from './MangaBoxHelpers'
 
 import {
     chapterSettings,
-    getImageServer
+    getImageServer,
+    resetSettings
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '0.1.0'
+const BASE_VERSION = '1.0.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -50,8 +55,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
 
     // Homepage sections key value mappings.
     mangaListHomeSectionsParams: HomeSectionsParams = {
-        key: 'type',
-        values: ['latest', 'newest', 'topview']
+        key: 'filter',
+        values: ['4', '1', '7']
     }
 
     // Selector for manga in manga list.
@@ -134,12 +139,15 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
     })
 
     async getSourceMenu(): Promise<DUISection> {
-        return App.createDUISection({
+        return Promise.resolve(App.createDUISection({
             id: 'main',
             header: 'Source Settings',
             isHidden: false,
-            rows: async () => [chapterSettings(this.stateManager)]
-        })
+            rows: async () => [
+                chapterSettings(this.stateManager),
+                resetSettings(this.stateManager)
+            ]
+        }))
     }
 
     getMangaShareUrl(mangaId: string): string { return `${mangaId}` }
@@ -269,15 +277,14 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
 
         const request = App.createRequest({
             url: new URLBuilder(this.baseURL)
-                .addPathComponent(`${this.mangaListPath}/${page}`)
+                .addPathComponent(`${this.mangaListPath}/${this.mangaListHomeSectionsPath}`)
                 .addQueryParameter(this.mangaListHomeSectionsParams.key, homePageSectionId)
+                .addQueryParameter('page', page)
                 .buildUrl(),
             method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        this.checkResponseError(response)
-
         const $ = this.cheerio.load(response.data as string)
         const results = this.parser.parseManga($, this)
 
@@ -289,46 +296,104 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
     }
 
     async supportsTagExclusion(): Promise<boolean> {
-        return true
+        return false
+    }
+
+    parseTagId(url: string): string | undefined {
+        return url.split(`${this.mangaListPath}/`).pop()?.replace(/all.*/g, '')
     }
 
     async getSearchTags(): Promise<TagSection[]> {
         const request = App.createRequest({
-            url: new URLBuilder(this.baseURL)
-                .addPathComponent('advanced_search')
-                .buildUrl(),
+            url: this.baseURL,
             method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
-        this.checkResponseError(response)
-
         const $ = this.cheerio.load(response.data as string)
-        return this.parser.parseTags($, this)
+
+        const tags: Tag[] = []
+
+        for (const tag of $('div.panel-category tbody a').toArray()) {
+            const id = this.parseTagId($(tag).attr('href') ?? '')
+            const label = $(tag).text().trim()
+            if (!id || !label) continue
+            tags.push({ id: id, label: label })
+        }
+
+        tags.sort((a, b) => {
+            if (a.label > b.label) return 1
+            if (a.label < b.label) return -1
+            return 0
+        })
+
+        const TagSection: TagSection[] = [
+            App.createTagSection({
+                id: '0',
+                label: 'genres',
+                tags: tags.map(t => App.createTag(t))
+            })
+        ]
+        return TagSection
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
+        const tag: string = query.includedTags[0]?.id ?? ''
+        let results: PartialSourceManga[] = []
 
-        const request = App.createRequest({
-            url: new URLBuilder(this.baseURL)
-                .addPathComponent('advanced_search')
-                .addQueryParameter('keyw', query.title?.replace(/[^a-zA-Z0-9 ]/g, '').replace(/ +/g, '_').toLowerCase() ?? '')
-                .addQueryParameter('g_i', `_${query.includedTags?.map(t => t.id).join('_')}_`)
-                .addQueryParameter('g_e', `_${query.excludedTags?.map(t => t.id).join('_')}_`)
-                .addQueryParameter('page', page)
-                .buildUrl(),
-            method: 'GET'
-        })
+        if (tag && tag.length != 0) {
+            const request = App.createRequest({
+                url: new URLBuilder(this.baseURL)
+                    .addPathComponent(`${this.mangaListPath}/${tag}`)
+                    .addQueryParameter('page', page)
+                    .buildUrl(),
+                method: 'GET'
+            })
 
-        const response = await this.requestManager.schedule(request, 1)
-        this.checkResponseError(response)
+            const response = await this.requestManager.schedule(request, 1)
+            const $ = this.cheerio.load(response.data as string)
 
-        const $ = this.cheerio.load(response.data as string)
-        const results = this.parser.parseManga($, this)
+            results = this.parser.parseManga($, this)
+            metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
+        } else {
+            const request = App.createRequest({
+                url: new URLBuilder(this.baseURL)
+                    .addPathComponent('search')
+                    .addPathComponent('story')
+                    .addPathComponent(query.title?.replace(/[^a-zA-Z0-9\s&'/-]/g, '')
+                        .replace(/[\s&'/-]/g, '_')
+                        .replace(/(__)/g,'')
+                        .toLowerCase() ?? '')
+                    .addQueryParameter('page', page)
+                    .buildUrl(),
+                method: 'GET'
+            })
 
-        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
+            const response = await this.requestManager.schedule(request, 1)
+            const $ = this.cheerio.load(response.data as string)
+
+            const collecedIds: string[] = []
+
+            for (const manga of $('div.panel_story_list div.story_item').toArray()) {
+                const mangaId = $('a', manga).first().attr('href')
+                const image = $('img', manga).first().attr('src') ?? ''
+                const title = decodeHTML($('h3.story_name a', manga).first().text().trim() ?? '')
+                const subtitle = decodeHTML($('h3.story_name + em.story_chapter a', manga).text().trim() ?? '')
+
+                if (!mangaId || !title || collecedIds.includes(mangaId)) continue
+                results.push(App.createPartialSourceManga({
+                    mangaId: mangaId,
+                    image: image,
+                    title: title,
+                    subtitle: subtitle ? subtitle : 'No Chapters'
+                }))
+                collecedIds.push(mangaId)
+            }
+            metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined
+        }
+
         return App.createPagedResults({
             results: results,
             metadata: metadata
