@@ -13,7 +13,6 @@ import { MangaBox } from './MangaBox'
 
 import { getImageServer } from './MangaBoxSettings'
 
-
 export class MangaBoxParser {
     parseManga = ($: CheerioStatic, source: MangaBox): PartialSourceManga[] => {
         const mangaItems: PartialSourceManga[] = []
