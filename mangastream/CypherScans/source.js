@@ -15459,9 +15459,9 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   };
 
   // src/CypherScans/CypherScans.ts
-  var DOMAIN = "https://cypher-scans.xyz";
+  var DOMAIN = "https://cypheroscans.xyz";
   var CypherScansInfo = {
-    version: getExportVersion("0.0.1"),
+    version: getExportVersion("0.0.2"),
     name: "CypherScans",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
