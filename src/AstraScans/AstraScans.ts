@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://astrascans.org'
 
 export const AstraScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'AstraScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -29,6 +29,8 @@ export class AstraScans extends MangaStream {
 
     baseUrl: string = DOMAIN
 
+    override directoryPath = 'series'
+   
     override configureSections() {
         this.homescreen_sections['new_titles'].enabled = false
     }
