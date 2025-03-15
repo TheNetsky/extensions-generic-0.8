@@ -285,6 +285,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
+
         const $ = this.cheerio.load(response.data as string)
         const results = this.parser.parseManga($, this)
 
@@ -310,6 +312,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
+
         const $ = this.cheerio.load(response.data as string)
 
         const tags: Tag[] = []
@@ -353,6 +357,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
             })
 
             const response = await this.requestManager.schedule(request, 1)
+            this.checkResponseError(response)
+
             const $ = this.cheerio.load(response.data as string)
 
             results = this.parser.parseManga($, this)
@@ -372,6 +378,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
             })
 
             const response = await this.requestManager.schedule(request, 1)
+            this.checkResponseError(response)
+
             const $ = this.cheerio.load(response.data as string)
 
             const collecedIds: string[] = []
