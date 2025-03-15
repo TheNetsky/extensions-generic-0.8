@@ -12,7 +12,7 @@ import {
 const SITE_DOMAIN = 'https://www.mangabats.com'
 
 export const MangaBatInfo: SourceInfo = {
-    version: getExportVersion('4.0.0'),
+    version: getExportVersion('4.0.1'),
     name: 'MangaBat',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -21,7 +21,7 @@ export const MangaBatInfo: SourceInfo = {
     contentRating: ContentRating.MATURE,
     websiteBaseURL: SITE_DOMAIN,
     sourceTags: [],
-    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
+    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
 export class MangaBat extends MangaBox {
