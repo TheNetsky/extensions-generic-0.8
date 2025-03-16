@@ -12,7 +12,7 @@ import {
 const SITE_DOMAIN = 'https://www.manganato.gg'
 
 export const ManganatoInfo: SourceInfo = {
-    version: getExportVersion('4.0.0'),
+    version: getExportVersion('4.0.1'),
     name: 'Manganato',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -21,7 +21,7 @@ export const ManganatoInfo: SourceInfo = {
     contentRating: ContentRating.MATURE,
     websiteBaseURL: SITE_DOMAIN,
     sourceTags: [],
-    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS
+    intents: SourceIntents.SETTINGS_UI | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.MANGA_CHAPTERS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
 }
 
 export class Manganato extends MangaBox {
