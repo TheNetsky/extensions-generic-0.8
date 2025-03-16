@@ -1659,6 +1659,7 @@ var _Sources = (() => {
         method: "GET"
       });
       const response = await this.requestManager.schedule(request, 1);
+      this.checkResponseError(response);
       const $ = this.cheerio.load(response.data);
       const results = this.parser.parseManga($, this);
       metadata = !this.parser.isLastPage($) ? { page: page + 1 } : void 0;
@@ -1679,6 +1680,7 @@ var _Sources = (() => {
         method: "GET"
       });
       const response = await this.requestManager.schedule(request, 1);
+      this.checkResponseError(response);
       const $ = this.cheerio.load(response.data);
       const tags = [];
       for (const tag of $("div.panel-category tbody a").toArray()) {
@@ -1712,6 +1714,7 @@ var _Sources = (() => {
           method: "GET"
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         results = this.parser.parseManga($, this);
         metadata = !this.parser.isLastPage($) ? { page: page + 1 } : void 0;
@@ -1721,6 +1724,7 @@ var _Sources = (() => {
           method: "GET"
         });
         const response = await this.requestManager.schedule(request, 1);
+        this.checkResponseError(response);
         const $ = this.cheerio.load(response.data);
         const collecedIds = [];
         for (const manga of $("div.panel_story_list div.story_item").toArray()) {
@@ -1771,7 +1775,7 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
   // src/MangaBat/MangaBat.ts
   var SITE_DOMAIN = "https://www.mangabats.com";
   var MangaBatInfo = {
-    version: getExportVersion("4.0.0"),
+    version: getExportVersion("4.0.1"),
     name: "MangaBat",
     icon: "icon.png",
     author: "Batmeow",
@@ -1780,7 +1784,7 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
     contentRating: import_types2.ContentRating.MATURE,
     websiteBaseURL: SITE_DOMAIN,
     sourceTags: [],
-    intents: import_types2.SourceIntents.SETTINGS_UI | import_types2.SourceIntents.HOMEPAGE_SECTIONS | import_types2.SourceIntents.MANGA_CHAPTERS
+    intents: import_types2.SourceIntents.SETTINGS_UI | import_types2.SourceIntents.HOMEPAGE_SECTIONS | import_types2.SourceIntents.MANGA_CHAPTERS | import_types2.SourceIntents.CLOUDFLARE_BYPASS_REQUIRED
   };
   var MangaBat = class extends MangaBox {
     constructor() {
