@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://toonily.com'
 
 export const ToonilyInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'Toonily',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -36,5 +36,7 @@ export class Toonily extends Madara {
 
     override chapterEndpoint = 1
 
+    override directoryPath = 'serie'
+   
     override searchMangaSelector = 'div.page-item-detail.manga'
 }
