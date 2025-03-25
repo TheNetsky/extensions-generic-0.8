@@ -18,7 +18,7 @@ import {
 const DOMAIN = 'https://www.toongod.org'
 
 export const ToonGodInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'ToonGod',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -39,7 +39,7 @@ export class ToonGod extends Madara {
 
     baseUrl: string = DOMAIN
 
-    override directoryPath = 'webtoons'
+    override directoryPath = 'webtoon'
 
     override chapterEndpoint = 2
 
