@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://www.webtoon.xyz'
 
 export const WebtoonXYZInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'WebtoonXYZ',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -33,6 +33,8 @@ export const WebtoonXYZInfo: SourceInfo = {
 export class WebtoonXYZ extends Madara {
 
     baseUrl: string = DOMAIN
+
+    override directoryPath = 'read'
 
     override chapterEndpoint = 1
 }
