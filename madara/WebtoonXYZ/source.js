@@ -16125,7 +16125,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   // src/WebtoonXYZ/WebtoonXYZ.ts
   var DOMAIN = "https://www.webtoon.xyz";
   var WebtoonXYZInfo = {
-    version: getExportVersion("0.0.0"),
+    version: getExportVersion("0.0.1"),
     name: "WebtoonXYZ",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
@@ -16145,6 +16145,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
     constructor() {
       super(...arguments);
       this.baseUrl = DOMAIN;
+      this.directoryPath = "read";
       this.chapterEndpoint = 1;
     }
   };
