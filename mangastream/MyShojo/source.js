@@ -791,30 +791,7 @@ var _Sources = (() => {
       var numeric_unicode_map_1 = require_numeric_unicode_map();
       var surrogate_pairs_1 = require_surrogate_pairs();
       var allNamedReferences = __assign(__assign({}, named_references_1.namedReferences), { all: named_references_1.namedReferences.html5 });
-      function replaceUsingRegExp(macroText, macroRegExp, macroReplacer) {
-        macroRegExp.lastIndex = 0;
-        var replaceMatch = macroRegExp.exec(macroText);
-        var replaceResult;
-        if (replaceMatch) {
-          replaceResult = "";
-          var replaceLastIndex = 0;
-          do {
-            if (replaceLastIndex !== replaceMatch.index) {
-              replaceResult += macroText.substring(replaceLastIndex, replaceMatch.index);
-            }
-            var replaceInput = replaceMatch[0];
-            replaceResult += macroReplacer(replaceInput);
-            replaceLastIndex = replaceMatch.index + replaceInput.length;
-          } while (replaceMatch = macroRegExp.exec(macroText));
-          if (replaceLastIndex !== macroText.length) {
-            replaceResult += macroText.substring(replaceLastIndex);
-          }
-        } else {
-          replaceResult = macroText;
-        }
-        return replaceResult;
-      }
-      var encodeRegExps = { specialChars: /[<>'"&]/g, nonAscii: /[<>'"&\u0080-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/g, nonAsciiPrintable: /[<>'"&\x01-\x08\x11-\x15\x17-\x1F\x7f-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/g, nonAsciiPrintableOnly: /[\x01-\x08\x11-\x15\x17-\x1F\x7f-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/g, extensive: /[\x01-\x0c\x0e-\x1f\x21-\x2c\x2e-\x2f\x3a-\x40\x5b-\x60\x7b-\x7d\x7f-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/g };
+      var encodeRegExps = { specialChars: /[<>'"&]/g, nonAscii: /[<>'"&\u0080-\uD7FF\uE000-\uFFFF\uDC00-\uDFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]?/g, nonAsciiPrintable: /[<>'"&\x01-\x08\x11-\x15\x17-\x1F\x7f-\uD7FF\uE000-\uFFFF\uDC00-\uDFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]?/g, nonAsciiPrintableOnly: /[\x01-\x08\x11-\x15\x17-\x1F\x7f-\uD7FF\uE000-\uFFFF\uDC00-\uDFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]?/g, extensive: /[\x01-\x0c\x0e-\x1f\x21-\x2c\x2e-\x2f\x3a-\x40\x5b-\x60\x7b-\x7d\x7f-\uD7FF\uE000-\uFFFF\uDC00-\uDFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]?/g };
       var defaultEncodeOptions = { mode: "specialChars", level: "all", numeric: "decimal" };
       function encode(text3, _a2) {
         var _b = _a2 === void 0 ? defaultEncodeOptions : _a2, _c = _b.mode, mode = _c === void 0 ? "specialChars" : _c, _d = _b.numeric, numeric = _d === void 0 ? "decimal" : _d, _e = _b.level, level = _e === void 0 ? "all" : _e;
@@ -824,7 +801,7 @@ var _Sources = (() => {
         var encodeRegExp = encodeRegExps[mode];
         var references = allNamedReferences[level].characters;
         var isHex = numeric === "hexadecimal";
-        return replaceUsingRegExp(text3, encodeRegExp, function(input) {
+        return text3.replace(encodeRegExp, function(input) {
           var result = references[input];
           if (!result) {
             var code = input.length > 1 ? surrogate_pairs_1.getCodePoint(input, 0) : input.charCodeAt(0);
@@ -878,7 +855,7 @@ var _Sources = (() => {
         var references = allNamedReferences[level].entities;
         var isAttribute = scope === "attribute";
         var isStrict = scope === "strict";
-        return replaceUsingRegExp(text3, decodeRegExp, function(entity) {
+        return text3.replace(decodeRegExp, function(entity) {
           return getDecodedEntity(entity, references, isAttribute, isStrict);
         });
       }
@@ -15459,9 +15436,9 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   };
 
   // src/MyShojo/MyShojo.ts
-  var DOMAIN = "https://mythicscans.com";
+  var DOMAIN = "https://mythicscans.net";
   var MyShojoInfo = {
-    version: getExportVersion("0.0.2"),
+    version: getExportVersion("0.0.3"),
     name: "MyShojo",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
