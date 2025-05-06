@@ -10,10 +10,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://reset-scans.co'
+const DOMAIN = 'https://rspro.xyz'
 
 export const ResetScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.8'),
+    version: getExportVersion('0.0.9'),
     name: 'ResetScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
