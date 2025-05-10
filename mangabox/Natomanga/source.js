@@ -1381,13 +1381,15 @@ var _Sources = (() => {
         const pages = [];
         const imageServer = await getImageServer(source.stateManager).then((server) => parseInt(server[0]?.replace("server", "") ?? "1") - 1);
         const cdnsMatch = ($("head").toString().match(/var cdns.*]/g) ?? [])[0]?.replace("var cdns = ", "");
-        const cdns = JSON.parse(cdnsMatch);
         for (const img of $(source.chapterImagesSelector).toArray()) {
           let image = $(img).attr("src") ?? "";
           if (!image) image = $(img).attr("data-src") ?? "";
           if (!image) throw new Error(`Unable to parse image(s) for Chapter ID: ${chapterId}`);
-          if (Array.isArray(cdns) && typeof cdns[imageServer] !== "undefined") {
-            for (const url of cdns) image = image.replace(url, cdns[imageServer]);
+          if (cdnsMatch) {
+            const cdns = JSON.parse(cdnsMatch);
+            if (Array.isArray(cdns) && typeof cdns[imageServer] !== "undefined") {
+              for (const url of cdns) image = image.replace(url, cdns[imageServer]);
+            }
           }
           pages.push(image);
         }
@@ -1484,7 +1486,7 @@ var _Sources = (() => {
   };
 
   // src/MangaBox.ts
-  var BASE_VERSION = "1.0.0";
+  var BASE_VERSION = "1.0.1";
   var getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split(".").map((x, index) => Number(x) + Number(EXTENSION_VERSION.split(".")[index])).join(".");
   };
@@ -1513,7 +1515,7 @@ var _Sources = (() => {
       // Selector for manga author.
       this.mangaAuthorSelector = "div.story-info-right td:contains(Author) + td a,ul.manga-info-text li:contains(Author) a";
       // Selector for manga description.
-      this.mangaDescSelector = "div#panel-story-info-description, div#noidungm, div.manga-info-top + div#contentBox";
+      this.mangaDescSelector = "div.chapter + div#contentBox, div#panel-story-info-description, div#noidungm, div.manga-info-top + div#contentBox";
       // Selector for manga tags.
       this.mangaGenresSelector = "div.story-info-right td:contains(Genre) + td a,ul.manga-info-text li:contains(Genres) a";
       // Selector for manga chapter list.
