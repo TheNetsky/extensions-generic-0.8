@@ -30,7 +30,7 @@ import {
     resetSettings
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '1.0.0'
+const BASE_VERSION = '1.0.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -96,7 +96,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         + 'ul.manga-info-text li:contains(Author) a'
 
     // Selector for manga description.
-    mangaDescSelector = 'div#panel-story-info-description, div#noidungm, div.manga-info-top + div#contentBox'
+    mangaDescSelector = 'div.chapter + div#contentBox, div#panel-story-info-description, div#noidungm, div.manga-info-top + div#contentBox'
 
     // Selector for manga tags.
     mangaGenresSelector = 'div.story-info-right td:contains(Genre) + td a,'
