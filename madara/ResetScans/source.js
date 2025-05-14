@@ -16583,9 +16583,9 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   };
 
   // src/ResetScans/ResetScans.ts
-  var DOMAIN = "https://rspro.xyz";
+  var DOMAIN = "https://reset-scans.org";
   var ResetScansInfo = {
-    version: getExportVersion("0.0.9"),
+    version: getExportVersion("0.0.10"),
     name: "ResetScans",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
