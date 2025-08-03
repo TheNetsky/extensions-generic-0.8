@@ -17031,7 +17031,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   // src/MadaraDex/MadaraDex.ts
   var DOMAIN = "https://madaradex.org";
   var MadaraDexInfo = {
-    version: getExportVersion("0.0.2"),
+    version: getExportVersion("0.0.3"),
     name: "MadaraDex",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
@@ -17053,6 +17053,32 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
       this.baseUrl = DOMAIN;
       this.chapterEndpoint = 1;
       this.searchMangaSelector = "div.c-tabs-item > div.row";
+      this.requestManager = App.createRequestManager({
+        requestsPerSecond: this.requestsPerSecond,
+        requestTimeout: this.requestTimeout,
+        interceptor: {
+          interceptRequest: async (request) => {
+            request.headers = {
+              ...request.headers ?? {},
+              ...{
+                "user-agent": "Paperback-iOS",
+                "referer": `${this.baseUrl}/`,
+                "origin": `${this.baseUrl}/`,
+                ...request.url.includes("wordpress.com") && { "Accept": "image/avif,image/webp,*/*" }
+                // Used for images hosted on Wordpress blogs
+              }
+            };
+            request.cookies = [
+              App.createCookie({ name: "wpmanga-adault", value: "1", domain: this.baseUrl }),
+              App.createCookie({ name: "toonily-mature", value: "1", domain: this.baseUrl })
+            ];
+            return request;
+          },
+          interceptResponse: async (response) => {
+            return response;
+          }
+        }
+      });
     }
   };
   return __toCommonJS(MadaraDex_exports);
