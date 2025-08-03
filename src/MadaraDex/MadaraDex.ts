@@ -2,7 +2,10 @@ import {
     ContentRating,
     SourceInfo,
     BadgeColor,
-    SourceIntents
+    SourceIntents,
+    RequestManager,
+    Request,
+    Response
 } from '@paperback/types'
 
 import {
@@ -13,7 +16,7 @@ import {
 const DOMAIN = 'https://madaradex.org'
 
 export const MadaraDexInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'MadaraDex',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -37,4 +40,33 @@ export class MadaraDex extends Madara {
     override chapterEndpoint = 1
 
     override searchMangaSelector = 'div.c-tabs-item > div.row'
+
+    override requestManager: RequestManager = App.createRequestManager({
+        requestsPerSecond: this.requestsPerSecond,
+        requestTimeout: this.requestTimeout,
+        interceptor: {
+            interceptRequest: async (request: Request): Promise<Request> => {
+
+                request.headers = {
+                    ...(request.headers ?? {}),
+                    ...{
+                        'user-agent': 'Paperback-iOS',
+                        'referer': `${this.baseUrl}/`,
+                        'origin': `${this.baseUrl}/`,
+                        ...(request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' }) // Used for images hosted on Wordpress blogs
+                    }
+                }
+                request.cookies = [
+                    App.createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl }),
+                    App.createCookie({ name: 'toonily-mature', value: '1', domain: this.baseUrl })
+                ]
+
+                return request
+            },
+
+            interceptResponse: async (response: Response): Promise<Response> => {
+                return response
+            }
+        }
+    })
 }
