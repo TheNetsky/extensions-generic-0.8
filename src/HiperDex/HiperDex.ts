@@ -10,10 +10,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://hiperdex.tv'
+const DOMAIN = 'https://hiperdex.com'
 
 export const HiperDexInfo: SourceInfo = {
-    version: getExportVersion('0.0.11'),
+    version: getExportVersion('0.0.12'),
     name: 'HiperDex',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
