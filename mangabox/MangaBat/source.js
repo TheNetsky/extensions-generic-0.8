@@ -1515,7 +1515,7 @@ var _Sources = (() => {
       // Selector for manga author.
       this.mangaAuthorSelector = "div.story-info-right td:contains(Author) + td a,ul.manga-info-text li:contains(Author) a";
       // Selector for manga description.
-      this.mangaDescSelector = "div.chapter + div#contentBox, div#panel-story-info-description, div#noidungm, div.manga-info-top + div#contentBox";
+      this.mangaDescSelector = "div.leftCol div#contentBox, div.chapter + div#contentBox, div#panel-story-info-description, div.manga-info-top + div#contentBox";
       // Selector for manga tags.
       this.mangaGenresSelector = "div.story-info-right td:contains(Genre) + td a,ul.manga-info-text li:contains(Genres) a";
       // Selector for manga chapter list.
@@ -1777,7 +1777,7 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
   // src/MangaBat/MangaBat.ts
   var SITE_DOMAIN = "https://www.mangabats.com";
   var MangaBatInfo = {
-    version: getExportVersion("4.0.1"),
+    version: getExportVersion("4.0.2"),
     name: "MangaBat",
     icon: "icon.png",
     author: "Batmeow",
@@ -1800,7 +1800,7 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
       // Appended path for manga list home sections.
       this.mangaListHomeSectionsPath = "all";
       // Selector for manga in manga list.
-      this.mangaListSelector = "div.truyen-list div.list-truyen-item-wrap";
+      this.mangaListSelector = "div.comic-list div.list-comic-item-wrap";
       // Selector for subtitle in manga list.
       this.mangaSubtitleSelector = "a.list-story-item-wrap-chapter";
       // CloudFlare Bypass url if required.
