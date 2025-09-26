@@ -12,7 +12,7 @@ import {
 const SITE_DOMAIN = 'https://www.mangakakalot.gg'
 
 export const MangakakalotGGInfo: SourceInfo = {
-    version: getExportVersion('0.1.3'),
+    version: getExportVersion('0.1.4'),
     name: 'MangakakalotGG',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -38,7 +38,7 @@ export class MangakakalotGG extends MangaBox {
     mangaListHomeSectionsPath = 'all'
 
     // Selector for manga in manga list.
-    mangaListSelector = 'div.truyen-list div.list-truyen-item-wrap'
+    mangaListSelector = 'div.comic-list div.list-comic-item-wrap'
 
     // Selector for subtitle in manga list.
     mangaSubtitleSelector = 'a.list-story-item-wrap-chapter'

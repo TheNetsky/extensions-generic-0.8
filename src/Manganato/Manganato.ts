@@ -12,7 +12,7 @@ import {
 const SITE_DOMAIN = 'https://www.manganato.gg'
 
 export const ManganatoInfo: SourceInfo = {
-    version: getExportVersion('4.0.1'),
+    version: getExportVersion('4.0.2'),
     name: 'Manganato',
     icon: 'icon.png',
     author: 'Batmeow',
@@ -38,7 +38,7 @@ export class Manganato extends MangaBox {
     mangaListHomeSectionsPath = 'all'
 
     // Selector for manga in manga list.
-    mangaListSelector = 'div.truyen-list div.list-truyen-item-wrap'
+    mangaListSelector = 'div.comic-list div.list-comic-item-wrap'
 
     // Selector for subtitle in manga list.
     mangaSubtitleSelector = 'a.list-story-item-wrap-chapter'
