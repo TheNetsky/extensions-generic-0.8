@@ -28,4 +28,9 @@ export const RDScansInfo: SourceInfo = {
 export class RDScans extends Madara {
 
     baseUrl: string = DOMAIN
+
+    override chapterEndpoint = 1
+
+    override chapterDetailsSelector = 'div.text-left img'
+
 }
