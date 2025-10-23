@@ -17029,13 +17029,13 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   };
 
   // src/CoffeeManga/CoffeeManga.ts
-  var DOMAIN = "https://coffeemanga.io";
+  var DOMAIN = "https://coffeemanga.moe";
   var CoffeeMangaInfo = {
     version: getExportVersion("0.0.0"),
     name: "CoffeeManga",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
-    authorWebsite: "http://github.com/TheNetsky",
+    authorWebsite: "https://github.com/TheNetsky",
     icon: "icon.png",
     contentRating: import_types3.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
