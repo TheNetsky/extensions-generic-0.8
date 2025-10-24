@@ -17029,9 +17029,9 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   };
 
   // src/CoffeeManga/CoffeeManga.ts
-  var DOMAIN = "https://coffeemanga.moe";
+  var DOMAIN = "https://coffeemanga.ink";
   var CoffeeMangaInfo = {
-    version: getExportVersion("0.0.0"),
+    version: getExportVersion("0.0.1"),
     name: "CoffeeManga",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
