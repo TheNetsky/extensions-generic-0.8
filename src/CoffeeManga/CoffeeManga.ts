@@ -10,10 +10,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://coffeemanga.moe'
+const DOMAIN = 'https://coffeemanga.ink'
 
 export const CoffeeMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'CoffeeManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
