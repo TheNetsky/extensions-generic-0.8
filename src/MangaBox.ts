@@ -93,7 +93,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
 
     // Selector for manga author.
     mangaAuthorSelector = 'div.story-info-right td:contains(Author) + td a,'
-        + 'ul.manga-info-text li:contains(Author) a'
+        + 'ul.manga-info-text li:contains(Author)'
 
     // Selector for manga description.
     mangaDescSelector = 'div.leftCol div#contentBox, div.chapter + div#contentBox, div#panel-story-info-description, div.manga-info-top + div#contentBox'
@@ -103,8 +103,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         + 'ul.manga-info-text li:contains(Genres) a'
 
     // Selector for manga chapter list.
-    chapterListSelector = 'div.panel-story-chapter-list ul.row-content-chapter li,'
-        + 'div.manga-info-chapter div.chapter-list div.row'
+    chapterListSelector = 'div#chapter div.manga-info-chapter div#chapter-list-container div.chapter-list div.row,'
+        + 'div.panel-story-chapter-list ul.row-content-chapter li'
 
     // Selector for manga chapter time updated.
     chapterTimeSelector = 'span.chapter-time, span:last-of-type'

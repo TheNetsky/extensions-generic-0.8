@@ -67,11 +67,7 @@ export class MangaBoxParser {
                 break
         }
 
-        const author = $(source.mangaAuthorSelector, mangaRootSelector)
-            .toArray()
-            .map(x => $(x).text().trim())
-            .join(', ') ?? ''
-
+        const author = $(source.mangaAuthorSelector, mangaRootSelector).first().text().replace('Author(s) :', '').trim()
         const desc = decodeHTML($(source.mangaDescSelector).first().children().remove().end().text().trim())
 
         const tags: Tag[] = []
