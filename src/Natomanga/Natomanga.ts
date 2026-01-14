@@ -12,7 +12,7 @@ import {
 const SITE_DOMAIN = 'https://www.natomanga.com'
 
 export const NatomangaInfo: SourceInfo = {
-    version: getExportVersion('0.1.4'),
+    version: getExportVersion('0.0.0'),
     name: 'Natomanga',
     icon: 'icon.png',
     author: 'Batmeow',

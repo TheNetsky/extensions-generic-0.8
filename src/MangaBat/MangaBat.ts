@@ -12,7 +12,7 @@ import {
 const SITE_DOMAIN = 'https://www.mangabats.com'
 
 export const MangaBatInfo: SourceInfo = {
-    version: getExportVersion('4.0.2'),
+    version: getExportVersion('4.0.0'),
     name: 'MangaBat',
     icon: 'icon.png',
     author: 'Batmeow',
