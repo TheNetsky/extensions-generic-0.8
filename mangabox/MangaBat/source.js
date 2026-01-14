@@ -1278,7 +1278,7 @@ var _Sources = (() => {
         const mangaItems = [];
         const collecedIds = [];
         for (const manga of $(source.mangaListSelector).toArray()) {
-          const mangaId = $("a", manga).first().attr("href");
+          const mangaId = this.idCleaner($("a", manga).attr("href") ?? "");
           const image = $("img", manga).first().attr("src")?.trim() ?? "";
           const title = decodeHTML($("a", manga).first().attr("title")?.trim() ?? "");
           const subtitle = $(source.mangaSubtitleSelector, manga).first().text().trim() ?? "";
@@ -1315,7 +1315,7 @@ var _Sources = (() => {
             status = "Ongoing";
             break;
         }
-        const author = $(source.mangaAuthorSelector, mangaRootSelector).toArray().map((x) => $(x).text().trim()).join(", ") ?? "";
+        const author = $(source.mangaAuthorSelector, mangaRootSelector).first().text().replace("Author(s) :", "").trim();
         const desc = decodeHTML($(source.mangaDescSelector).first().children().remove().end().text().trim());
         const tags = [];
         for (const tag of $(source.mangaGenresSelector, mangaRootSelector).toArray()) {
@@ -1343,20 +1343,15 @@ var _Sources = (() => {
           })
         });
       };
-      this.parseChapters = ($, mangaId, source) => {
+      this.parseChapters = (apiChapters, mangaId, source) => {
         const chapters = [];
         let sortingIndex = 0;
-        for (const chapter of $(source.chapterListSelector).toArray()) {
-          const id = $("a", chapter).attr("href") ?? "";
+        for (const chapter of apiChapters) {
+          const id = chapter.chapter_slug ?? "";
           if (!id) continue;
-          const name = decodeHTML($("a", chapter).text().trim());
-          const timeText = $(source.chapterTimeSelector, chapter).text().trim();
-          const time = this.parseDate(
-            (timeText.includes("a") ? timeText : $(source.chapterTimeSelector, chapter).attr("title")) ?? ""
-          );
-          let chapNum = 0;
-          const chapRegex = id.match(/(?:chap.*)[-_](\d+\.?\d?)/);
-          if (chapRegex && chapRegex[1]) chapNum = Number(chapRegex[1].replace(/\\/g, "."));
+          const name = decodeHTML(chapter.chapter_name?.trim() ?? "");
+          const time = new Date(chapter.updated_at?.trim() ?? "");
+          const chapNum = chapter.chapter_num ?? 0;
           chapters.push({
             id,
             chapNum: isNaN(chapNum) ? 0 : chapNum,
@@ -1422,24 +1417,6 @@ var _Sources = (() => {
         ];
         return TagSection2;
       };
-      this.parseDate = (date) => {
-        let time;
-        let number = Number((/\d*/.exec(date) ?? [])[0]);
-        number = number == 0 && date.includes("a") ? 1 : number;
-        date = date.toUpperCase();
-        if (date.includes("MINUTE") || date.includes("MINUTES") || date.includes("MINS")) {
-          time = new Date(Date.now() - number * 6e4);
-        } else if (date.includes("HOUR") || date.includes("HOURS")) {
-          time = new Date(Date.now() - number * 36e5);
-        } else if (date.includes("DAY") || date.includes("DAYS")) {
-          time = new Date(Date.now() - number * 864e5);
-        } else if (date.includes("YEAR") || date.includes("YEARS")) {
-          time = new Date(Date.now() - number * 31556952e3);
-        } else {
-          time = /* @__PURE__ */ new Date(`${date} UTC`);
-        }
-        return time;
-      };
       this.isLastPage = ($) => {
         const currentPage = $(".page-select, .page_select").text();
         let totalPages = $(".page-last, .page_last").text();
@@ -1449,6 +1426,13 @@ var _Sources = (() => {
         }
         return true;
       };
+    }
+    idCleaner(str) {
+      let cleanId = str;
+      cleanId = cleanId.replace(/\/$/, "");
+      cleanId = cleanId.split("/").pop() ?? null;
+      if (!cleanId) throw new Error(`Unable to parse id for ${str}`);
+      return cleanId;
     }
   };
 
@@ -1486,7 +1470,7 @@ var _Sources = (() => {
   };
 
   // src/MangaBox.ts
-  var BASE_VERSION = "1.0.1";
+  var BASE_VERSION = "2.0.0";
   var getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split(".").map((x, index) => Number(x) + Number(EXTENSION_VERSION.split(".")[index])).join(".");
   };
@@ -1513,13 +1497,13 @@ var _Sources = (() => {
       // Selector for manga status.
       this.mangaStatusSelector = "div.story-info-right td:contains(Status) + td,ul.manga-info-text li:contains(Status)";
       // Selector for manga author.
-      this.mangaAuthorSelector = "div.story-info-right td:contains(Author) + td a,ul.manga-info-text li:contains(Author) a";
+      this.mangaAuthorSelector = "div.story-info-right td:contains(Author) + td a,ul.manga-info-text li:contains(Author)";
       // Selector for manga description.
       this.mangaDescSelector = "div.leftCol div#contentBox, div.chapter + div#contentBox, div#panel-story-info-description, div.manga-info-top + div#contentBox";
       // Selector for manga tags.
       this.mangaGenresSelector = "div.story-info-right td:contains(Genre) + td a,ul.manga-info-text li:contains(Genres) a";
       // Selector for manga chapter list.
-      this.chapterListSelector = "div.panel-story-chapter-list ul.row-content-chapter li,div.manga-info-chapter div.chapter-list div.row";
+      this.chapterListSelector = "div#chapter div.manga-info-chapter div#chapter-list-container div.chapter-list div.row,div.panel-story-chapter-list ul.row-content-chapter li";
       // Selector for manga chapter time updated.
       this.chapterTimeSelector = "span.chapter-time, span:last-of-type";
       // Selector for manga chapter images.
@@ -1558,7 +1542,7 @@ var _Sources = (() => {
       }));
     }
     getMangaShareUrl(mangaId) {
-      return `${mangaId}`;
+      return `${this.baseURL}/manga/${mangaId}/`;
     }
     async getHomePageSections(sectionCallback) {
       const sections = [
@@ -1615,7 +1599,7 @@ var _Sources = (() => {
     }
     async getMangaDetails(mangaId) {
       const request = App.createRequest({
-        url: `${mangaId}`,
+        url: new URLBuilder(this.baseURL).addPathComponent("manga").addPathComponent(mangaId).buildUrl(),
         method: "GET"
       });
       const response = await this.requestManager.schedule(request, 1);
@@ -1623,22 +1607,38 @@ var _Sources = (() => {
       const $ = this.cheerio.load(response.data);
       return this.parser.parseMangaDetails($, mangaId, this);
     }
-    async getChapters(mangaId) {
+    async getChaptersAPI(mangaId, limit = 50, offset) {
       const request = App.createRequest({
-        url: `${mangaId}`,
+        url: new URLBuilder(this.baseURL).addPathComponent("api").addPathComponent("manga").addPathComponent(mangaId).addPathComponent("chapters").addQueryParameter("limit", limit.toString()).addQueryParameter("offset", offset.toString()).buildUrl(),
         method: "GET"
       });
       const response = await this.requestManager.schedule(request, 1);
       this.checkResponseError(response);
-      const $ = this.cheerio.load(response.data);
-      return this.parser.parseChapters($, mangaId, this);
+      if (!response.data) throw new Error("No data received from Chapter API");
+      return JSON.parse(response.data);
+    }
+    async getChapters(mangaId) {
+      const apiChapters = [];
+      let offset = 0;
+      let hasMore = true;
+      while (hasMore) {
+        const chapters_api_data = await this.getChaptersAPI(mangaId, 50, offset);
+        if (!chapters_api_data.success) throw new Error("API did not return success for chapters request");
+        apiChapters.push(...chapters_api_data.data.chapters);
+        if (!chapters_api_data.data.pagination.has_more) {
+          hasMore = false;
+          break;
+        }
+        offset += 50;
+      }
+      return this.parser.parseChapters(apiChapters, mangaId, this);
     }
     async getChapterDetails(mangaId, chapterId) {
       const cookieDomainRegex = chapterId.match(/(https?:\/\/[^\\/]+\/)/g);
       const cookieDomain = cookieDomainRegex ? cookieDomainRegex[0] : this.baseURL;
       const imageServer = await getImageServer(this.stateManager).then((value) => value[0]);
       const request = App.createRequest({
-        url: `${chapterId}`,
+        url: new URLBuilder(this.baseURL).addPathComponent("manga").addPathComponent(mangaId).addPathComponent(chapterId).buildUrl(),
         method: "GET",
         cookies: [
           App.createCookie({
@@ -1777,7 +1777,7 @@ Please go to the homepage of <${this.baseURL}> and press the cloud icon.`);
   // src/MangaBat/MangaBat.ts
   var SITE_DOMAIN = "https://www.mangabats.com";
   var MangaBatInfo = {
-    version: getExportVersion("4.0.2"),
+    version: getExportVersion("4.0.0"),
     name: "MangaBat",
     icon: "icon.png",
     author: "Batmeow",
