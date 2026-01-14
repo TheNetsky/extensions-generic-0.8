@@ -1470,7 +1470,7 @@ var _Sources = (() => {
   };
 
   // src/MangaBox.ts
-  var BASE_VERSION = "2.0.0";
+  var BASE_VERSION = "2.0.1";
   var getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split(".").map((x, index) => Number(x) + Number(EXTENSION_VERSION.split(".")[index])).join(".");
   };
@@ -1730,7 +1730,7 @@ var _Sources = (() => {
         const $ = this.cheerio.load(response.data);
         const collecedIds = [];
         for (const manga of $("div.panel_story_list div.story_item").toArray()) {
-          const mangaId = $("a", manga).first().attr("href");
+          const mangaId = this.parser.idCleaner($("a", manga).attr("href") ?? "");
           const image = $("img", manga).first().attr("src") ?? "";
           const title = decodeHTML($("h3.story_name a", manga).first().text().trim() ?? "");
           const subtitle = decodeHTML($("h3.story_name + em.story_chapter a", manga).text().trim() ?? "");
