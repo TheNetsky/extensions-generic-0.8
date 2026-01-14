@@ -30,7 +30,7 @@ import {
     resetSettings
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '1.0.1'
+const BASE_VERSION = '2.0.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -38,6 +38,14 @@ export const getExportVersion = (EXTENSION_VERSION: string): string => {
 export interface HomeSectionsParams {
     key: string
     values: [latest: string, newest: string, popular: string]
+}
+
+export interface APIChapter {
+    chapter_name: string
+    chapter_slug: string
+    chapter_num: number
+    updated_at: string
+    view: number
 }
 
 export abstract class MangaBox implements SearchResultsProviding, MangaProviding, ChapterProviding, HomePageSectionsProviding {
@@ -93,7 +101,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
 
     // Selector for manga author.
     mangaAuthorSelector = 'div.story-info-right td:contains(Author) + td a,'
-        + 'ul.manga-info-text li:contains(Author) a'
+        + 'ul.manga-info-text li:contains(Author)'
 
     // Selector for manga description.
     mangaDescSelector = 'div.leftCol div#contentBox, div.chapter + div#contentBox, div#panel-story-info-description, div.manga-info-top + div#contentBox'
@@ -103,8 +111,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         + 'ul.manga-info-text li:contains(Genres) a'
 
     // Selector for manga chapter list.
-    chapterListSelector = 'div.panel-story-chapter-list ul.row-content-chapter li,'
-        + 'div.manga-info-chapter div.chapter-list div.row'
+    chapterListSelector = 'div#chapter div.manga-info-chapter div#chapter-list-container div.chapter-list div.row,'
+        + 'div.panel-story-chapter-list ul.row-content-chapter li'
 
     // Selector for manga chapter time updated.
     chapterTimeSelector = 'span.chapter-time, span:last-of-type'
@@ -150,7 +158,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         }))
     }
 
-    getMangaShareUrl(mangaId: string): string { return `${mangaId}` }
+    getMangaShareUrl(mangaId: string): string { return `${this.baseURL}/manga/${mangaId}/` }
 
     async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
@@ -223,7 +231,10 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
 
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const request = App.createRequest({
-            url: `${mangaId}`,
+            url: new URLBuilder(this.baseURL)
+                .addPathComponent('manga')
+                .addPathComponent(mangaId)
+                .buildUrl(),
             method: 'GET'
         })
 
@@ -234,17 +245,44 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         return this.parser.parseMangaDetails($, mangaId, this)
     }
 
-    async getChapters(mangaId: string): Promise<Chapter[]> {
+    async getChaptersAPI(mangaId: string, limit = 50, offset: number): Promise<any> {
         const request = App.createRequest({
-            url: `${mangaId}`,
+            url: new URLBuilder(this.baseURL)
+                .addPathComponent('api')
+                .addPathComponent('manga')
+                .addPathComponent(mangaId)
+                .addPathComponent('chapters')
+                .addQueryParameter('limit', limit.toString())
+                .addQueryParameter('offset', offset.toString())
+                .buildUrl(),
             method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
         this.checkResponseError(response)
 
-        const $ = this.cheerio.load(response.data as string)
-        return this.parser.parseChapters($, mangaId, this)
+        if (!response.data) throw new Error('No data received from Chapter API')
+        return JSON.parse(response.data)
+    }
+
+    async getChapters(mangaId: string): Promise<Chapter[]> {
+        const apiChapters: APIChapter[] = []
+        let offset = 0
+        let hasMore = true
+
+        while (hasMore) {
+            const chapters_api_data = await this.getChaptersAPI(mangaId, 50, offset)
+            if (!chapters_api_data.success) throw new Error('API did not return success for chapters request')
+            apiChapters.push(...chapters_api_data.data.chapters)
+
+            if (!chapters_api_data.data.pagination.has_more) {
+                hasMore = false
+                break
+            }
+            offset += 50
+        }
+
+        return this.parser.parseChapters(apiChapters, mangaId, this)
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
@@ -253,7 +291,11 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         const imageServer = await getImageServer(this.stateManager).then(value => value[0])
 
         const request = App.createRequest({
-            url: `${chapterId}`,
+            url: new URLBuilder(this.baseURL)
+                .addPathComponent('manga')
+                .addPathComponent(mangaId)
+                .addPathComponent(chapterId)
+                .buildUrl(),
             method: 'GET',
             cookies: [
                 App.createCookie({

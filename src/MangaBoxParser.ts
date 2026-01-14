@@ -9,7 +9,10 @@ import {
 
 import { decodeHTML } from 'entities'
 
-import { MangaBox } from './MangaBox'
+import {
+    APIChapter,
+    MangaBox
+} from './MangaBox'
 
 import { getImageServer } from './MangaBoxSettings'
 
@@ -19,7 +22,7 @@ export class MangaBoxParser {
         const collecedIds: string[] = []
 
         for (const manga of $(source.mangaListSelector).toArray()) {
-            const mangaId = $('a', manga).first().attr('href')
+            const mangaId = this.idCleaner($('a', manga).attr('href') ?? '')
             const image = $('img', manga).first().attr('src')?.trim() ?? ''
             const title = decodeHTML($('a', manga).first().attr('title')?.trim() ?? '')
             const subtitle = $(source.mangaSubtitleSelector, manga).first().text().trim() ?? ''
@@ -67,11 +70,7 @@ export class MangaBoxParser {
                 break
         }
 
-        const author = $(source.mangaAuthorSelector, mangaRootSelector)
-            .toArray()
-            .map(x => $(x).text().trim())
-            .join(', ') ?? ''
-
+        const author = $(source.mangaAuthorSelector, mangaRootSelector).first().text().replace('Author(s) :', '').trim()
         const desc = decodeHTML($(source.mangaDescSelector).first().children().remove().end().text().trim())
 
         const tags: Tag[] = []
@@ -103,23 +102,17 @@ export class MangaBoxParser {
         })
     }
 
-    parseChapters = ($: CheerioStatic, mangaId: string, source: MangaBox): Chapter[] => {
+    parseChapters = (apiChapters: APIChapter[], mangaId: string, source: MangaBox): Chapter[] => {
         const chapters: Chapter[] = []
         let sortingIndex = 0
 
-        for (const chapter of $(source.chapterListSelector).toArray()) {
-            const id = $('a', chapter).attr('href') ?? ''
+        for (const chapter of apiChapters) {
+            const id = chapter.chapter_slug ?? ''
             if (!id) continue
 
-            const name = decodeHTML($('a', chapter).text().trim())
-            const timeText = $(source.chapterTimeSelector, chapter).text().trim()
-            const time = this.parseDate(
-                (timeText.includes('a') ? timeText : $(source.chapterTimeSelector, chapter).attr('title')) ?? ''
-            )
-
-            let chapNum = 0
-            const chapRegex = id.match(/(?:chap.*)[-_](\d+\.?\d?)/)
-            if (chapRegex && chapRegex[1]) chapNum = Number(chapRegex[1].replace(/\\/g, '.'))
+            const name = decodeHTML(chapter.chapter_name?.trim() ?? '')
+            const time = new Date(chapter.updated_at?.trim() ?? '')
+            const chapNum = chapter.chapter_num ?? 0
 
             chapters.push({
                 id: id,
@@ -162,7 +155,6 @@ export class MangaBoxParser {
                     for (const url of cdns) image = image.replace(url, cdns[imageServer])
                 }
             }
-
             pages.push(image)
         }
 
@@ -200,26 +192,6 @@ export class MangaBoxParser {
         return TagSection
     }
 
-    parseDate = (date: string): Date => {
-        let time: Date
-        let number = Number((/\d*/.exec(date) ?? [])[0])
-        number = (number == 0 && date.includes('a')) ? 1 : number
-        date = date.toUpperCase()
-        if (date.includes('MINUTE') || date.includes('MINUTES') || date.includes('MINS')) {
-            time = new Date(Date.now() - (number * 60000))
-        } else if (date.includes('HOUR') || date.includes('HOURS')) {
-            time = new Date(Date.now() - (number * 3600000))
-        } else if (date.includes('DAY') || date.includes('DAYS')) {
-            time = new Date(Date.now() - (number * 86400000))
-        } else if (date.includes('YEAR') || date.includes('YEARS')) {
-            time = new Date(Date.now() - (number * 31556952000))
-        } else {
-            time = new Date(`${date} UTC`)
-        }
-
-        return time
-    }
-
     isLastPage = ($: CheerioStatic): boolean => {
         const currentPage = $('.page-select, .page_select').text()
         let totalPages = $('.page-last, .page_last').text()
@@ -230,5 +202,14 @@ export class MangaBoxParser {
         }
 
         return true
+    }
+
+    idCleaner(str: string): string {
+        let cleanId: string | null = str
+        cleanId = cleanId.replace(/\/$/, '')
+        cleanId = cleanId.split('/').pop() ?? null
+
+        if (!cleanId) throw new Error(`Unable to parse id for ${str}`) // Log to logger
+        return cleanId
     }
 }
