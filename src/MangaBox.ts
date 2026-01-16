@@ -264,7 +264,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         if (!response.data) throw new Error('No data received from Chapter API')
 
         try {
-        return JSON.parse(response.data)
+            return JSON.parse(response.data)
         }
         catch (e) {
             throw new Error(`Failed to parse chapter JSON for ${mangaId}!`)
