@@ -44,5 +44,5 @@ export class Manganato extends MangaBox {
     mangaSubtitleSelector = 'a.list-story-item-wrap-chapter'
 
     // CloudFlare Bypass url if required.
-    bypassPage = ''
+    bypassPage = `${this.baseURL}/search/story/`
 }
