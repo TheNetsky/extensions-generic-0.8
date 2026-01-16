@@ -30,7 +30,7 @@ import {
     resetSettings
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '2.0.1'
+const BASE_VERSION = '2.0.2'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -262,16 +262,24 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
         this.checkResponseError(response)
 
         if (!response.data) throw new Error('No data received from Chapter API')
-        return JSON.parse(response.data)
+
+        try {
+            return JSON.parse(response.data)
+        }
+        catch (e) {
+            throw new Error(`Failed to parse chapter JSON for ${mangaId}!`)
+        }
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const apiChapters: APIChapter[] = []
+
+        const limit = 5000
         let offset = 0
         let hasMore = true
 
         while (hasMore) {
-            const chapters_api_data = await this.getChaptersAPI(mangaId, 50, offset)
+            const chapters_api_data = await this.getChaptersAPI(mangaId, limit, offset)
             if (!chapters_api_data.success) throw new Error('API did not return success for chapters request')
             apiChapters.push(...chapters_api_data.data.chapters)
 
@@ -279,7 +287,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
                 hasMore = false
                 break
             }
-            offset += 50
+            offset += limit
         }
 
         return this.parser.parseChapters(apiChapters, mangaId, this)
