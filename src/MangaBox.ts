@@ -267,11 +267,13 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const apiChapters: APIChapter[] = []
+
+        const limit = 5000
         let offset = 0
         let hasMore = true
 
         while (hasMore) {
-            const chapters_api_data = await this.getChaptersAPI(mangaId, 50, offset)
+            const chapters_api_data = await this.getChaptersAPI(mangaId, limit, offset)
             if (!chapters_api_data.success) throw new Error('API did not return success for chapters request')
             apiChapters.push(...chapters_api_data.data.chapters)
 
@@ -279,7 +281,7 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
                 hasMore = false
                 break
             }
-            offset += 50
+            offset += limit
         }
 
         return this.parser.parseChapters(apiChapters, mangaId, this)
