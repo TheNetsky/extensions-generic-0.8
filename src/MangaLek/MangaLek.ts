@@ -12,7 +12,7 @@ import {
 
 import { MangaLekParser } from './MangaLekParser'
 
-const DOMAIN = 'https://lek-manga.net'
+const DOMAIN = 'https://lekmanga.net'
 
 export const MangaLekInfo: SourceInfo = {
     version: getExportVersion('0.0.6'),
