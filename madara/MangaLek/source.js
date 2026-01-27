@@ -17154,7 +17154,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   // src/MangaLek/MangaLek.ts
   var DOMAIN = "https://lekmanga.net";
   var MangaLekInfo = {
-    version: getExportVersion("0.0.7"),
+    version: getExportVersion("0.0.5"),
     name: "MangaLek",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
