@@ -3396,9 +3396,6 @@ var _Sources = (() => {
     CharacterCode2[CharacterCode2["Exclamation"] = 33] = "Exclamation";
   })(CharacterCode || (CharacterCode = {}));
   function isHtml(str) {
-    if (typeof str !== "string") {
-      return false;
-    }
     const tagStart = str.indexOf("<");
     if (tagStart === -1 || tagStart > str.length - 3)
       return false;
@@ -5282,7 +5279,6 @@ var _Sources = (() => {
         }
         return this.attr("multiple") ? option.toArray().map((el) => text(el.children)) : option.attr("value");
       }
-      case "button":
       case "input":
       case "option": {
         return querying ? this.attr("value") : this.attr("value", value);
@@ -6986,7 +6982,7 @@ var _Sources = (() => {
   }
 
   // node_modules/cheerio/dist/browser/api/traversing.js
-  var reContextSelector = /^\s*(?:[+~]|:scope\b)/;
+  var reSiblingSelector = /^\s*[+~]/;
   function find3(selectorOrHaystack) {
     if (!selectorOrHaystack) {
       return this._make([]);
@@ -7001,7 +6997,7 @@ var _Sources = (() => {
   function _findBySelector(selector, limit) {
     var _a5;
     const context = this.toArray();
-    const elems = reContextSelector.test(selector) ? context : this.children().toArray();
+    const elems = reSiblingSelector.test(selector) ? context : this.children().toArray();
     const options = {
       context,
       root: (_a5 = this._root) === null || _a5 === void 0 ? void 0 : _a5[0],
@@ -7072,25 +7068,15 @@ var _Sources = (() => {
     return elems.length > 1 ? Array.from(new Set(elems)) : elems;
   }
   var parent = _singleMatcher(({ parent: parent2 }) => parent2 && !isDocument(parent2) ? parent2 : null, _removeDuplicates);
-  var parents = _matcher(
-    (elem) => {
-      const matched = [];
-      while (elem.parent && !isDocument(elem.parent)) {
-        matched.push(elem.parent);
-        elem = elem.parent;
-      }
-      return matched;
-    },
-    uniqueSort,
-    // eslint-disable-next-line unicorn/no-array-reverse
-    (elems) => elems.reverse()
-  );
-  var parentsUntil = _matchUntil(
-    ({ parent: parent2 }) => parent2 && !isDocument(parent2) ? parent2 : null,
-    uniqueSort,
-    // eslint-disable-next-line unicorn/no-array-reverse
-    (elems) => elems.reverse()
-  );
+  var parents = _matcher((elem) => {
+    const matched = [];
+    while (elem.parent && !isDocument(elem.parent)) {
+      matched.push(elem.parent);
+      elem = elem.parent;
+    }
+    return matched;
+  }, uniqueSort, (elems) => elems.reverse());
+  var parentsUntil = _matchUntil(({ parent: parent2 }) => parent2 && !isDocument(parent2) ? parent2 : null, uniqueSort, (elems) => elems.reverse());
   function closest(selector) {
     var _a5;
     const set = [];
@@ -17154,7 +17140,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`);
   // src/MangaLek/MangaLek.ts
   var DOMAIN = "https://lekmanga.net";
   var MangaLekInfo = {
-    version: getExportVersion("0.0.5"),
+    version: getExportVersion("0.0.7"),
     name: "MangaLek",
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: "Netsky",
