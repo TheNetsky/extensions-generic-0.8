@@ -11,24 +11,26 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww9.tokyoghoulre.com'
+const DOMAIN = 'https://tokyoghoulre.com'
 
 export const ReadTokyoGhoulInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'ReadTokyoGhoul',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'MuhamedZ1',
-    authorWebsite: 'http://github.com/MuhamedZ1',
+    author: 'EmZedH',
+    authorWebsite: 'http://github.com/EmZedH',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 }
 
 export class ReadTokyoGhoul extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/LGjBype.png'
 
     baseSourceList: SourceBase[] = [
         {
@@ -58,6 +60,10 @@ export class ReadTokyoGhoul extends MangaCatalog {
         {
             title: 'ReadTokyoGhoul (Tokyo Ghoul:re Light Novels)',
             url: DOMAIN + '/manga/tokyo-ghoul-re-light-novels'
+        },
+        {
+            title: 'ReadTokyoGhoul (Choujin X)',
+            url: DOMAIN + '/manga/choujin-x'
         }
     ]
 }

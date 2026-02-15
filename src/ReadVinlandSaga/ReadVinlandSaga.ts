@@ -11,24 +11,26 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww2.readvinlandsaga.com'
+const DOMAIN = 'https://readvinlandsaga.com'
 
 export const ReadVinlandSagaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ReadVinlandSaga',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'MuhamedZ1',
-    authorWebsite: 'http://github.com/MuhamedZ1',
+    author: 'EmZedH',
+    authorWebsite: 'http://github.com/EmZedH',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 }
 
 export class ReadVinlandSaga extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/yv8QOj4.png'
 
     baseSourceList: SourceBase[] = [
         {

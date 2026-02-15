@@ -11,24 +11,26 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww2.readtowerofgod.com'
+const DOMAIN = 'https://readtowerofgod.com'
 
 export const ReadTowerOfGodInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'ReadTowerOfGod',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'MuhamedZ1',
-    authorWebsite: 'http://github.com/MuhamedZ1',
+    author: 'EmZedH',
+    authorWebsite: 'http://github.com/EmZedH',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 }
 
 export class ReadTowerOfGod extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = ''
 
     baseSourceList: SourceBase[] = [
         {

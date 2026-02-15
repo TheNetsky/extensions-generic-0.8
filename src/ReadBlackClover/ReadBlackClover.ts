@@ -11,24 +11,26 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww7.readblackclover.com'
+const DOMAIN = 'https://readblackclover.com'
 
 export const ReadBlackCloverInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'ReadBlackClover',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'MuhamedZ1',
-    authorWebsite: 'http://github.com/MuhamedZ1',
+    author: 'EmZedH',
+    authorWebsite: 'http://github.com/EmZedH',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 }
 
 export class ReadBlackClover extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/pKG50Z8.png'
 
     baseSourceList: SourceBase[] = [
         {

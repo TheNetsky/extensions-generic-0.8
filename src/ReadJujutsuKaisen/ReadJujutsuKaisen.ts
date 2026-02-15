@@ -11,24 +11,26 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww2.readjujutsukaisen.com'
+const DOMAIN = 'https://readjujutsukaisen.com'
 
 export const ReadJujutsuKaisenInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'ReadJujutsuKaisen',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'MuhamedZ1',
-    authorWebsite: 'http://github.com/MuhamedZ1',
+    author: 'EmZedH',
+    authorWebsite: 'http://github.com/EmZedH',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 }
 
 export class ReadJujutsuKaisen extends MangaCatalog {
 
     baseUrl: string = DOMAIN
+
+    iconUrl = 'https://i.imgur.com/AHz5hzf.png'
 
     baseSourceList: SourceBase[] = [
         {

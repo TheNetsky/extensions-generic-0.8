@@ -11,18 +11,18 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://ww3.readopm.com'
+const DOMAIN = 'https://readopm.com'
 
 export const ReadOnePunchManInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'ReadOnePunchMan',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'MuhamedZ1',
-    authorWebsite: 'http://github.com/MuhamedZ1',
+    author: 'EmZedH',
+    authorWebsite: 'http://github.com/EmZedH',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 }
 
@@ -30,8 +30,9 @@ export class ReadOnePunchMan extends MangaCatalog {
 
     baseUrl: string = DOMAIN
 
+    iconUrl = 'https://i0.wp.com/ww4.readopm.com/wp-content/uploads/2017/01/keep-calm-and-read-manga-1.png'
+
     override mangaTitleSelector = 'h2 > span'
-    override mangaImageSelector = '.card-img-right'
     override mangaDescriptionSelector = 'div.card.flex-md-row.mb-4.box-shadow.h-md-250 > div > p:nth-child(3)'
 
     override chaptersArraySelector = 'tbody.no-border-x > tr'

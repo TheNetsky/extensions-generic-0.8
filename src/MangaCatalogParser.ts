@@ -9,7 +9,7 @@ import entities = require('entities')
 export class Parser {
 
     parseMangaDetails = ($: CheerioStatic, mangaId: string, source: any): SourceManga => {
-        const image = $(source.mangaImageSelector).attr('src') ?? ''
+        const image = source.iconUrl
         const title = this.decodeHTMLEntity($(source.mangaTitleSelector).text().trim())
         const description = this.decodeHTMLEntity($(source.mangaDescriptionSelector).text().trim())
 
@@ -29,8 +29,7 @@ export class Parser {
         let sortingIndex = 0
 
         for (const chapter of $(source.chaptersArraySelector).toArray()) {
-            const title: string = $(source.chapterTitleSelector, chapter).text()
-            const id: string = $(source.chapterIdSelector, chapter).attr('href')?.split('/')[4] ?? ''
+            const id: string = this.idCleaner($('a', chapter).attr('href') ?? '')
 
             const chapNumRegex = id.match(/(\d+\.?\d?)+/)
 
@@ -45,14 +44,14 @@ export class Parser {
             }
 
             if (!id || typeof id === 'undefined') {
-                throw new Error(`Could not parse out ID when getting chapters for postId:${mangaId}`)
+                continue
             }
 
             chapters.push({
                 id: id,
                 langCode: source.language,
                 chapNum: chapNum,
-                name: title,
+                name: 'Chapter ' + chapNum,
                 time: date,
                 sortingIndex,
                 volume: 0,
@@ -77,7 +76,7 @@ export class Parser {
         for (const img of $(source.chapterImageSelector, source.chapterImagesArraySelector).toArray()) {
             const image = img.attribs['src']
             if (!image) continue
-            pages.push(image)
+            pages.push(image.trim())
         }
 
         const chapterDetails = App.createChapterDetails({
@@ -92,5 +91,14 @@ export class Parser {
     // UTILITY METHODS
     decodeHTMLEntity(str: string): string {
         return entities.decodeHTML(str)
+    }
+
+    idCleaner(str: string): string {
+        let cleanId: string | null = str
+        cleanId = cleanId.replace(/\/$/, '')
+        cleanId = cleanId.split('/').pop() ?? null
+
+        if (!cleanId) throw new Error(`Unable to parse id for ${str}`) // Log to logger
+        return cleanId
     }
 }

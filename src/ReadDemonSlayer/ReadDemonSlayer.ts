@@ -11,14 +11,14 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://readkingdom.com'
+const DOMAIN = 'https://demonslayermanga.com'
 
-export const ReadKingdomInfo: SourceInfo = {
+export const ReadDemonSlayerInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'ReadKingdom',
+    name: 'ReadDemonSlayer',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'EmZedH',
-    authorWebsite: 'http://github.com/EmZedH',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
@@ -26,24 +26,16 @@ export const ReadKingdomInfo: SourceInfo = {
     sourceTags: []
 }
 
-export class ReadKingdom extends MangaCatalog {
+export class ReadDemonSlayer extends MangaCatalog {
 
     baseUrl: string = DOMAIN
 
-    iconUrl = 'https://i.imgur.com/hCbdZKu.png'
+    iconUrl = 'https://i.imgur.com/aPt6kZ1.jpg'
 
     baseSourceList: SourceBase[] = [
         {
-            title: 'ReadKingdom (Kingdom)',
-            url: DOMAIN + '/manga/kingdom'
-        },
-        {
-            title: 'ReadKingdom (Li Mu)',
-            url: DOMAIN + '/manga/li-mu'
-        },
-        {
-            title: 'ReadKingdom (Meng Wu and Chu Zi: One-Shot)',
-            url: DOMAIN + '/manga/meng-wu-and-chu-zi-one-shot'
+            title: 'ReadDemonSlayer (Demon Slayer: Kimetsu no Yaiba)',
+            url: DOMAIN + '/manga/demon-slayer-kimetsu-no-yaiba'
         }
     ]
 }

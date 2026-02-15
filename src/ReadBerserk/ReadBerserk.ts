@@ -18,12 +18,12 @@ export const ReadBerserkInfo: SourceInfo = {
     version: getExportVersion('0.0.1'),
     name: 'ReadBerserk',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'EmZedace',
+    author: 'EmZedH',
     authorWebsite: 'http://github.com/EmZedH',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
-    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS,
+    intents: SourceIntents.MANGA_CHAPTERS | SourceIntents.HOMEPAGE_SECTIONS | SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
     sourceTags: []
 }
 
@@ -36,8 +36,9 @@ export class ReadBerserk extends MangaCatalog {
 
     baseUrl: string = DOMAIN
 
+    iconUrl = 'https://i0.wp.com/readberserk.com/wp-content/uploads/2017/06/berserk-1.jpg'
+
     override mangaTitleSelector = 'h2 > span'
-    override mangaImageSelector = '.card-img-right'
     override mangaDescriptionSelector = 'div.card.flex-md-row.mb-4.box-shadow.h-md-250 > div > p:nth-child(3)'
 
     override chaptersArraySelector = 'tbody.no-border-x > tr'

@@ -11,14 +11,14 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://readnoblesse.com'
+const DOMAIN = 'https://readbleachmanga.com/'
 
-export const ReadNoblesseInfo: SourceInfo = {
+export const ReadBleachInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'ReadNoblesse',
+    name: 'ReadBleach',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'EmZedH',
-    authorWebsite: 'http://github.com/EmZedH',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
@@ -26,28 +26,24 @@ export const ReadNoblesseInfo: SourceInfo = {
     sourceTags: []
 }
 
-export class ReadNoblesse extends MangaCatalog {
+export class ReadBleach extends MangaCatalog {
 
     baseUrl: string = DOMAIN
 
-    iconUrl = ''
+    iconUrl = 'https://i.imgur.com/Vf65wQL.png'
 
     baseSourceList: SourceBase[] = [
         {
-            title: 'ReadNoblesse (Noblesse)',
-            url: DOMAIN + '/manga/noblesse'
+            title: 'ReadBleach (Bleach)',
+            url: DOMAIN + '/manga/bleach'
         },
         {
-            title: 'ReadNoblesse (Noblesse: Rai\'s Adventure)',
-            url: DOMAIN + '/manga/noblesse-rais-adventure'
+            title: 'ReadBleach (Bleach Digital Colored Comics)',
+            url: DOMAIN + '/manga/bleach-digital-colored-comics'
         },
         {
-            title: 'ReadNoblesse (Noblesse S)',
-            url: DOMAIN + '/manga/noblesse-s'
-        },
-        {
-            title: 'ReadNoblesse (Ability)',
-            url: DOMAIN + '/manga/ability'
+            title: 'ReadBleach (Bleach One Shot: Burn the Witch)',
+            url: DOMAIN + '/manga/bleach-one-shot-burn-the-witch'
         }
     ]
 }

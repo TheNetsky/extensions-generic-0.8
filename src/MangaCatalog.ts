@@ -15,9 +15,12 @@ import {
 } from '@paperback/types'
 
 import { Parser } from './MangaCatalogParser'
-import { SourceBase, SourceBaseData } from './MangaCatalogInterface'
+import {
+    SourceBase,
+    SourceBaseData
+} from './MangaCatalogInterface'
 
-const BASE_VERSION = '0.0.0'
+const BASE_VERSION = '1.1.1'
 
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     // Thanks to https://github.com/TheNetsky/
@@ -30,19 +33,20 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
 
     abstract baseUrl: string
 
+    abstract iconUrl: string
+
     abstract baseSourceList: SourceBase[]
 
     private sourceData: SourceBaseData[] = [] // Store the manga 
 
     mangaTitleSelector = 'div.container > h1'
-    mangaImageSelector = 'div.flex > img'
     mangaDescriptionSelector = 'div.text-text-muted'
 
-    chaptersArraySelector = '.bg-bg-secondary.p-3.rounded.mb-3.shadow'
+    chaptersArraySelector = 'div.col-span-4'
     chapterTitleSelector = 'a.text'
     chapterIdSelector = 'a.text'
 
-    chapterImagesArraySelector = 'div.text-center'
+    chapterImagesArraySelector = 'div.my-3'
     chapterImageSelector = 'img'
     chapterDateSelector = ''
 
@@ -51,13 +55,14 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
     parser = new Parser()
 
     requestManager = App.createRequestManager({
-        requestsPerSecond: 4,
+        requestsPerSecond: 5,
         requestTimeout: 20000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
+                        'user-agent': await this.requestManager.getDefaultUserAgent(),
                         'referer': `${this.baseUrl}/`
                     }
                 }
@@ -78,6 +83,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseMangaDetails($, mangaId, this)
@@ -89,6 +95,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
             method: 'GET'
         })
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseChapters($, mangaId, this)
@@ -101,6 +108,7 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
         })
 
         const response = await this.requestManager.schedule(request, 1)
+        this.checkResponseError(response)
         const $ = this.cheerio.load(response.data as string)
 
         return this.parser.parseChapterDetails($, mangaId, chapterId, this)
@@ -147,14 +155,14 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
         })
     }
 
-    // Populat the "SourceBaseData" array
+    // Populate the "SourceBaseData" array
     async populateMangaList(): Promise<SourceBaseData[]> {
         // If the list is already populated, return list
         if (this.sourceData.length == this.baseSourceList.length) {
             return this.sourceData
         }
 
-        this.sourceData = []
+        const fetchPromises: Promise<void>[] = []
 
         for (const source of this.baseSourceList) {
             const request = App.createRequest({
@@ -162,27 +170,55 @@ export abstract class MangaCatalog implements SearchResultsProviding, MangaProvi
                 method: 'GET'
             })
 
-            const response = await this.requestManager.schedule(request, 1)
-            const $ = this.cheerio.load(response.data as string)
+            const fetchPromise = this.requestManager.schedule(request, 1)
+                .then(response => {
+                    this.checkResponseError(response)
+                    const $ = this.cheerio.load(response.data as string)
+                    const title: string = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim())
+                    const id: string = source.url.split('/')[4] || ''
 
-            const title: string = this.parser.decodeHTMLEntity($(this.mangaTitleSelector).text().trim())
-            const image: string = $(this.mangaImageSelector).attr('src') ?? ''
-            const id: string = source.url.split('/')[4] ?? ''
-
-            if (!id || !title) {
-                continue
-            }
-
-            this.sourceData.push({
-                data: source,
-                items: App.createPartialSourceManga({
-                    image: image,
-                    title: title,
-                    mangaId: id
+                    if (id && title) {
+                        this.sourceData.push({
+                            data: source,
+                            items: App.createPartialSourceManga({
+                                image: this.iconUrl,
+                                title: title,
+                                mangaId: id
+                            })
+                        })
+                    }
+                }).catch(error => {
+                    throw new Error(error)
                 })
-            })
+
+            fetchPromises.push(fetchPromise)
         }
 
+        await Promise.all(fetchPromises)
+
         return this.sourceData
+    }
+
+    async getCloudflareBypassRequestAsync(): Promise<Request> {
+        return App.createRequest({
+            url: `${this.baseUrl}/`,
+            method: 'GET',
+            headers: {
+                'referer': `${this.baseUrl}/`,
+                'origin': `${this.baseUrl}/`,
+                'user-agent': await this.requestManager.getDefaultUserAgent()
+            }
+        })
+    }
+
+    checkResponseError(response: Response): void {
+        const status = response.status
+        switch (status) {
+            case 403:
+            case 503:
+                throw new Error(`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`)
+            case 404:
+                throw new Error(`The requested page ${response.request.url} was not found!`)
+        }
     }
 }

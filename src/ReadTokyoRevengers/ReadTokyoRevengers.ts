@@ -11,14 +11,14 @@ import {
 
 import { SourceBase } from '../MangaCatalogInterface'
 
-const DOMAIN = 'https://readkingdom.com'
+const DOMAIN = 'https://readtokyorevengers.net'
 
-export const ReadKingdomInfo: SourceInfo = {
+export const ReadTokyoRevengersInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'ReadKingdom',
+    name: 'ReadTokyoRevengers',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'EmZedH',
-    authorWebsite: 'http://github.com/EmZedH',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
     websiteBaseURL: DOMAIN,
@@ -26,24 +26,20 @@ export const ReadKingdomInfo: SourceInfo = {
     sourceTags: []
 }
 
-export class ReadKingdom extends MangaCatalog {
+export class ReadTokyoRevengers extends MangaCatalog {
 
     baseUrl: string = DOMAIN
 
-    iconUrl = 'https://i.imgur.com/hCbdZKu.png'
+    iconUrl = 'https://i.imgur.com/Gwpyjgi.jpeg'
 
     baseSourceList: SourceBase[] = [
         {
-            title: 'ReadKingdom (Kingdom)',
-            url: DOMAIN + '/manga/kingdom'
+            title: 'ReadTokyoRevengers (Tokyo Revengers)',
+            url: DOMAIN + '/manga/tokyo-revengers'
         },
         {
-            title: 'ReadKingdom (Li Mu)',
-            url: DOMAIN + '/manga/li-mu'
-        },
-        {
-            title: 'ReadKingdom (Meng Wu and Chu Zi: One-Shot)',
-            url: DOMAIN + '/manga/meng-wu-and-chu-zi-one-shot'
+            title: 'ReadTokyoRevengers (Tokyo Revengers: Letter from Keisuke Baji)',
+            url: DOMAIN + '/manga/tokyo-revengers-letter-from-keisuke-baji'
         }
     ]
 }
