@@ -1696,9 +1696,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadBerserk = exports.ReadBerserkInfo = void 0;
 const types_1 = require("@paperback/types");
 const MangaCatalog_1 = require("../MangaCatalog");
+const ReadBerserkParser_1 = require("./ReadBerserkParser");
 const DOMAIN = 'https://readberserk.com';
 exports.ReadBerserkInfo = {
-    version: (0, MangaCatalog_1.getExportVersion)('0.0.0'),
+    version: (0, MangaCatalog_1.getExportVersion)('0.0.1'),
     name: 'ReadBerserk',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'EmZedH',
@@ -1710,8 +1711,8 @@ exports.ReadBerserkInfo = {
     sourceTags: []
 };
 class ReadBerserk extends MangaCatalog_1.MangaCatalog {
-    constructor() {
-        super(...arguments);
+    constructor(cheerio) {
+        super(cheerio);
         this.baseUrl = DOMAIN;
         this.iconUrl = 'https://i0.wp.com/readberserk.com/wp-content/uploads/2017/06/berserk-1.jpg';
         this.mangaTitleSelector = 'h2 > span';
@@ -1752,9 +1753,45 @@ class ReadBerserk extends MangaCatalog_1.MangaCatalog {
                 url: DOMAIN + '/manga/berserk-spoilers-raw'
             }
         ];
+        this.parser = new ReadBerserkParser_1.ReadBerserkParser();
     }
 }
 exports.ReadBerserk = ReadBerserk;
 
-},{"../MangaCatalog":70,"@paperback/types":61}]},{},[72])(72)
+},{"../MangaCatalog":70,"./ReadBerserkParser":73,"@paperback/types":61}],73:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReadBerserkParser = void 0;
+const MangaCatalogParser_1 = require("../MangaCatalogParser");
+class ReadBerserkParser extends MangaCatalogParser_1.Parser {
+    constructor() {
+        super(...arguments);
+        this.parseChapterDetails = ($, mangaId, chapterId, source) => {
+            const pages = [];
+            for (const img of $(source.chapterImageSelector, source.chapterImagesArraySelector).toArray()) {
+                let image = img.attribs['data-src'];
+                if (!image) {
+                    image = img.attribs['src'];
+                }
+                if (!image)
+                    continue;
+                // Sometimes random url param strings end up getting appended, so we are making 
+                // sure that this is an image link
+                const match = image.match(/(https?:\/\/[^\s]+?\.(?:jpe?g|png|webp|gif|svg))/i);
+                if (match) {
+                    pages.push(match[0]);
+                }
+            }
+            const chapterDetails = App.createChapterDetails({
+                id: chapterId,
+                mangaId: mangaId,
+                pages: pages
+            });
+            return chapterDetails;
+        };
+    }
+}
+exports.ReadBerserkParser = ReadBerserkParser;
+
+},{"../MangaCatalogParser":71}]},{},[72])(72)
 });
