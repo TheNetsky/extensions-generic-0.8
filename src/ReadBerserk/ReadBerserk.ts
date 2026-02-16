@@ -10,11 +10,12 @@ import {
 } from '../MangaCatalog'
 
 import { SourceBase } from '../MangaCatalogInterface'
+import { ReadBerserkParser } from './ReadBerserkParser'
 
 const DOMAIN = 'https://readberserk.com'
 
 export const ReadBerserkInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ReadBerserk',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'EmZedH',
@@ -27,6 +28,11 @@ export const ReadBerserkInfo: SourceInfo = {
 }
 
 export class ReadBerserk extends MangaCatalog {
+
+    constructor(cheerio: CheerioAPI) {
+        super(cheerio)
+        this.parser = new ReadBerserkParser()
+    }
 
     baseUrl: string = DOMAIN
 
