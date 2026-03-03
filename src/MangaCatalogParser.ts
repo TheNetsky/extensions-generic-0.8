@@ -72,11 +72,18 @@ export class Parser {
 
     parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string, source: any): ChapterDetails => {
         const pages: string[] = []
-
         for (const img of $(source.chapterImageSelector, source.chapterImagesArraySelector).toArray()) {
-            const image = img.attribs['src']
+            let image = img.attribs['data-src']
+            if (!image) {
+                image = img.attribs['src']
+            }
             if (!image) continue
-            pages.push(image.trim())
+            // Sometimes random url param strings end up getting appended, so we are making 
+            // sure that this is an image link
+            const match = image.match(/(https?:\/\/[^\s]+?\.(?:jpe?g|png|webp|gif|svg))/i);
+            if (match) {
+                pages.push(match[0])
+            }
         }
 
         const chapterDetails = App.createChapterDetails({
