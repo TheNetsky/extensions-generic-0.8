@@ -30,7 +30,7 @@ import {
     resetSettings
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '2.0.2'
+const BASE_VERSION = '2.0.3'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -127,8 +127,8 @@ export abstract class MangaBox implements SearchResultsProviding, MangaProviding
     stateManager = App.createSourceStateManager()
 
     requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
-        requestTimeout: 20000,
+        requestsPerSecond: 2,
+        requestTimeout: 25000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
                 request.headers = {
