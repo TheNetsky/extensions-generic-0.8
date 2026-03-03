@@ -1470,7 +1470,7 @@ var _Sources = (() => {
   };
 
   // src/MangaBox.ts
-  var BASE_VERSION = "2.0.2";
+  var BASE_VERSION = "2.0.3";
   var getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split(".").map((x, index) => Number(x) + Number(EXTENSION_VERSION.split(".")[index])).join(".");
   };
@@ -1511,8 +1511,8 @@ var _Sources = (() => {
       this.parser = new MangaBoxParser();
       this.stateManager = App.createSourceStateManager();
       this.requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
-        requestTimeout: 2e4,
+        requestsPerSecond: 2,
+        requestTimeout: 25e3,
         interceptor: {
           interceptRequest: async (request) => {
             request.headers = {
