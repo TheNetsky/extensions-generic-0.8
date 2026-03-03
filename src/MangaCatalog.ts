@@ -20,7 +20,7 @@ import {
     SourceBaseData
 } from './MangaCatalogInterface'
 
-const BASE_VERSION = '1.1.1'
+const BASE_VERSION = '1.1.2'
 
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     // Thanks to https://github.com/TheNetsky/
