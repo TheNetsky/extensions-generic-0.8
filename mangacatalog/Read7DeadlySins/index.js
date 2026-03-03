@@ -1438,7 +1438,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaCatalog = exports.getExportVersion = void 0;
 const types_1 = require("@paperback/types");
 const MangaCatalogParser_1 = require("./MangaCatalogParser");
-const BASE_VERSION = '1.1.1';
+const BASE_VERSION = '1.1.2';
 const getExportVersion = (EXTENSION_VERSION) => {
     // Thanks to https://github.com/TheNetsky/
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
@@ -1662,10 +1662,18 @@ class Parser {
         this.parseChapterDetails = ($, mangaId, chapterId, source) => {
             const pages = [];
             for (const img of $(source.chapterImageSelector, source.chapterImagesArraySelector).toArray()) {
-                const image = img.attribs['src'];
+                let image = img.attribs['data-src'];
+                if (!image) {
+                    image = img.attribs['src'];
+                }
                 if (!image)
                     continue;
-                pages.push(image.trim());
+                // Sometimes random url param strings end up getting appended, so we are making 
+                // sure that this is an image link
+                const match = image.match(/(https?:\/\/[^\s]+?\.(?:jpe?g|png|webp|gif|svg))/i);
+                if (match) {
+                    pages.push(match[0]);
+                }
             }
             const chapterDetails = App.createChapterDetails({
                 id: chapterId,
