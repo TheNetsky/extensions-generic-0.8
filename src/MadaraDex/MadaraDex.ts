@@ -47,15 +47,13 @@ export class MadaraDex extends Madara {
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
 
-                request.headers = {
-                    ...(request.headers ?? {}),
-                    ...{
-                        'user-agent': 'Paperback-iOS',
-                        'referer': `${this.baseUrl}/`,
-                        'origin': `${this.baseUrl}/`,
-                        ...(request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' }) // Used for images hosted on Wordpress blogs
-                    }
-                }
+                request.headers = ({
+                    ...request.headers,
+                    'user-agent': 'Paperback-iOS',
+                    'referer': `${this.baseUrl}/`,
+                    'origin': `${this.baseUrl}/`,
+                    ...request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' }
+                })
                 request.cookies = [
                     App.createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl }),
                     App.createCookie({ name: 'toonily-mature', value: '1', domain: this.baseUrl })

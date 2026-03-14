@@ -25,5 +25,8 @@
     "@paperback/types": "^0.8.7",
     "cheerio": "~1.1.0",
     "html-entities": "^2.5.2"
+  },
+  "overrides": {
+    "htmlparser2": "~10.0.0"
   }
 }
