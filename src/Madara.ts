@@ -25,7 +25,7 @@ import * as cheerio from 'cheerio'
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '3.2.1'
+const BASE_VERSION = '3.2.2'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -44,15 +44,13 @@ export abstract class Madara implements SearchResultsProviding, MangaProviding, 
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
 
-                request.headers = {
-                    ...(request.headers ?? {}),
-                    ...{
-                        'user-agent': await this.requestManager.getDefaultUserAgent(),
-                        'referer': `${this.baseUrl}/`,
-                        'origin': `${this.baseUrl}/`,
-                        ...(request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' }) // Used for images hosted on Wordpress blogs
-                    }
-                }
+                request.headers = ({
+                    ...request.headers,
+                    'user-agent': await this.requestManager.getDefaultUserAgent(),
+                    'referer': `${this.baseUrl}/`,
+                    'origin': `${this.baseUrl}/`,
+                    ...request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' }
+                })
                 request.cookies = [
                     App.createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl }),
                     App.createCookie({ name: 'toonily-mature', value: '1', domain: this.baseUrl })
